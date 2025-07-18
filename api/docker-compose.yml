@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  swagger-ui:
+    image: swaggerapi/swagger-ui:latest
+    container_name: soso-swagger-ui
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      # docs ディレクトリに置いた OpenAPI YAML ファイルを参照
+      SWAGGER_JSON: /docs/swagger.yaml
+    volumes:
+      # カレントディレクトリの docs フォルダをマウント
+      - ./docs:/docs:ro

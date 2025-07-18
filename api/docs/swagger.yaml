@@ -1,0 +1,917 @@
+openapi: 3.1.0
+info:
+  title: SOSO 配車サポート API
+  version: 0.1.0
+  description: SOSO配車サービスAPI
+servers:
+  - url: http://localhost:8080/api
+    description: ローカル開発用サーバ
+paths:
+  /users:
+    post:
+      summary: ユーザー登録API
+      description: 新規ユーザー登録
+      operationId: createUser
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreateRequest'
+      responses:
+        '201':
+          description: ユーザー登録成功レスポンス
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '400':
+          description: 入力値不正エラー
+    get:
+      summary: ユーザー一覧取得API
+      description: ユーザー一覧取得（取得数制限付き）
+      operationId: listUsers
+      tags:
+        - Users
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: limit
+          in: query
+          description: 取得上限件数
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 100
+            default: 50
+        - name: offset
+          in: query
+          description: 取得開始オフセット
+          schema:
+            type: integer
+            format: int32
+            minimum: 0
+            default: 0
+      responses:
+        '200':
+          description: ユーザー一覧取得成功レスポンス
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalCount:
+                    type: integer
+                    description: 総ユーザー件数
+                  count:
+                    type: integer
+                    description: 取得件数
+                  users:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/UserResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /users/{id}:
+    get:
+      summary: ユーザー情報取得API
+      description: ユーザー情報取得
+      operationId: getUser
+      tags:
+        - Users
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ユーザー識別子
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ユーザー情報取得成功レスポンス
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: ユーザー未登録エラー
+    put:
+      summary: ユーザー情報更新API
+      description: ユーザー情報更新
+      operationId: updateUser
+      tags:
+        - Users
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ユーザー識別子
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdateRequest'
+      responses:
+        '200':
+          description: ユーザー情報更新成功レスポンス
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '400':
+          description: 入力値不正エラー
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: ユーザー未登録エラー
+    delete:
+      summary: ユーザー削除API
+      description: ユーザー削除
+      operationId: deleteUser
+      tags:
+        - Users
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ユーザー識別子
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: ユーザー削除成功レスポンス
+        '400':
+          description: ID形式不正エラー
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: ユーザー未登録エラー
+
+  /auth/login:
+    post:
+      summary: ユーザーログインAPI
+      description: 登録ユーザー認証およびトークン発行
+      operationId: loginUser
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: 認証トークン返却
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '400':
+          description: リクエスト形式不正エラー
+        '401':
+          description: 認証情報不正エラー
+
+  /auth/logout:
+    post:
+      summary: ユーザーログアウトAPI
+      description: 認証トークン破棄
+      operationId: logoutUser
+      tags:
+        - Auth
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: ログアウト成功レスポンス
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /teams:
+    get:
+      summary: チーム一覧取得API
+      description: 参加可能チーム一覧取得
+      operationId: listTeams
+      tags:
+        - Teams
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: チーム一覧取得成功レスポンス
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TeamResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+    post:
+      summary: チーム作成API
+      description: チーム作成
+      operationId: createTeam
+      tags:
+        - Teams
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TeamCreateRequest'
+      responses:
+        '201':
+          description: チーム作成成功レスポンス
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamResponse'
+        '400':
+          description: 入力値不正エラー
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /teams/{teamId}:
+    get:
+      summary: チーム詳細取得API
+      description: チーム詳細取得
+      operationId: getTeam
+      tags:
+        - Teams
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: teamId
+          in: path
+          description: チーム識別子
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: チーム詳細取得成功レスポンス
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: チーム未登録エラー
+
+  /teams/{teamId}/members:
+    get:
+      summary: チームメンバー一覧取得API
+      description: チームメンバー一覧取得
+      operationId: listTeamMembers
+      tags:
+        - Teams
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: teamId
+          in: path
+          description: チーム識別子
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: チームメンバー一覧取得成功レスポンス
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TeamMemberResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+    post:
+      summary: チーム参加申請API
+      description: チーム参加申請
+      operationId: joinTeam
+      tags:
+        - Teams
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: teamId
+          in: path
+          description: チーム識別子
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: 参加申請成功レスポンス
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: チーム未登録エラー
+
+  /teams/{teamId}/reservations:
+    get:
+      summary: 配車希望一覧取得API
+      description: 指定期間の配車希望一覧取得
+      operationId: listReservations
+      tags:
+        - Reservations
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: teamId
+          in: path
+          description: チーム識別子
+          required: true
+          schema:
+            type: string
+        - name: start
+          in: query
+          description: 取得開始日時（YYYY-MM-DD）
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: end
+          in: query
+          description: 取得終了日時（YYYY-MM-DD）
+          required: true
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: 配車希望一覧取得成功レスポンス
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ReservationResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+    post:
+      summary: 配車希望登録API
+      description: 新規配車希望登録
+      operationId: createReservation
+      tags:
+        - Reservations
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReservationCreateRequest'
+      responses:
+        '201':
+          description: 配車希望登録成功レスポンス
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationResponse'
+        '400':
+          description: 入力値不正エラー
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /reservations/{reservationId}:
+    get:
+      summary: 配車希望取得API
+      description: 配車希望詳細取得
+      operationId: getReservation
+      tags:
+        - Reservations
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: reservationId
+          in: path
+          description: 配車希望識別子
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 配車希望取得成功レスポンス
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: 配車希望未登録エラー
+    patch:
+      summary: 配車希望更新API
+      description: 配車希望情報更新
+      operationId: updateReservation
+      tags:
+        - Reservations
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: reservationId
+          in: path
+          description: 配車希望識別子
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReservationCreateRequest'
+      responses:
+        '200':
+          description: 配車希望更新成功レスポンス
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationResponse'
+        '400':
+          description: 入力値不正エラー
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: 配車希望未登録エラー
+    delete:
+      summary: 配車希望削除API
+      description: 配車希望削除
+      operationId: deleteReservation
+      tags:
+        - Reservations
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: reservationId
+          in: path
+          description: 配車希望識別子
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: 配車希望削除成功レスポンス
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: 配車希望未登録エラー
+
+  /reservations/{reservationId}/participants:
+    post:
+      summary: 配車登録API
+      description: 配車への参加登録
+      operationId: registerReservation
+      tags:
+        - Reservations
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: reservationId
+          in: path
+          description: 配車希望識別子
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: 配車登録成功レスポンス
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: 配車希望未登録エラー
+
+  /reservations/{reservationId}/participants/{userId}:
+    delete:
+      summary: 配車キャンセルAPI
+      description: 配車参加キャンセル
+      operationId: cancelReservation
+      tags:
+        - Reservations
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: reservationId
+          in: path
+          description: 配車希望識別子
+          required: true
+          schema:
+            type: string
+        - name: userId
+          in: path
+          description: ユーザー識別子
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: 配車キャンセル成功レスポンス
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: 配車希望未登録エラー
+
+  /users/{userId}/reservations:
+    get:
+      summary: 自分の配車登録一覧取得API
+      description: 自身が登録した配車一覧取得
+      operationId: listMyReservations
+      tags:
+        - Reservations
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          description: ユーザー識別子
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 自分の配車登録一覧取得成功レスポンス
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ReservationResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    UnauthorizedError:
+      description: 認証情報不正エラー
+    ForbiddenError:
+      description: 権限不足エラー
+
+  schemas:
+    UserCreateRequest:
+      type: object
+      required:
+        - username
+        - password
+        - hasCar
+      properties:
+        username:
+          type: string
+          minLength: 1
+          maxLength: 64
+          description: ログインID
+          example: kitano_masaki
+        password:
+          type: string
+          format: password
+          minLength: 8
+          description: ログイン用パスワード
+          example: Passw0rd!123
+        hasCar:
+          type: boolean
+          description: 車所有および乗車可否
+          example: true
+        capacity:
+          type: integer
+          format: int32
+          minimum: 0
+          description: 車乗車定員（ドライバー含む最大人数、非所有時0）
+          example: 4
+
+    UserResponse:
+      type: object
+      required:
+        - id
+        - username
+        - hasCar
+      properties:
+        id:
+          type: string
+          description: ユーザー識別子
+          example: usr_12345
+        username:
+          type: string
+          description: ユーザー名
+          example: kitano_masaki
+        hasCar:
+          type: boolean
+          description: 車所有状況
+          example: true
+        capacity:
+          type: integer
+          format: int32
+          description: 車乗車定員
+          example: 4
+        createdAt:
+          type: string
+          format: date-time
+          description: ユーザー登録日時
+          example: 2025-07-16T12:34:56Z
+        modifiedAt:
+          type: string
+          format: date-time
+          description: ユーザー情報最終更新日時
+          example: 2025-07-17T09:00:00Z
+        sosoPoints:
+          type: integer
+          format: int32
+          description: SOSOポイント
+          example: 120
+
+    UserUpdateRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          minLength: 1
+          maxLength: 64
+          description: ログインID
+          example: kitano_masaki
+        password:
+          type: string
+          format: password
+          minLength: 8
+          description: ログイン用パスワード
+          example: NewP@ssw0rd
+        hasCar:
+          type: boolean
+          description: 車所有および乗車可否
+          example: false
+        capacity:
+          type: integer
+          format: int32
+          minimum: 0
+          description: 車乗車定員（ドライバー含む最大人数、非所有時0）
+          example: 0
+
+    LoginRequest:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+          description: ログインID
+          example: kitano_masaki
+        password:
+          type: string
+          format: password
+          description: ログイン用パスワード
+          example: Passw0rd!123
+
+    LoginResponse:
+      type: object
+      required:
+        - token
+        - expiresIn
+      properties:
+        token:
+          type: string
+          description: 認証トークン
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        expiresIn:
+          type: integer
+          format: int32
+          description: トークン有効期限（秒）
+          example: 3600
+
+    TeamCreateRequest:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          description: チーム名
+          example: 開発チーム
+        description:
+          type: string
+          description: チーム説明
+          example: 社内配車管理用チーム
+
+    TeamResponse:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: string
+          description: チーム識別子
+          example: team_12345
+        name:
+          type: string
+          description: チーム名
+          example: 開発チーム
+        description:
+          type: string
+          description: チーム説明
+          example: 社内配車管理用チーム
+        ownerId:
+          type: string
+          description: 作成者ユーザー識別子
+          example: usr_12345
+        createdAt:
+          type: string
+          format: date-time
+          description: チーム作成日時
+          example: 2025-07-17T10:00:00Z
+        updatedAt:
+          type: string
+          format: date-time
+          description: チーム更新日時
+          example: 2025-07-17T10:00:00Z
+
+    TeamMemberResponse:
+      type: object
+      required:
+        - userId
+      properties:
+        userId:
+          type: string
+          description: メンバーユーザー識別子
+          example: usr_12345
+        role:
+          type: string
+          description: メンバーロール
+          example: member
+        joinedAt:
+          type: string
+          format: date-time
+          description: 参加日時
+          example: 2025-07-17T11:00:00Z
+
+    ReservationCreateRequest:
+      type: object
+      required:
+        - title
+        - startTime
+        - endTime
+      properties:
+        title:
+          type: string
+          description: 予約タイトル
+          example: 月次会議出発
+        description:
+          type: string
+          description: 予約詳細
+          example: 本社から会議室まで
+        startTime:
+          type: string
+          format: date-time
+          description: 出発日時
+          example: 2025-07-20T09:00:00Z
+        endTime:
+          type: string
+          format: date-time
+          description: 帰着日時
+          example: 2025-07-20T12:00:00Z
+        originLocation:
+          type: string
+          description: 出発地点
+          example: 本社ビル
+        destinationLocation:
+          type: string
+          description: 到着地点
+          example: 会議室ビル
+        seatsRequired:
+          type: integer
+          format: int32
+          description: 必要座席数
+          example: 3
+
+    ReservationResponse:
+      type: object
+      required:
+        - id
+        - teamId
+        - creatorId
+        - title
+        - startTime
+        - endTime
+      properties:
+        id:
+          type: string
+          description: 予約識別子
+          example: resv_12345
+        teamId:
+          type: string
+          description: チーム識別子
+          example: team_12345
+        creatorId:
+          type: string
+          description: 作成者ユーザー識別子
+          example: usr_12345
+        title:
+          type: string
+          description: 予約タイトル
+          example: 月次会議出発
+        description:
+          type: string
+          description: 予約詳細
+          example: 本社から会議室まで
+        startTime:
+          type: string
+          format: date-time
+          description: 出発日時
+          example: 2025-07-20T09:00:00Z
+        endTime:
+          type: string
+          format: date-time
+          description: 帰着日時
+          example: 2025-07-20T12:00:00Z
+        originLocation:
+          type: string
+          description: 出発地点
+          example: 本社ビル
+        destinationLocation:
+          type: string
+          description: 到着地点
+          example: 会議室ビル
+        seatsRequired:
+          type: integer
+          format: int32
+          description: 必要座席数
+          example: 3
+        createdAt:
+          type: string
+          format: date-time
+          description: 予約作成日時
+          example: 2025-07-17T11:30:00Z
+        updatedAt:
+          type: string
+          format: date-time
+          description: 予約更新日時
+          example: 2025-07-17T11:30:00Z
+
+tags:
+  - name: Users
+    description: ユーザー関連API
+  - name: Auth
+    description: 認証関連API
+  - name: Teams
+    description: チーム管理関連API
+  - name: Reservations
+    description: 配車希望／配車登録関連API
