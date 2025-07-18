@@ -6,10 +6,8 @@ services:
     container_name: soso-swagger-ui
     restart: unless-stopped
     ports:
-      - "8080:8080"
+      - "9419:8080"
     environment:
-      # docs ディレクトリに置いた OpenAPI YAML ファイルを参照
-      SWAGGER_JSON: app/api/docs/swagger.yaml
+      SWAGGER_JSON: /app/api/docs/swagger.yaml
     volumes:
-      # カレントディレクトリの docs フォルダをマウント
-      - app/api/docs:/docs:ro
+      - ./app:/app:ro
