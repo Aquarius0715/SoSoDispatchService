@@ -345,6 +345,30 @@ paths:
           $ref: '#/components/responses/ForbiddenError'
         '404':
           description: チーム未登録エラー
+    delete:
+      summary: チーム削除API
+      description: 指定したチームを削除
+      operationId: deleteTeam
+      tags:
+        - Teams
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: teamId
+          in: path
+          description: 削除対象のチーム識別子
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: チーム削除成功レスポンス
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: チーム未登録エラー
 
   /teams/{teamId}/reservations:
     get:
