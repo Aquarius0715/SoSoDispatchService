@@ -1,0 +1,58 @@
+services:
+  soso-api:
+    build:
+      context: ../..
+      dockerfile: build/Dockerfile
+    container_name: soso-api
+    env_file: ../../config/.env
+    ports:
+      - "8080:8080"
+    depends_on:
+      soso-database:
+        condition: service_healthy
+
+  soso-database:
+    image: mysql:8.0
+    container_name: soso-database
+    env_file: ../../config/.env
+    command: --default-authentication-plugin=mysql_native_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+      - ../../init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u root -p$MYSQL_ROOT_PASSWORD"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  soso-api-document:
+    image: swaggerapi/swagger-ui:latest
+    container_name: soso-api-document
+    ports:
+      - "9419:8080"
+    environment:
+      SWAGGER_JSON: /swagger.yaml
+    volumes:
+      - ../../api/swagger.yaml:/swagger.yaml:ro
+    depends_on:
+      - soso-api
+  
+  soso-web:
+    build:
+      context: ../../web
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_BASE_URL: http://localhost:8080
+    container_name: soso-web
+    ports:
+      - "3000:3000"
+    depends_on:
+      - soso-api
+
+
+
+
+volumes:
+  db_data:

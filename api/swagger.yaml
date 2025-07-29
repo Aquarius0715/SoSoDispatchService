@@ -1,0 +1,969 @@
+openapi: 3.1.0
+info:
+  title: SOSO 配車サポート API
+  version: 0.1.0
+  description: |
+    SOSO配車サービスAPI。  
+    認証は「アクセスJWT(Authorizationヘッダ)」＋「リフレッシュトークン(HttpOnly Cookie: rt)」の二段構成。  
+    変更系エンドポイントでは CSRF トークン（X-CSRF-Token ヘッダ）を要求します。
+
+servers:
+  - url: http://localhost:8080
+    description: ローカル開発用サーバ
+  - url: http://localhost:8080/api
+    description: /api プレフィックスを付ける構成の場合（必要に応じてパスも合わせる）
+
+tags:
+  - name: Auth
+    description: 認証関連API
+  - name: Users
+    description: ユーザー関連API
+  - name: Teams
+    description: チーム管理関連API
+  - name: Reservations
+    description: 配車希望／配車登録関連API
+  - name: System
+    description: システムユーティリティ
+
+paths:
+  /csrf:
+    get:
+      tags: [System]
+      summary: CSRFトークン取得
+      description: CSRFトークンを返却し、必要に応じてCookieにも設定します。
+      responses:
+        '200':
+          description: 取得成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CsrfResponse'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: ユーザーログイン
+      description: |
+        ユーザーを認証し、アクセスJWTを返却。リフレッシュトークンは HttpOnly Cookie `rt` に設定されます。
+      security:
+        - CsrfToken: []    # CSRFミドルウェア有効時
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: 認証成功
+          headers:
+            Set-Cookie:
+              description: HttpOnly refresh token cookie (rt)
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /auth/refresh:
+    post:
+      tags: [Auth]
+      summary: アクセストークン再発行
+      description: |
+        有効なリフレッシュトークンCookieを用いてアクセストークンを再発行し、リフレッシュトークンもローテーションします。
+      security:
+        - RefreshCookie: []
+        - CsrfToken: []
+      responses:
+        '200':
+          description: 再発行成功
+          headers:
+            Set-Cookie:
+              description: Rotated HttpOnly refresh token cookie (rt)
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /auth/logout:
+    post:
+      tags: [Auth]
+      summary: ログアウト
+      description: リフレッシュトークンを無効化し、Cookieを削除します。
+      security:
+        - RefreshCookie: []
+        - CsrfToken: []
+      responses:
+        '204':
+          description: ログアウト成功（No Content）
+          headers:
+            Set-Cookie:
+              description: クリアされたリフレッシュトークンCookie
+              schema:
+                type: string
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /users/register:
+    post:
+      tags: [Users]
+      summary: ユーザー登録
+      description: 新規ユーザー登録
+      operationId: createUser
+      security:
+        - CsrfToken: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreateRequest'
+      responses:
+        '201':
+          description: 登録成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /users/me:
+    get:
+      tags: [Users]
+      summary: 自分のユーザー情報取得
+      security:
+        - AccessToken: []
+      responses:
+        '200':
+          description: 取得成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  # 以降は既存設計（未実装含む）
+  /users:
+    get:
+      tags: [Users]
+      summary: ユーザー一覧取得
+      description: ユーザー一覧取得（取得数制限付き）
+      operationId: listUsers
+      security:
+        - AccessToken: []
+      parameters:
+        - name: limit
+          in: query
+          description: 取得上限件数
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 100
+            default: 50
+        - name: offset
+          in: query
+          description: 取得開始オフセット
+          schema:
+            type: integer
+            format: int32
+            minimum: 0
+            default: 0
+      responses:
+        '200':
+          description: 取得成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalCount:
+                    type: integer
+                  count:
+                    type: integer
+                  users:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/UserResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /users/{id}:
+    get:
+      tags: [Users]
+      summary: ユーザー情報取得
+      operationId: getUser
+      security:
+        - AccessToken: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ユーザー識別子
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 取得成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [Users]
+      summary: ユーザー情報更新
+      operationId: updateUser
+      security:
+        - AccessToken: []
+        - CsrfToken: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ユーザー識別子
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdateRequest'
+      responses:
+        '200':
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags: [Users]
+      summary: ユーザー削除
+      operationId: deleteUser
+      security:
+        - AccessToken: []
+        - CsrfToken: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ユーザー識別子
+          schema:
+            type: string
+      responses:
+        '204':
+          description: 削除成功
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /teams:
+    get:
+      tags: [Teams]
+      summary: チーム一覧取得
+      operationId: listTeams
+      security:
+        - AccessToken: []
+      responses:
+        '200':
+          description: 取得成功
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TeamResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+    post:
+      tags: [Teams]
+      summary: チーム作成
+      operationId: createTeam
+      security:
+        - AccessToken: []
+        - CsrfToken: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TeamCreateRequest'
+      responses:
+        '201':
+          description: 作成成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /teams/{teamId}:
+    get:
+      tags: [Teams]
+      summary: チーム詳細取得
+      operationId: getTeam
+      security:
+        - AccessToken: []
+      parameters:
+        - name: teamId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 取得成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /teams/{teamId}/members:
+    get:
+      tags: [Teams]
+      summary: チームメンバー一覧取得
+      operationId: listTeamMembers
+      security:
+        - AccessToken: []
+      parameters:
+        - name: teamId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 取得成功
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TeamMemberResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+    post:
+      tags: [Teams]
+      summary: チーム参加申請
+      operationId: joinTeam
+      security:
+        - AccessToken: []
+        - CsrfToken: []
+      parameters:
+        - name: teamId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: 参加申請成功
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags: [Teams]
+      summary: チーム削除
+      operationId: deleteTeam
+      security:
+        - AccessToken: []
+        - CsrfToken: []
+      parameters:
+        - name: teamId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: 削除成功
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /teams/{teamId}/reservations:
+    get:
+      tags: [Reservations]
+      summary: 配車希望一覧取得
+      operationId: listReservations
+      security:
+        - AccessToken: []
+      parameters:
+        - name: teamId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: start
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: end
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: 取得成功
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ReservationResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+    post:
+      tags: [Reservations]
+      summary: 配車希望登録
+      operationId: createReservation
+      security:
+        - AccessToken: []
+        - CsrfToken: []
+      parameters:
+        - name: teamId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReservationCreateRequest'
+      responses:
+        '201':
+          description: 登録成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /reservations/{reservationId}:
+    get:
+      tags: [Reservations]
+      summary: 配車希望取得
+      operationId: getReservation
+      security:
+        - AccessToken: []
+      parameters:
+        - name: reservationId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 取得成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      tags: [Reservations]
+      summary: 配車希望更新
+      operationId: updateReservation
+      security:
+        - AccessToken: []
+        - CsrfToken: []
+      parameters:
+        - name: reservationId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReservationCreateRequest'
+      responses:
+        '200':
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags: [Reservations]
+      summary: 配車希望削除
+      operationId: deleteReservation
+      security:
+        - AccessToken: []
+        - CsrfToken: []
+      parameters:
+        - name: reservationId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: 削除成功
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /reservations/{reservationId}/participants:
+    post:
+      tags: [Reservations]
+      summary: 配車登録（参加）
+      operationId: registerReservation
+      security:
+        - AccessToken: []
+        - CsrfToken: []
+      parameters:
+        - name: reservationId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: 登録成功
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /reservations/{reservationId}/participants/{userId}:
+    delete:
+      tags: [Reservations]
+      summary: 配車キャンセル
+      operationId: cancelReservation
+      security:
+        - AccessToken: []
+        - CsrfToken: []
+      parameters:
+        - name: reservationId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: キャンセル成功
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /users/{userId}/reservations:
+    get:
+      tags: [Reservations]
+      summary: 自分の配車登録一覧取得
+      operationId: listMyReservations
+      security:
+        - AccessToken: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 取得成功
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ReservationResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+components:
+  securitySchemes:
+    AccessToken:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    RefreshCookie:
+      type: apiKey
+      in: cookie
+      name: rt
+    CsrfToken:
+      type: apiKey
+      in: header
+      name: X-CSRF-Token
+
+  responses:
+    BadRequest:
+      description: 入力値不正エラー
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    UnauthorizedError:
+      description: 認証情報不正エラー
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    ForbiddenError:
+      description: 権限不足エラー
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Conflict:
+      description: 競合エラー
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFound:
+      description: 対象が存在しない
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    ServerError:
+      description: サーバ内部エラー
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+      required: [message]
+
+    CsrfResponse:
+      type: object
+      properties:
+        csrf_token:
+          type: string
+      required: [csrf_token]
+
+    LoginRequest:
+      type: object
+      required: [username, password]
+      properties:
+        username:
+          type: string
+          description: ログインID
+          example: kitano_masaki
+        password:
+          type: string
+          format: password
+          description: ログイン用パスワード
+          example: Passw0rd!123
+
+    TokenResponse:
+      type: object
+      required: [access_token, access_expires_at]
+      properties:
+        access_token:
+          type: string
+          description: アクセスJWT
+        access_expires_at:
+          type: string
+          format: date-time
+          description: アクセスJWTの有効期限
+
+    UserCreateRequest:
+      type: object
+      required: [username, password, hasCar]
+      properties:
+        username:
+          type: string
+          minLength: 3
+          maxLength: 30
+          example: kitano_masaki
+        password:
+          type: string
+          format: password
+          minLength: 8
+          maxLength: 72
+          example: Passw0rd!123
+        hasCar:
+          type: boolean
+          example: true
+        capacity:
+          type: integer
+          format: int32
+          minimum: 0
+          example: 4
+
+    UserUpdateRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          minLength: 1
+          maxLength: 64
+        password:
+          type: string
+          format: password
+          minLength: 8
+        hasCar:
+          type: boolean
+        capacity:
+          type: integer
+          format: int32
+          minimum: 0
+
+    UserResponse:
+      type: object
+      required: [id, username, hasCar]
+      properties:
+        id:
+          type: string
+          example: usr_12345
+        username:
+          type: string
+          example: kitano_masaki
+        hasCar:
+          type: boolean
+          example: true
+        capacity:
+          type: integer
+          format: int32
+          example: 4
+        createdAt:
+          type: string
+          format: date-time
+        modifiedAt:
+          type: string
+          format: date-time
+        sosoPoints:
+          type: integer
+          format: int32
+          example: 120
+
+    TeamCreateRequest:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+          example: 開発チーム
+        description:
+          type: string
+          example: 社内配車管理用チーム
+
+    TeamResponse:
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          type: string
+          example: team_12345
+        name:
+          type: string
+          example: 開発チーム
+        description:
+          type: string
+        ownerId:
+          type: string
+          example: usr_12345
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    TeamMemberResponse:
+      type: object
+      required: [userId]
+      properties:
+        userId:
+          type: string
+          example: usr_12345
+        role:
+          type: string
+          example: member
+        joinedAt:
+          type: string
+          format: date-time
+
+    ReservationCreateRequest:
+      type: object
+      required: [title, startTime, endTime]
+      properties:
+        title:
+          type: string
+          example: 月次会議出発
+        description:
+          type: string
+          example: 本社から会議室まで
+        startTime:
+          type: string
+          format: date-time
+          example: 2025-07-20T09:00:00Z
+        endTime:
+          type: string
+          format: date-time
+          example: 2025-07-20T12:00:00Z
+        originLocation:
+          type: string
+          example: 本社ビル
+        destinationLocation:
+          type: string
+          example: 会議室ビル
+        seatsRequired:
+          type: integer
+          format: int32
+          example: 3
+
+    ReservationResponse:
+      type: object
+      required:
+        - id
+        - teamId
+        - creatorId
+        - title
+        - startTime
+        - endTime
+      properties:
+        id:
+          type: string
+          example: resv_12345
+        teamId:
+          type: string
+          example: team_12345
+        creatorId:
+          type: string
+          example: usr_12345
+        title:
+          type: string
+          example: 月次会議出発
+        description:
+          type: string
+        startTime:
+          type: string
+          format: date-time
+        endTime:
+          type: string
+          format: date-time
+        originLocation:
+          type: string
+        destinationLocation:
+          type: string
+        seatsRequired:
+          type: integer
+          format: int32
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
