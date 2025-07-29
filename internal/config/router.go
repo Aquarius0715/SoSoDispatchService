@@ -76,7 +76,7 @@ func SetupRouter(cfg *Config) *echo.Echo {
 	}
 
 	// CSRFトークン配布
-	e.GET("/csrf", func(c echo.Context) error {
+	e.GET("/auth/csrf", func(c echo.Context) error {
 		if !cfg.CSRFEnabled {
 			return c.NoContent(http.StatusNoContent)
 		}

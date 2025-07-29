@@ -22,25 +22,8 @@ tags:
     description: チーム管理関連API
   - name: Reservations
     description: 配車希望／配車登録関連API
-  - name: System
-    description: システムユーティリティ
 
 paths:
-  /csrf:
-    get:
-      tags: [System]
-      summary: CSRFトークン取得
-      description: CSRFトークンを返却し、必要に応じてCookieにも設定します。
-      responses:
-        '200':
-          description: 取得成功
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CsrfResponse'
-        '500':
-          $ref: '#/components/responses/ServerError'
-
   /auth/login:
     post:
       tags: [Auth]
@@ -118,6 +101,20 @@ paths:
               description: クリアされたリフレッシュトークンCookie
               schema:
                 type: string
+        '500':
+          $ref: '#/components/responses/ServerError'
+  /auth/csrf:
+    get:
+      tags: [Auth]
+      summary: CSRFトークン取得
+      description: CSRFトークンを返却し、必要に応じてCookieにも設定します。
+      responses:
+        '200':
+          description: 取得成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CsrfResponse'
         '500':
           $ref: '#/components/responses/ServerError'
 

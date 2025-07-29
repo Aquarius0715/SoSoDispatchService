@@ -15,7 +15,7 @@ export default function Home() {
   useEffect(() => {
     const fetchCsrfToken = async () => {
       try {
-        const res = await axios.get(`${API_BASE}/csrf`, {
+        const res = await axios.get(`${API_BASE}/auth/csrf`, {
           withCredentials: true
         })
         setCsrfToken(res.data.csrf_token)
