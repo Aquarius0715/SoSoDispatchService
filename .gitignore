@@ -1,2 +1,2 @@
-config/.env
+services/soso-api/config/.env
 .DS_Store
