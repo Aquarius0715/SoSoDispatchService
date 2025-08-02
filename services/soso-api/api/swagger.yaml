@@ -862,10 +862,6 @@ components:
         modifiedAt:
           type: string
           format: date-time
-        sosoPoints:
-          type: integer
-          format: int32
-          example: 120
 
     CalenderCreateRequest:
       type: object

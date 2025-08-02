@@ -5,7 +5,6 @@ CREATE TABLE `users` (
   `password_hash`  VARCHAR(255)      NOT NULL,
   `has_car`        TINYINT(1)        NOT NULL DEFAULT 0,
   `capacity`       INT               NOT NULL DEFAULT 0,
-  `soso_points`    INT               NOT NULL DEFAULT 0,
   `created_at`     DATETIME(6)       NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
   `updated_at`     DATETIME(6)       NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
   PRIMARY KEY(`id`)
@@ -31,6 +30,7 @@ CREATE TABLE `team_memberships` (
   `team_id`        VARCHAR(36)               NOT NULL,
   `user_id`        VARCHAR(36)               NOT NULL,
   `role`           ENUM('member','admin')    NOT NULL DEFAULT 'member',
+  `soso_point`     INT                       NOT NULL DEFAULT 0,
   `joined_at`      DATETIME(6)               NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
   PRIMARY KEY (`team_id`,`user_id`),
   INDEX `idx_tm_user` (`user_id`),
@@ -93,4 +93,34 @@ CREATE TABLE refresh_tokens (
   PRIMARY KEY (`id`),
   KEY `idx_user` (`user_id`),
   CONSTRAINT `fk_rt_user` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `soso_point_histories` (
+  `id`             BIGINT AUTO_INCREMENT PRIMARY KEY,
+  `team_id`        VARCHAR(36) NOT NULL,
+  `user_id`        VARCHAR(36) NOT NULL,
+  `changed_at`     DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  `changed_by`     VARCHAR(36),  -- 操作したユーザー（NULL = システム）
+  `reservation_id` VARCHAR(36),  -- 関連する予約（NULL可）
+  `old_point`      INT NOT NULL,
+  `new_point`      INT NOT NULL,
+  `point_delta`    INT NOT NULL,  -- new_point - old_point
+  `reason`         TEXT,  -- 操作理由の自由記述欄
+
+  INDEX `idx_sph_user` (`user_id`),
+  INDEX `idx_sph_team` (`team_id`),
+  INDEX `idx_sph_reservation` (`reservation_id`),
+
+  CONSTRAINT `fk_sph_team`
+    FOREIGN KEY (`team_id`) REFERENCES `teams`(`id`)
+    ON DELETE CASCADE,
+  CONSTRAINT `fk_sph_user`
+    FOREIGN KEY (`user_id`) REFERENCES `users`(`id`)
+    ON DELETE CASCADE,
+  CONSTRAINT `fk_sph_changed_by`
+    FOREIGN KEY (`changed_by`) REFERENCES `users`(`id`)
+    ON DELETE SET NULL,
+  CONSTRAINT `fk_sph_reservation`
+    FOREIGN KEY (`reservation_id`) REFERENCES `reservations`(`id`)
+    ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
