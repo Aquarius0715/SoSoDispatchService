@@ -18,4 +18,8 @@ func RegisterUser(v *validator.Validate) {
 	_ = v.RegisterValidation("capacity", func(fl validator.FieldLevel) bool {
 		return fl.Field().Int() >= 0
 	})
+	_ = v.RegisterValidation("mailAddress", func(fl validator.FieldLevel) bool {
+		// 非常に基本的なメール形式の正規表現（完全ではありません）
+		return regexp.MustCompile(`^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$`).MatchString(fl.Field().String())
+	})
 }

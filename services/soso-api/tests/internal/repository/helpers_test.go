@@ -45,6 +45,7 @@ const (
 		SELECT
 			id,
 			username,
+			mail_address,
 			password_hash,
 			has_car,
 			capacity,
@@ -60,6 +61,7 @@ const (
 		SELECT
 			id,
 			username,
+			mail_address,
 			password_hash,
 			has_car,
 			capacity,

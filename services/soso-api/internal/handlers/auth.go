@@ -46,8 +46,8 @@ func NewAuthHandler(u *repository.UserRepository, r *repository.RefreshTokenRepo
 }
 
 type LoginRequest struct {
-	Username string `json:"username" validate:"required"`
-	Password string `json:"password" validate:"required"`
+	MailAddress string `json:"mailAddress" validate:"required"`
+	Password    string `json:"password" validate:"required"`
 }
 
 type TokenResponse struct {
@@ -66,7 +66,7 @@ func (h *AuthHandler) Login(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	u, err := h.UserRepo.FindByUsername(ctx, req.Username)
+	u, err := h.UserRepo.FindByMailAddress(ctx, req.MailAddress)
 	if err != nil {
 		return err
 	}

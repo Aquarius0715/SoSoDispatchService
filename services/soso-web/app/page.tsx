@@ -5,6 +5,7 @@ import axios from 'axios'
 
 export default function Home() {
   const [username, setUsername] = useState('')
+  const [mailAddress, setMailAddress] = useState('')
   const [password, setPassword] = useState('')
   const [token, setToken] = useState('')
   const [csrfToken, setCsrfToken] = useState('')
@@ -31,6 +32,7 @@ export default function Home() {
     try {
       await axios.post(`${API_BASE}/users/register`, {
         username,
+        mailAddress,
         password,
         hasCar: true,
         capacity: 4
@@ -47,7 +49,7 @@ export default function Home() {
   const login = async () => {
     try {
       const res = await axios.post(`${API_BASE}/auth/login`, {
-        username,
+        mailAddress,
         password
       }, {
         headers: { 'X-CSRF-Token': csrfToken },
@@ -84,6 +86,13 @@ export default function Home() {
         className="w-full p-2 border"
         value={username}
         onChange={(e) => setUsername(e.target.value)}
+      />
+      <input
+        type="text"
+        placeholder="メールアドレス"
+        className="w-full p-2 border"
+        value={mailAddress}
+        onChange={(e) => setMailAddress(e.target.value)}
       />
       <input
         type="password"

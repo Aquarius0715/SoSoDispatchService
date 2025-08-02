@@ -2,6 +2,7 @@
 CREATE TABLE `users` (
   `id`             VARCHAR(36)       NOT NULL,
   `username`       VARCHAR(64)       NOT NULL UNIQUE,
+  `mail_address`   VARCHAR(128)      NOT NULL UNIQUE,
   `password_hash`  VARCHAR(255)      NOT NULL,
   `has_car`        TINYINT(1)        NOT NULL DEFAULT 0,
   `capacity`       INT               NOT NULL DEFAULT 0,

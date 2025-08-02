@@ -864,13 +864,16 @@ components:
 
     UserCreateRequest:
       type: object
-      required: [username, password, hasCar]
+      required: [username, mailAddress, password, hasCar]
       properties:
         username:
           type: string
           minLength: 3
           maxLength: 30
           example: kitano_masaki
+        mailAddress:
+          type: string
+          example: foo@example.com
         password:
           type: string
           format: password
@@ -893,6 +896,8 @@ components:
           type: string
           minLength: 1
           maxLength: 64
+        mailAddress:
+          type: string
         password:
           type: string
           format: password
@@ -906,7 +911,7 @@ components:
 
     UserResponse:
       type: object
-      required: [id, username, hasCar]
+      required: [id, username, mailAddress, hasCar]
       properties:
         id:
           type: string
@@ -914,6 +919,9 @@ components:
         username:
           type: string
           example: kitano_masaki
+        mailAddress:
+          type: string
+          example: foo@example.com
         hasCar:
           type: boolean
           example: true

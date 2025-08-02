@@ -30,15 +30,15 @@ func TestUserRepository_Create_OK(t *testing.T) {
 
 	u := &model.User{
 		ID:           "u1",
+		MailAddress:  "foo@example.com",
 		Username:     "alice",
 		PasswordHash: "hash",
 		HasCar:       true,
 		Capacity:     2,
-		SoSoPoints:   0,
 	}
 
 	mock.ExpectExec(SQLInsertUser).
-		WithArgs(u.ID, u.Username, u.PasswordHash, u.HasCar, u.Capacity, u.SoSoPoints).
+		WithArgs(u.ID, u.Username, u.MailAddress, u.PasswordHash, u.HasCar, u.Capacity).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 
 	err := repo.Create(context.Background(), u)
@@ -58,7 +58,7 @@ func TestUserRepository_Create_DuplicateUsername(t *testing.T) {
 	}
 
 	mock.ExpectExec(SQLInsertUser).
-		WithArgs(u.ID, u.Username, u.PasswordHash, u.HasCar, u.Capacity, u.SoSoPoints).
+		WithArgs(u.ID, u.Username, u.MailAddress, u.PasswordHash, u.HasCar, u.Capacity).
 		WillReturnError(&mysql.MySQLError{
 			Number:  1062,
 			Message: "Duplicate entry 'alice' for key 'users.username'",
@@ -81,7 +81,7 @@ func TestUserRepository_FindByUsername_Hit(t *testing.T) {
 
 	now := time.Now()
 	rows := sqlmock.NewRows([]string{
-		"id", "username", "password_hash", "has_car", "capacity", "soso_points", "created_at", "updated_at",
+		"id", "username", "mail_address", "password_hash", "has_car", "capacity", "soso_points", "created_at", "updated_at",
 	}).AddRow("u1", "alice", "hash", true, 3, 10, now, now)
 
 	mock.ExpectQuery(SQLSelectUserByName).
@@ -119,7 +119,7 @@ func TestUserRepository_FindByID_Hit(t *testing.T) {
 
 	now := time.Now()
 	rows := sqlmock.NewRows([]string{
-		"id", "username", "password_hash", "has_car", "capacity", "soso_points", "created_at", "updated_at",
+		"id", "username", "mail_address", "password_hash", "has_car", "capacity", "soso_points", "created_at", "updated_at",
 	}).AddRow("u1", "alice", "hash", false, 0, 0, now, now)
 
 	mock.ExpectQuery(SQLSelectUserByID).

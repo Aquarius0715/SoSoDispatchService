@@ -23,10 +23,11 @@ func NewUserHandler(r *repository.UserRepository) *UserHandler {
 
 // 入力DTOに validator タグを付与
 type RegisterRequest struct {
-	Username string `json:"username" validate:"required,username"`
-	Password string `json:"password" validate:"required,password"`
-	HasCar   bool   `json:"has_car"`
-	Capacity int    `json:"capacity" validate:"capacity"` // HasCar=true の時は後段で追加チェック
+	Username    string `json:"username" validate:"required,username"`
+	MailAddress string `json:"mailAddress" validate:"required,mailAddress"`
+	Password    string `json:"password" validate:"required,password"`
+	HasCar      bool   `json:"hasCar"`
+	Capacity    int    `json:"capacity" validate:"capacity"` // HasCar=true の時は後段で追加チェック
 }
 
 // POST /users/register
@@ -58,6 +59,7 @@ func (h *UserHandler) Register(c echo.Context) error {
 	u := &model.User{
 		ID:           uuid.NewString(),
 		Username:     req.Username,
+		MailAddress:  req.MailAddress,
 		PasswordHash: hash,
 		HasCar:       req.HasCar,
 		Capacity:     req.Capacity,
@@ -89,12 +91,12 @@ func (h *UserHandler) Me(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusNotFound, "user not found")
 	}
 	return c.JSON(http.StatusOK, map[string]any{
-		"id":         u.ID,
-		"username":   u.Username,
-		"hasCar":     u.HasCar,
-		"capacity":   u.Capacity,
-		"sosoPoints": u.SoSoPoints,
-		"createdAt":  u.CreatedAt,
-		"updatedAt":  u.UpdatedAt,
+		"id":          u.ID,
+		"username":    u.Username,
+		"mailAddress": u.MailAddress,
+		"hasCar":      u.HasCar,
+		"capacity":    u.Capacity,
+		"createdAt":   u.CreatedAt,
+		"updatedAt":   u.UpdatedAt,
 	})
 }
