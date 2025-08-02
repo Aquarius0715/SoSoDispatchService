@@ -51,6 +51,11 @@ func (h *UserHandler) Register(c echo.Context) error {
 	} else if exist != nil {
 		return echo.NewHTTPError(http.StatusConflict, "username already exists")
 	}
+	if exist, err := h.UserRepo.FindByMailAddress(ctx, req.MailAddress); err != nil {
+		return err
+	} else if exist != nil {
+		return echo.NewHTTPError(http.StatusConflict, "mailAddress already exists")
+	}
 
 	hash, err := auth.HashPassword(req.Password)
 	if err != nil {
