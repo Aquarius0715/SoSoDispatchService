@@ -1,10 +1,12 @@
 FROM golang:1.24.5 AS builder
 
-WORKDIR /src
+WORKDIR /app
 
-COPY . .
+COPY services/soso-api/ .
 
-RUN go build -o /app/server ./services/soso-api/cmd/server
+RUN go mod tidy
+
+RUN go build -o /app/server ./cmd/server
 
 FROM alpine:3.20
 
