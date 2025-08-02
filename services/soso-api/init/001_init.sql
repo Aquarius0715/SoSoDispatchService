@@ -95,6 +95,7 @@ CREATE TABLE refresh_tokens (
   CONSTRAINT `fk_rt_user` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- 7. soso_point_histories テーブル
 CREATE TABLE `soso_point_histories` (
   `id`             BIGINT AUTO_INCREMENT PRIMARY KEY,
   `team_id`        VARCHAR(36) NOT NULL,

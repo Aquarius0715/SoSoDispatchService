@@ -623,6 +623,77 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
+  /reservations/{reservationId}/members:
+    get:
+      tags: [Reservations]
+      summary: 予約メンバー一覧取得
+      operationId: listReservationMembers
+      security:
+        - AccessToken: []
+      parameters:
+        - name: reservationId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: 取得上限件数
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 100
+            default: 50
+        - name: offset
+          in: query
+          description: 取得開始オフセット
+          schema:
+            type: integer
+            format: int32
+            minimum: 0
+            default: 0
+      responses:
+        '200':
+          description: 取得成功
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ReservationMemberResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /reservations/{reservationId}/histories:
+    get:
+      tags: [Reservations]
+      summary: SOSOポイント変更履歴取得
+      operationId: get sosoPoint histories
+      security:
+        - AccessToken: []
+      parameters:
+        - name: reservationId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 取得成功
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ReservationHistoryResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
   /reservations/{reservationId}/participants:
     post:
       tags: [Reservations]
@@ -647,7 +718,6 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
-  /reservations/{reservationId}/participants/{userId}:
     delete:
       tags: [Reservations]
       summary: 配車キャンセル
@@ -657,11 +727,6 @@ paths:
         - CsrfToken: []
       parameters:
         - name: reservationId
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: userId
           in: path
           required: true
           schema:
@@ -980,5 +1045,46 @@ components:
           type: string
           format: date-time
         updatedAt:
+          type: string
+          format: date-time
+
+    ReservationHistoryResponse:
+      type: object
+      required:
+        - executorName
+        - targetName
+        - pointDelta
+        - reason
+        - executeAt
+      properties:
+        executorName:
+          type: string
+          example: name
+        targetName:
+          type: string
+          example: targetName
+        pointDelta:
+          type: int32
+          example: 2
+        reason: 
+          type: string
+          example: お酒をこぼしたため
+        executeAt: 
+          type: string
+          format: date-time
+    ReservationMemberResponse:
+      type: object
+      required: [userId]
+      properties:
+        userId:
+          type: string
+          example: usr_12345
+        userName:
+          type: string
+          example: "kitano_masaki"
+        role:
+          type: string
+          example: member
+        joinedAt:
           type: string
           format: date-time
