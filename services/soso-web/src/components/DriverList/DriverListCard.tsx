@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import React from 'react';
 
-export enum driveState {
+export enum DriveState {
   PICK_UP,  // 迎え
   DROP_OFF, // 送り
 }
@@ -10,7 +10,7 @@ interface Props {
   className?: string;
   calenderName?: string;
   eventName?: string;
-  driveState?: driveState;
+  driveState?: DriveState;
   eventDate?: string;
   driveTime?: string;
   passengerNumber?: number;
@@ -23,8 +23,8 @@ function DriverListCard(props: Props) {
     (props.className ? ` ${props.className}` : '');
 
   const driveStateText = {
-    [driveState.PICK_UP]: '迎え',
-    [driveState.DROP_OFF]: '送り',
+    [DriveState.PICK_UP]: '迎え',
+    [DriveState.DROP_OFF]: '送り',
   };
 
   return (
