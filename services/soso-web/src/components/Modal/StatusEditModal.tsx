@@ -5,9 +5,10 @@ import Textarea from '../TextFieald/Textfieald';
 import Radio from '../Button/RadioButton';
 
 
-// モーダルで扱うデータの型定義
+// 1. モーダルで扱うデータの型定義に`email`を追加
 interface UserStatus {
   userName: string;
+  email: string; // ★追加
   hasCar: boolean;
   capacity: number;
 }
@@ -26,14 +27,15 @@ const StatusEditModal: FC<StatusEditModalProps> = ({
   onSave,
   initialStatus,
 }) => {
-  // 各フォームフィールドの状態を管理
+  // 2. 各フォームフィールドの状態を管理（emailを追加）
   const [userName, setUserName] = useState(initialStatus.userName);
+  const [email, setEmail] = useState(initialStatus.email); // ★追加
   const [hasCar, setHasCar] = useState(initialStatus.hasCar);
   const [capacity, setCapacity] = useState(initialStatus.capacity);
 
-  // 保存ボタンが押されたときの処理
+  // 保存ボタンが押されたときの処理（onSaveにemailを渡す）
   const handleSave = () => {
-    onSave({ userName, hasCar, capacity });
+    onSave({ userName, email, hasCar, capacity }); // ★emailを追加
   };
   
   // モーダルが開いていなければ何も表示しない
@@ -65,19 +67,31 @@ const StatusEditModal: FC<StatusEditModalProps> = ({
           <button onClick={onClose} className="text-gray-500 text-2xl font-light hover:text-black">&times;</button>
         </div>
 
-        {/* フォーム */}
+        {/* 3. フォームにメールアドレスの入力欄を追加 */}
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               ユーザー名
             </label>
-            {/* Textareaを単一行入力として使用。高さを強制的に上書き */}
             <Textarea
               value={userName}
               onChange={(e) => setUserName(e.target.value)}
               className="!h-11 !rounded-md" 
             />
           </div>
+
+          {/* ★ここから追加 */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              メールアドレス
+            </label>
+            <Textarea
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="!h-11 !rounded-md"
+            />
+          </div>
+          {/* ★ここまで追加 */}
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -105,13 +119,11 @@ const StatusEditModal: FC<StatusEditModalProps> = ({
             <label className="block text-sm font-medium text-gray-700 mb-1">
               最大乗車可能人数（運転手を除く）
             </label>
-            {/* Dropdownコンポーネントを選択メニューとして使用 */}
             <Dropdown trigger={dropdownTrigger}>
               {capacityOptions.map(num => (
                 <div
                   key={num}
                   className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-center"
-                  // Dropdown内の項目クリックで人数を更新
                   onClick={() => setCapacity(num)}
                 >
                   {num}人
@@ -120,6 +132,7 @@ const StatusEditModal: FC<StatusEditModalProps> = ({
             </Dropdown>
           </div>
         </div>
+        {/* ★フォームの追加はここまで */}
 
         {/* フッターのボタン */}
         <div className="mt-8">
