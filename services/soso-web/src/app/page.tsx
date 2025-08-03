@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import axios from 'axios'
-
 export default function Home() {
   const [username, setUsername] = useState('')
   const [mailAddress, setMailAddress] = useState('')
