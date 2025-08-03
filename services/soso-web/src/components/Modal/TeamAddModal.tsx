@@ -9,10 +9,12 @@ interface Props {
 
 const TeamAddModal: React.FC<Props> = ({ onClose }) => {
   const [newCalendarTitle, setNewCalendarTitle] = useState('');
+  const [newCalendarReason, setNewCalendarReason] = useState(''); // 追加
   const [sharedCalendarUrl, setSharedCalendarUrl] = useState('');
 
   const handleCreateNewCalendar = () => {
-    console.log('新規カレンダーを作成:', newCalendarTitle);
+    // console.logに作成理由を追加
+    console.log('新規カレンダーを作成:', newCalendarTitle, '作成理由:', newCalendarReason);
     onClose();
   };
 
@@ -41,6 +43,13 @@ const TeamAddModal: React.FC<Props> = ({ onClose }) => {
             placeholder="カレンダータイトル"
             value={newCalendarTitle}
             onChange={(e) => setNewCalendarTitle(e.target.value)}
+          />
+          {/* 作成理由のテキストボックスを追加 */}
+          <Textarea
+            className="w-full !h-24 !rounded-md"
+            placeholder="作成理由 (任意)"
+            value={newCalendarReason}
+            onChange={(e) => setNewCalendarReason(e.target.value)}
           />
           <Button
             className={clsx('w-full !rounded-md bg-gray-700 text-white hover:bg-gray-800')}
