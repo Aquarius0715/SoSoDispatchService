@@ -8,7 +8,6 @@ interface Props {
   hasCar?: boolean;
   sosoPoint?: number;
   children?: React.ReactNode;
-  onClick?: () => void;
 }
 
 function MemberListCard(props: Props) {
@@ -17,7 +16,7 @@ function MemberListCard(props: Props) {
     (props.className ? ` ${props.className}` : '');
 
   return (
-    <div onClick={props.onClick} className={clsx('font-semibold flex justify-between items-center bg-primary-1 rounded-lg', className)}>
+    <div className={clsx('font-semibold flex justify-between items-center bg-primary-1 rounded-lg', className)}>
       <div>
         <p className='text-md text-gray-800'>{props.memberName}</p>
         <p className='text-sm text-gray-600'>SOSOポイント: {props.sosoPoint}pt</p>
