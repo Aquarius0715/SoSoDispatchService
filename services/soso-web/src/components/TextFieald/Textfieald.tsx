@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import React from 'react';
 
-import s from './Textarea.module.css';
+// import s from './Textarea.module.css'; // この行を削除
 
 interface Props {
   className?: string;
@@ -20,7 +20,7 @@ function Textarea(props: Props){
     (props.className ? ` ${props.className}` : '');
   return (
     <textarea
-      className={clsx(s.textarea, className)}
+      className={className} // clsx(s.textarea, className) から変更
       placeholder={props.placeholder}
       id={props.id}
       value={props.value}
