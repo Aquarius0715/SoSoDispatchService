@@ -8,15 +8,16 @@ interface Props {
   hasCar?: boolean;
   sosoPoint?: number;
   children?: React.ReactNode;
+  onClick?: () => void;
 }
 
 function MemberListCard(props: Props) {
   const className =
-    'px-4 py-2 text-black text-md rounded-lg bg-gray-100' +
+    'px-4 py-2 text-black text-md rounded-lg bg-gray-100 hover-gray-200' +
     (props.className ? ` ${props.className}` : '');
 
   return (
-    <div className={clsx('font-semibold flex justify-between items-center bg-primary-1 rounded-lg', className)}>
+    <div onClick={props.onClick} className={clsx('font-semibold flex justify-between items-center bg-primary-1 rounded-lg', className)}>
       <div>
         <p className='text-md text-gray-800'>{props.memberName}</p>
         <p className='text-sm text-gray-600'>SOSOポイント: {props.sosoPoint}pt</p>
