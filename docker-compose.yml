@@ -44,12 +44,25 @@ services:
   soso-web:
     build:
       context: services/soso-web
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.nextjs  # Next.js用Dockerfileを指定
       args:
         NEXT_PUBLIC_API_BASE_URL: http://localhost:8080
     container_name: soso-web
     ports:
       - "3000:3000"
+    depends_on:
+      - soso-api
+
+  soso-web-storybook:
+    build:
+      context: services/soso-web
+      dockerfile: Dockerfile.storybook  # Storybook用Dockerfileを指定
+    container_name: soso-web-storybook
+    ports:
+      - "6006:6006" # ホスト側の6006ポートとコンテナをマッピング
+    volumes:
+      - ./services/soso-web:/app # ホストとコンテナ間でソースコードを同期
+      - /app/node_modules # node_modulesは同期対象から除外
     depends_on:
       - soso-api
 
