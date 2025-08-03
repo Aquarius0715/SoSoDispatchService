@@ -11,7 +11,8 @@ interface Props {
   calenderName?: string;
   eventName?: string;
   driveState?: driveState;
-  date?: string;
+  eventDate?: string;
+  driveTime?: string;
   passengerNumber?: number;
   children?: React.ReactNode;
 }
@@ -30,7 +31,7 @@ function DriverListCard(props: Props) {
     <div className={clsx('flex flex-col bg-primary-1 rounded-lg', className)}>
       <p className='text-sm text-gray-600'>{props.calenderName}</p>
       <p className='font-medium text-gray-800'>{props.calenderName}</p>
-      <p className='text-sm text-gray-600'>{props.date}</p>
+      <p className='text-sm text-gray-600'>{props.eventDate} {props.driveTime}</p>
       <p className='text-sm text-gray-600'>{props.driveState !== undefined && driveStateText[props.driveState]}: {props.passengerNumber}</p>
       {props.children}
     </div>
