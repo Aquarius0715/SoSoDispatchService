@@ -13,6 +13,7 @@ interface Props {
 function Radio(props: Props){
   const className = '' + (props.className ? ` ${props.className}` : '');
   return (
+    <>
     <input
       type='radio'
       name='radio'
@@ -21,9 +22,9 @@ function Radio(props: Props){
       value={props.value}
       onClick={props.onClick}
       onChange={props.onChange}
-    >
-      {props.children}
-    </input>
+    />
+    {props.children}
+    </>
   );
 }
 
