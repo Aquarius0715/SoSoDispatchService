@@ -1,26 +1,17 @@
 import clsx from 'clsx';
 import React from 'react';
-
-export enum DriveState {
-  PICK_UP,  // 迎え
-  DROP_OFF, // 送り
-}
+import { Drive, DriveState } from './DriverList';
 
 interface Props {
   className?: string;
-  calenderName?: string;
-  eventName?: string;
-  driveState?: DriveState;
-  eventDate?: string;
-  driveTime?: string;
-  passengerNumber?: number;
+  drive: Drive;
   children?: React.ReactNode;
 }
 
-function DriverListCard(props: Props) {
-  const className =
+function DriverListCard({className,drive,children}: Props) {
+  const finalClassName =
     'px-4 py-2 text-black font-bold text-md rounded-lg bg-gray-200' +
-    (props.className ? ` ${props.className}` : '');
+    (className ? ` ${className}` : '');
 
   const driveStateText = {
     [DriveState.PICK_UP]: '迎え',
@@ -28,12 +19,12 @@ function DriverListCard(props: Props) {
   };
 
   return (
-    <div className={clsx('flex flex-col bg-primary-1 rounded-lg', className)}>
-      <p className='text-sm text-gray-600'>{props.calenderName}</p>
-      <p className='font-medium text-gray-800'>{props.calenderName}</p>
-      <p className='text-sm text-gray-600'>{props.eventDate} {props.driveTime}</p>
-      <p className='text-sm text-gray-600'>{props.driveState !== undefined && driveStateText[props.driveState]}: {props.passengerNumber}</p>
-      {props.children}
+    <div className={clsx('flex flex-col bg-primary-1 rounded-lg', finalClassName)}>
+      <p className='text-sm text-gray-600'>{drive.calenderName}</p>
+      <p className='font-medium text-gray-800'>{drive.eventName}</p>
+      <p className='text-sm text-gray-600'>{drive.eventDate} {drive.driveTime}</p>
+      <p className='text-sm text-gray-600'>{drive.driveState !== undefined && driveStateText[drive.driveState]}: {drive.passengerNumber}</p>
+      {children}
     </div>
   );
 }
