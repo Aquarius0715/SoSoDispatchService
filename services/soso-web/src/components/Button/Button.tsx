@@ -13,7 +13,7 @@ function Button(props: Props) {
     'px-4 py-2 text-white-0 font-bold text-md rounded-lg' +
     (props.className ? ` ${props.className}` : '');
   return (
-    <button className={clsx(className)} onClick={props.onClick}>
+    <button className={clsx(className)} onClick={props.onClick} disabled={props.disabled}>
       <div className={clsx('flex items-center')}>{props.children}</div>
     </button>
   );
