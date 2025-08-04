@@ -37,7 +37,7 @@ func Ctx() context.Context { return context.Background() }
 const (
 	SQLInsertUser = `
 		INSERT INTO users (
-			id, username, password_hash, has_car, capacity, soso_points
+			id, username, mail_address, password_hash, has_car, capacity
 		) VALUES (?,?,?,?,?,?)
 	`
 
@@ -49,11 +49,25 @@ const (
 			password_hash,
 			has_car,
 			capacity,
-			soso_points,
 			created_at,
 			updated_at
 		FROM users
 		WHERE username = ?
+		LIMIT 1
+	`
+
+	SQLSelectUserByMailAddress = `
+		SELECT
+			id,
+			username,
+			mail_address,
+			password_hash,
+			has_car,
+			capacity,
+			created_at,
+			updated_at
+		FROM users
+		WHERE mail_address = ?
 		LIMIT 1
 	`
 
@@ -65,7 +79,6 @@ const (
 			password_hash,
 			has_car,
 			capacity,
-			soso_points,
 			created_at,
 			updated_at
 		FROM users

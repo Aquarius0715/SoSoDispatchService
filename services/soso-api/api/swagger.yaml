@@ -838,12 +838,12 @@ components:
 
     LoginRequest:
       type: object
-      required: [username, password]
+      required: [mailAddress, password]
       properties:
-        username:
+        mailAddress:
           type: string
-          description: ログインID
-          example: kitano_masaki
+          description: メールアドレス
+          example: hoge@example.com
         password:
           type: string
           format: password

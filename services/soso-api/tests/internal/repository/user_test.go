@@ -30,7 +30,7 @@ func TestUserRepository_Create_OK(t *testing.T) {
 
 	u := &model.User{
 		ID:           "u1",
-		MailAddress:  "foo@example.com",
+		MailAddress:  "hoge@example.com",
 		Username:     "alice",
 		PasswordHash: "hash",
 		HasCar:       true,
@@ -74,6 +74,33 @@ func TestUserRepository_Create_DuplicateUsername(t *testing.T) {
 	assert.NoError(t, mock.ExpectationsWereMet())
 }
 
+func TestUserRepository_Create_DuplicateMailAddress(t *testing.T) {
+	repo, mock, close := newUserRepoMock(t)
+	defer close()
+
+	u := &model.User{
+		ID:           "u2",
+		MailAddress:  "hoge@example.com",
+		PasswordHash: "hash2",
+	}
+
+	mock.ExpectExec(SQLInsertUser).
+		WithArgs(u.ID, u.Username, u.MailAddress, u.PasswordHash, u.HasCar, u.Capacity).
+		WillReturnError(&mysql.MySQLError{
+			Number:  1062,
+			Message: "Duplicate entry 'alice' for key 'users.username'",
+		})
+
+	err := repo.Create(context.Background(), u)
+	assert.Error(t, err)
+	// 好みでエラー番号チェック
+	var me *mysql.MySQLError
+	if assert.ErrorAs(t, err, &me) {
+		assert.Equal(t, uint16(1062), me.Number)
+	}
+	assert.NoError(t, mock.ExpectationsWereMet())
+}
+
 // FindByUsername ヒット
 func TestUserRepository_FindByUsername_Hit(t *testing.T) {
 	repo, mock, close := newUserRepoMock(t)
@@ -81,8 +108,8 @@ func TestUserRepository_FindByUsername_Hit(t *testing.T) {
 
 	now := time.Now()
 	rows := sqlmock.NewRows([]string{
-		"id", "username", "mail_address", "password_hash", "has_car", "capacity", "soso_points", "created_at", "updated_at",
-	}).AddRow("u1", "alice", "hash", true, 3, 10, now, now)
+		"id", "username", "mail_address", "password_hash", "has_car", "capacity", "created_at", "updated_at",
+	}).AddRow("u1", "alice", "hoge@example.com", "hash", true, 3, now, now)
 
 	mock.ExpectQuery(SQLSelectUserByName).
 		WithArgs("alice").
@@ -92,6 +119,29 @@ func TestUserRepository_FindByUsername_Hit(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, u)
 	assert.Equal(t, "alice", u.Username)
+	assert.True(t, u.HasCar)
+	assert.Equal(t, 3, u.Capacity)
+	assert.NoError(t, mock.ExpectationsWereMet())
+}
+
+// FindByEmail見つからない
+func TestUserRepository_FindByMailAddress_Hit(t *testing.T) {
+	repo, mock, close := newUserRepoMock(t)
+	defer close()
+
+	now := time.Now()
+	rows := sqlmock.NewRows([]string{
+		"id", "username", "mail_address", "password_hash", "has_car", "capacity", "created_at", "updated_at",
+	}).AddRow("u1", "alice", "hoge@example.com", "hash", true, 3, now, now)
+
+	mock.ExpectQuery(SQLSelectUserByMailAddress).
+		WithArgs("hoge@example.com").
+		WillReturnRows(rows)
+
+	u, err := repo.FindByMailAddress(context.Background(), "hoge@example.com")
+	assert.NoError(t, err)
+	assert.NotNil(t, u)
+	assert.Equal(t, "hoge@example.com", u.MailAddress)
 	assert.True(t, u.HasCar)
 	assert.Equal(t, 3, u.Capacity)
 	assert.NoError(t, mock.ExpectationsWereMet())
@@ -112,6 +162,21 @@ func TestUserRepository_FindByUsername_NotFound(t *testing.T) {
 	assert.NoError(t, mock.ExpectationsWereMet())
 }
 
+// FindByMailAddress 見つからない
+func TestUserRepository_FindByMailAddress_NotFound(t *testing.T) {
+	repo, mock, close := newUserRepoMock(t)
+	defer close()
+
+	mock.ExpectQuery(SQLSelectUserByMailAddress).
+		WithArgs("hogehoge@example.com").
+		WillReturnRows(sqlmock.NewRows([]string{}))
+
+	u, err := repo.FindByMailAddress(context.Background(), "hogehoge@example.com")
+	assert.NoError(t, err)
+	assert.Nil(t, u)
+	assert.NoError(t, mock.ExpectationsWereMet())
+}
+
 // FindByID ヒット
 func TestUserRepository_FindByID_Hit(t *testing.T) {
 	repo, mock, close := newUserRepoMock(t)
@@ -119,8 +184,8 @@ func TestUserRepository_FindByID_Hit(t *testing.T) {
 
 	now := time.Now()
 	rows := sqlmock.NewRows([]string{
-		"id", "username", "mail_address", "password_hash", "has_car", "capacity", "soso_points", "created_at", "updated_at",
-	}).AddRow("u1", "alice", "hash", false, 0, 0, now, now)
+		"id", "username", "mail_address", "password_hash", "has_car", "capacity", "created_at", "updated_at",
+	}).AddRow("u1", "alice", "hoge@example.com", "hash", false, 0, now, now)
 
 	mock.ExpectQuery(SQLSelectUserByID).
 		WithArgs("u1").
