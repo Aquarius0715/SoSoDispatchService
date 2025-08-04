@@ -59,5 +59,10 @@ func (h *CalenderHandler) Create(c echo.Context) error {
 	if err := h.CalenderRepo.Create(ctx, ca); err != nil {
 		return err
 	}
-	return c.NoContent(http.StatusCreated)
+	return c.JSON(http.StatusCreated, map[string]any{
+		"id":          ca.ID,
+		"name":        ca.Name,
+		"description": ca.Description,
+		"ownerId":     ca.OwnerId,
+	})
 }
