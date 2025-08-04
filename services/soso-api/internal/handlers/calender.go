@@ -23,7 +23,7 @@ type CalenderCreateRequest struct {
 	Description string `json:"description" validate:"description"`
 }
 
-func (h *CalenderHandler) Resister(c echo.Context) error {
+func (h *CalenderHandler) Create(c echo.Context) error {
 	var req CalenderCreateRequest
 
 	tok, ok := c.Get("user").(*jwt.Token)

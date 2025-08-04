@@ -32,6 +32,7 @@ func SetupRouter(cfg *Config) *echo.Echo {
 
 	userRepo := &repository.UserRepository{DB: db}
 	rtRepo := &repository.RefreshTokenRepository{DB: db}
+	calRepo := &repository.CalenderRepository{DB: db}
 
 	cookieCfg := handlers.CookieConf{
 		Name:     cfg.CookieNameRT,
@@ -42,6 +43,7 @@ func SetupRouter(cfg *Config) *echo.Echo {
 	}
 	authH := handlers.NewAuthHandler(userRepo, rtRepo, cfg.JWTSigningKey, cfg.AccessTokenTTLMin, cfg.RefreshTokenTTLH, cookieCfg)
 	userH := handlers.NewUserHandler(userRepo)
+	calenderH := handlers.NewCalenderHandler(calRepo)
 
 	// Echo標準ミドルウェア
 	e.Use(echoMW.Logger())
@@ -105,8 +107,13 @@ func SetupRouter(cfg *Config) *echo.Echo {
 	usersG := e.Group("/users", csrfMW)
 	usersG.POST("/register", userH.Register)
 
+	// Users
 	usersPriv := usersG.Group("", echojwt.WithConfig(jwtCfg)) // 同じ /users 配下
 	usersPriv.GET("/me", userH.Me)
+
+	// Calenders
+	calG := e.Group("/calenders", csrfMW, echojwt.WithConfig(jwtCfg))
+	calG.POST("/create", calenderH.Create)
 
 	// シャットダウン時クローズ
 	e.Server.RegisterOnShutdown(func() { _ = db.Close() })
