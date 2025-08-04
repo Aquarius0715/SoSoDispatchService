@@ -78,8 +78,6 @@ func (h *UserHandler) Register(c echo.Context) error {
 		"mailAddress": u.MailAddress,
 		"hasCar":      u.HasCar,
 		"capacity":    u.Capacity,
-		"createdAt":   u.CreatedAt,
-		"updatedAt":   u.UpdatedAt,
 	})
 }
 
