@@ -113,4 +113,24 @@ const (
 		 WHERE id = ?
 		   AND revoked_at IS NULL
 	`
+
+	SQLCalenderCreate = `
+		INSERT INTO calenders (
+			id, name, description, owner_id
+		VALUES(?, ?, ?, ?)
+		)
+	`
+
+	SQLCalenderFindByName = `
+		SELECT
+			id,
+			name,
+			description,
+			owner_id,
+			created_at,
+			updated_at
+		FROM calenders
+		WHERE name = ?
+		LIMIT 1
+	`
 )
