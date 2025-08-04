@@ -14,7 +14,7 @@ CREATE TABLE `users` (
 -- 2. calenders テーブル
 CREATE TABLE `calenders` (
   `id`             VARCHAR(36)       NOT NULL,
-  `name`           VARCHAR(128)      NOT NULL,
+  `name`           VARCHAR(128)      NOT NULL UNIQUE,
   `description`    TEXT,
   `owner_id`       VARCHAR(36)       NOT NULL,
   `created_at`     DATETIME(6)       NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
