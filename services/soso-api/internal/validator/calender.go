@@ -7,4 +7,8 @@ func ResisterCalender(v *validator.Validate) {
 		l := len(fl.Field().String())
 		return l < 128
 	})
+	_ = v.RegisterValidation("description", func(fl validator.FieldLevel) bool {
+		l := len(fl.Field().String())
+		return l < 1024
+	})
 }
