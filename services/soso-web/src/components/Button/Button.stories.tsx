@@ -23,7 +23,7 @@ type Story = StoryObj<typeof Button>;
 export const Default: Story = {
   args: {
     children: 'Default Button',
-    className: 'bg-blue-500 hover:bg-blue-600',
+    className: 'bg-red-500 hover:bg-blue-600',
   },
 };
 
