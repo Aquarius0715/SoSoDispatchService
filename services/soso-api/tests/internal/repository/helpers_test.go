@@ -117,8 +117,7 @@ const (
 	SQLCalenderCreate = `
 		INSERT INTO calenders (
 			id, name, description, owner_id
-		VALUES(?, ?, ?, ?)
-		)
+		) VALUES (?, ?, ?, ?)
 	`
 
 	SQLCalenderFindByName = `
