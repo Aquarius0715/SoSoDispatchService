@@ -45,7 +45,7 @@ func (r *CalenderRepository) Create(ctx context.Context, c *model.Calender) erro
 	_, err := r.DB.ExecContext(ctx, `
 		INSERT INTO calenders (
 			id, name, description, owner_id
-		VALUES (?, ?, ?, ?, ?)
+		VALUES (?, ?, ?, ?)
 		)
 	`, c.ID, c.Name, c.Description, c.OwnerId)
 	return err
