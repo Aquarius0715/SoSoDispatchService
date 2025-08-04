@@ -3,6 +3,7 @@ import React from 'react';
 
 interface Props {
   className?: string;
+  disabled?: boolean;
   onClick?: () => void;
   children?: React.ReactNode;
 }
