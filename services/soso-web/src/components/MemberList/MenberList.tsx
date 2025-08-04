@@ -6,6 +6,7 @@ export interface Member {
   id: number | string; // リスト表示のためのユニークなID
   memberName: string;
   hasCar: boolean;
+  passengerNumber?: number; // 車の有無に応じて乗車人数をオプションに
   sosoPoint: number;
 }
 
@@ -24,6 +25,7 @@ function MemberList({ members }: MemberListProps) {
           key={member.id} // ループで表示する要素には必ずユニークなkeyを指定
           memberName={member.memberName}
           hasCar={member.hasCar}
+          passengerNumber={member.passengerNumber}
           sosoPoint={member.sosoPoint}
         />
       ))}
