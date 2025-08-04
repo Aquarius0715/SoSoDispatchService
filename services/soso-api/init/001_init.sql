@@ -11,8 +11,8 @@ CREATE TABLE `users` (
   PRIMARY KEY(`id`)
 );
 
--- 2. teams テーブル
-CREATE TABLE `teams` (
+-- 2. calenders テーブル
+CREATE TABLE `calenders` (
   `id`             VARCHAR(36)       NOT NULL,
   `name`           VARCHAR(128)      NOT NULL,
   `description`    TEXT,
@@ -20,23 +20,23 @@ CREATE TABLE `teams` (
   `created_at`     DATETIME(6)       NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
   `updated_at`     DATETIME(6)       NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
   PRIMARY KEY (`id`),
-  INDEX `idx_teams_owner` (`owner_id`),
-  CONSTRAINT `fk_teams_owner`
+  INDEX `idx_calenders_owner` (`owner_id`),
+  CONSTRAINT `fk_calenders_owner`
     FOREIGN KEY (`owner_id`) REFERENCES `users`(`id`)
     ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- 3. team_memberships テーブル
-CREATE TABLE `team_memberships` (
-  `team_id`        VARCHAR(36)               NOT NULL,
+-- 3. calender_memberships テーブル
+CREATE TABLE `calender_memberships` (
+  `calender_id`        VARCHAR(36)               NOT NULL,
   `user_id`        VARCHAR(36)               NOT NULL,
   `role`           ENUM('member','admin')    NOT NULL DEFAULT 'member',
   `soso_point`     INT                       NOT NULL DEFAULT 0,
   `joined_at`      DATETIME(6)               NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
-  PRIMARY KEY (`team_id`,`user_id`),
+  PRIMARY KEY (`calender_id`,`user_id`),
   INDEX `idx_tm_user` (`user_id`),
-  CONSTRAINT `fk_tm_team`
-    FOREIGN KEY (`team_id`) REFERENCES `teams`(`id`)
+  CONSTRAINT `fk_tm_calender`
+    FOREIGN KEY (`calender_id`) REFERENCES `calenders`(`id`)
     ON DELETE CASCADE,
   CONSTRAINT `fk_tm_user`
     FOREIGN KEY (`user_id`) REFERENCES `users`(`id`)
@@ -46,7 +46,7 @@ CREATE TABLE `team_memberships` (
 -- 4. reservations テーブル
 CREATE TABLE `reservations` (
   `id`                   VARCHAR(36)       NOT NULL,
-  `team_id`              VARCHAR(36)       NOT NULL,
+  `calender_id`              VARCHAR(36)       NOT NULL,
   `creator_id`           VARCHAR(36)       NOT NULL,
   `title`                VARCHAR(128)      NOT NULL,
   `description`          TEXT,
@@ -58,9 +58,9 @@ CREATE TABLE `reservations` (
   `created_at`           DATETIME(6)       NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
   `updated_at`           DATETIME(6)       NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
   PRIMARY KEY (`id`),
-  INDEX `idx_reservations_team` (`team_id`),
-  CONSTRAINT `fk_reservations_team`
-    FOREIGN KEY (`team_id`) REFERENCES `teams`(`id`)
+  INDEX `idx_reservations_calender` (`calender_id`),
+  CONSTRAINT `fk_reservations_calender`
+    FOREIGN KEY (`calender_id`) REFERENCES `calenders`(`id`)
     ON DELETE CASCADE,
   CONSTRAINT `fk_reservations_creator`
     FOREIGN KEY (`creator_id`) REFERENCES `users`(`id`)
@@ -99,7 +99,7 @@ CREATE TABLE refresh_tokens (
 -- 7. soso_point_histories テーブル
 CREATE TABLE `soso_point_histories` (
   `id`             BIGINT AUTO_INCREMENT PRIMARY KEY,
-  `team_id`        VARCHAR(36) NOT NULL,
+  `calender_id`        VARCHAR(36) NOT NULL,
   `user_id`        VARCHAR(36) NOT NULL,
   `changed_at`     DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
   `changed_by`     VARCHAR(36),  -- 操作したユーザー（NULL = システム）
@@ -110,11 +110,11 @@ CREATE TABLE `soso_point_histories` (
   `reason`         TEXT,  -- 操作理由の自由記述欄
 
   INDEX `idx_sph_user` (`user_id`),
-  INDEX `idx_sph_team` (`team_id`),
+  INDEX `idx_sph_calender` (`calender_id`),
   INDEX `idx_sph_reservation` (`reservation_id`),
 
-  CONSTRAINT `fk_sph_team`
-    FOREIGN KEY (`team_id`) REFERENCES `teams`(`id`)
+  CONSTRAINT `fk_sph_calender`
+    FOREIGN KEY (`calender_id`) REFERENCES `calenders`(`id`)
     ON DELETE CASCADE,
   CONSTRAINT `fk_sph_user`
     FOREIGN KEY (`user_id`) REFERENCES `users`(`id`)
