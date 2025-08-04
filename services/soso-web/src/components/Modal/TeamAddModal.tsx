@@ -9,18 +9,36 @@ interface Props {
 
 const TeamAddModal: React.FC<Props> = ({ onClose }) => {
   const [newCalendarTitle, setNewCalendarTitle] = useState('');
-  const [newCalendarReason, setNewCalendarReason] = useState(''); // 追加
+  const [newCalendarReason, setNewCalendarReason] = useState('');
   const [sharedCalendarUrl, setSharedCalendarUrl] = useState('');
+  
+  // ロード状態を管理するstateを追加
+  const [isCreating, setIsCreating] = useState(false);
+  const [isJoining, setIsJoining] = useState(false);
 
   const handleCreateNewCalendar = () => {
-    // console.logに作成理由を追加
+    // ボタンをクリックしたらロード状態をtrueにする
+    setIsCreating(true);
     console.log('新規カレンダーを作成:', newCalendarTitle, '作成理由:', newCalendarReason);
-    onClose();
+    
+    // ここでAPI通信などの処理を行う
+    // 処理が完了したらロード状態をfalseに戻し、モーダルを閉じる
+    setTimeout(() => {
+      setIsCreating(false);
+      onClose();
+    }, 2000); // 2秒後に処理が完了したと仮定
   };
 
   const handleJoinSharedCalendar = () => {
+    // ボタンをクリックしたらロード状態をtrueにする
+    setIsJoining(true);
     console.log('共有カレンダーに参加:', sharedCalendarUrl);
-    onClose();
+    
+    // ここでAPI通信などの処理を行う
+    setTimeout(() => {
+      setIsJoining(false);
+      onClose();
+    }, 2000); // 2秒後に処理が完了したと仮定
   };
 
   return (
@@ -52,10 +70,12 @@ const TeamAddModal: React.FC<Props> = ({ onClose }) => {
             onChange={(e) => setNewCalendarReason(e.target.value)}
           />
           <Button
-            className={clsx('w-full !rounded-md bg-gray-700 text-white hover:bg-gray-800')}
+            // ロード状態と入力値の両方でボタンを無効化
+            disabled={isCreating || !newCalendarTitle}
+            className={clsx('w-full !rounded-md bg-gray-700 text-white hover:bg-gray-800', isCreating && 'opacity-50 cursor-not-allowed')}
             onClick={handleCreateNewCalendar}
           >
-            新規作成
+            {isCreating ? '作成中...' : '新規作成'}
           </Button>
         </div>
 
@@ -75,10 +95,12 @@ const TeamAddModal: React.FC<Props> = ({ onClose }) => {
             onChange={(e) => setSharedCalendarUrl(e.target.value)}
           />
           <Button
-            className={clsx('w-full !rounded-md bg-gray-700 text-white hover:bg-gray-800')}
+            // ロード状態と入力値の両方でボタンを無効化
+            disabled={isJoining || !sharedCalendarUrl}
+            className={clsx('w-full !rounded-md bg-gray-700 text-white hover:bg-gray-800', isJoining && 'opacity-50 cursor-not-allowed')}
             onClick={handleJoinSharedCalendar}
           >
-            参加
+            {isJoining ? '参加中...' : '参加'}
           </Button>
         </div>
       </div>
