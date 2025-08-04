@@ -22,7 +22,7 @@ func TestCalenderCreate_OK(t *testing.T) {
 	e := NewEcho()
 
 	dbm.Mock.ExpectQuery(SQLCalenderFindByName).
-		WithArgs("hoge").
+		WithArgs("jouhoukyoku").
 		WillReturnRows(sqlmock.NewRows([]string{}))
 	dbm.Mock.ExpectExec(SQLCalenderCreate).
 		WithArgs(sqlmock.AnyArg(), "jouhoukyoku", "jouhoukyoku", sqlmock.AnyArg()).
