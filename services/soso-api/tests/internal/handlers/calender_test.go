@@ -96,3 +96,21 @@ func TestCalenderCreate_InvalidPayload(t *testing.T) {
 	he := err.(*echo.HTTPError)
 	assert.Equal(t, http.StatusBadRequest, he.Code)
 }
+
+func TestCalenderCreate_Unauthorized(t *testing.T) {
+	dbm := NewSQLMock(t)
+	defer dbm.Close()
+
+	repo := repository.NewCalenderRepository(dbm.DB)
+	h := handlers.NewCalenderHandler(repo)
+	e := NewEcho()
+
+	req := httptest.NewRequest(http.MethodPost, "/calenders/create", nil)
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+
+	err := h.Create(c)
+	assert.Error(t, err)
+	he := err.(*echo.HTTPError)
+	assert.Equal(t, http.StatusUnauthorized, he.Code)
+}
