@@ -84,17 +84,7 @@ func SetupRouter(cfg *Config) *echo.Echo {
 		return c.JSON(http.StatusOK, map[string]string{"csrf_token": token})
 	}, csrfMW)
 
-	// /auth
-	authG := e.Group("/auth", csrfMW)
-	authG.POST("/login", authH.Login)
-	authG.POST("/refresh", authH.Refresh)
-	authG.POST("/logout", authH.Logout)
-
-	// /users 公開
-	usersG := e.Group("/users", csrfMW)
-	usersG.POST("/register", userH.Register)
-
-	// /users 認証必須
+	// JWT認証
 	jwtCfg := echojwt.Config{
 		SigningKey: []byte(cfg.JWTSigningKey),
 		NewClaimsFunc: func(c echo.Context) jwt.Claims {
@@ -104,6 +94,17 @@ func SetupRouter(cfg *Config) *echo.Echo {
 			return echo.NewHTTPError(http.StatusUnauthorized, "invalid or expired token")
 		},
 	}
+
+	// /auth
+	authG := e.Group("/auth", csrfMW)
+	authG.POST("/login", authH.Login)
+	authG.POST("/refresh", authH.Refresh)
+	authG.POST("/logout", authH.Logout, echojwt.WithConfig(jwtCfg))
+
+	// /users 公開
+	usersG := e.Group("/users", csrfMW)
+	usersG.POST("/register", userH.Register)
+
 	usersPriv := usersG.Group("", echojwt.WithConfig(jwtCfg)) // 同じ /users 配下
 	usersPriv.GET("/me", userH.Me)
 
