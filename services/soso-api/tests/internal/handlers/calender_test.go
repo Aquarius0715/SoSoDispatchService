@@ -74,3 +74,25 @@ func TestCalenderCreate_Conflict(t *testing.T) {
 	assert.Equal(t, http.StatusConflict, he.Code)
 	assert.NoError(t, dbm.Mock.ExpectationsWereMet())
 }
+
+func TestCalenderCreate_InvalidPayload(t *testing.T) {
+	dbm := NewSQLMock(t)
+	defer dbm.Close()
+
+	repo := repository.NewCalenderRepository(dbm.DB)
+	h := handlers.NewCalenderHandler(repo)
+	e := NewEcho()
+
+	req := httptest.NewRequest(http.MethodPost, "/calenders/create",
+		bytes.NewBufferString(`{`))
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+
+	SetJWTUser(c, "u1")
+
+	err := h.Create(c)
+	assert.Error(t, err)
+	he := err.(*echo.HTTPError)
+	assert.Equal(t, http.StatusBadRequest, he.Code)
+}
