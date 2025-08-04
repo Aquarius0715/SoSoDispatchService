@@ -49,9 +49,9 @@ func TestAuthHandler_Login_OK(t *testing.T) {
 	pwHash, _ := auth.HashPassword("password123")
 	now := time.Now()
 	rows := sqlmock.NewRows([]string{
-		"id", "username", "password_hash", "has_car", "capacity", "soso_points", "created_at", "updated_at",
-	}).AddRow("u1", "alice", pwHash, false, 0, 0, now, now)
-	mock.ExpectQuery(SQLSelectUserByName).WithArgs("alice").WillReturnRows(rows)
+		"id", "username", "mail_address", "password_hash", "has_car", "capacity", "created_at", "updated_at",
+	}).AddRow("u1", "alice", "hoge@example.com", pwHash, false, 0, now, now)
+	mock.ExpectQuery(SQLSelectUserByEmailAddress).WithArgs("hoge@example.com").WillReturnRows(rows)
 
 	mock.ExpectExec(SQLInsertRT).
 		WithArgs(sqlmock.AnyArg(), "u1", sqlmock.AnyArg(), sqlmock.AnyArg()).
@@ -59,7 +59,7 @@ func TestAuthHandler_Login_OK(t *testing.T) {
 
 	e := NewEcho()
 	req := httptest.NewRequest(http.MethodPost, "/auth/login",
-		bytes.NewBufferString(`{"username":"alice","password":"password123"}`))
+		bytes.NewBufferString(`{"username":"alice","mailAddress":"hoge@example.com","password":"password123"}`))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
@@ -92,13 +92,13 @@ func TestAuthHandler_Login_UserNotFound(t *testing.T) {
 	h, mock, close := newAuthHandler(t)
 	defer close()
 
-	mock.ExpectQuery(SQLSelectUserByName).
-		WithArgs("alice").
+	mock.ExpectQuery(SQLSelectUserByEmailAddress).
+		WithArgs("hoge@example.com").
 		WillReturnRows(sqlmock.NewRows([]string{}))
 
 	e := NewEcho()
 	req := httptest.NewRequest(http.MethodPost, "/auth/login",
-		bytes.NewBufferString(`{"username":"alice","password":"password123"}`))
+		bytes.NewBufferString(`{"username":"alice","mailAddress":"hoge@example.com","password":"password123"}`))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
@@ -117,15 +117,15 @@ func TestAuthHandler_Login_InvalidPassword(t *testing.T) {
 	wrongHash, _ := auth.HashPassword("otherpass")
 	now := time.Now()
 	rows := sqlmock.NewRows([]string{
-		"id", "username", "password_hash", "has_car", "capacity", "soso_points", "created_at", "updated_at",
-	}).AddRow("u1", "alice", wrongHash, false, 0, 0, now, now)
-	mock.ExpectQuery(SQLSelectUserByName).
-		WithArgs("alice").
+		"id", "username", "mail_address", "password_hash", "has_car", "capacity", "created_at", "updated_at",
+	}).AddRow("u1", "hoge@example.com", "alice", wrongHash, false, 0, now, now)
+	mock.ExpectQuery(SQLSelectUserByEmailAddress).
+		WithArgs("hoge@example.com").
 		WillReturnRows(rows)
 
 	e := NewEcho()
 	req := httptest.NewRequest(http.MethodPost, "/auth/login",
-		bytes.NewBufferString(`{"username":"alice","password":"password123"}`))
+		bytes.NewBufferString(`{"username":"alice","mailAddress":"hoge@example.com","password":"password123"}`))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)

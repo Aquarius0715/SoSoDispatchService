@@ -32,6 +32,7 @@ func SetupRouter(cfg *Config) *echo.Echo {
 
 	userRepo := &repository.UserRepository{DB: db}
 	rtRepo := &repository.RefreshTokenRepository{DB: db}
+	calRepo := &repository.CalenderRepository{DB: db}
 
 	cookieCfg := handlers.CookieConf{
 		Name:     cfg.CookieNameRT,
@@ -42,6 +43,7 @@ func SetupRouter(cfg *Config) *echo.Echo {
 	}
 	authH := handlers.NewAuthHandler(userRepo, rtRepo, cfg.JWTSigningKey, cfg.AccessTokenTTLMin, cfg.RefreshTokenTTLH, cookieCfg)
 	userH := handlers.NewUserHandler(userRepo)
+	calenderH := handlers.NewCalenderHandler(calRepo)
 
 	// Echo標準ミドルウェア
 	e.Use(echoMW.Logger())
@@ -84,17 +86,7 @@ func SetupRouter(cfg *Config) *echo.Echo {
 		return c.JSON(http.StatusOK, map[string]string{"csrf_token": token})
 	}, csrfMW)
 
-	// /auth
-	authG := e.Group("/auth", csrfMW)
-	authG.POST("/login", authH.Login)
-	authG.POST("/refresh", authH.Refresh)
-	authG.POST("/logout", authH.Logout)
-
-	// /users 公開
-	usersG := e.Group("/users", csrfMW)
-	usersG.POST("/register", userH.Register)
-
-	// /users 認証必須
+	// JWT認証
 	jwtCfg := echojwt.Config{
 		SigningKey: []byte(cfg.JWTSigningKey),
 		NewClaimsFunc: func(c echo.Context) jwt.Claims {
@@ -104,8 +96,24 @@ func SetupRouter(cfg *Config) *echo.Echo {
 			return echo.NewHTTPError(http.StatusUnauthorized, "invalid or expired token")
 		},
 	}
+
+	// /auth
+	authG := e.Group("/auth", csrfMW)
+	authG.POST("/login", authH.Login)
+	authG.POST("/refresh", authH.Refresh)
+	authG.POST("/logout", authH.Logout, echojwt.WithConfig(jwtCfg))
+
+	// /users 公開
+	usersG := e.Group("/users", csrfMW)
+	usersG.POST("/register", userH.Register)
+
+	// Users
 	usersPriv := usersG.Group("", echojwt.WithConfig(jwtCfg)) // 同じ /users 配下
 	usersPriv.GET("/me", userH.Me)
+
+	// Calenders
+	calG := e.Group("/calenders", csrfMW, echojwt.WithConfig(jwtCfg))
+	calG.POST("/create", calenderH.Create)
 
 	// シャットダウン時クローズ
 	e.Server.RegisterOnShutdown(func() { _ = db.Close() })

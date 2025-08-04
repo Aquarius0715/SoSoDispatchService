@@ -56,18 +56,33 @@ func Ctx() context.Context { return context.Background() }
 const (
 	SQLInsertUser = `
 		INSERT INTO users (
-			id, username, password_hash, has_car, capacity, soso_points
+			id, username, mail_address, password_hash, has_car, capacity
 		) VALUES (?,?,?,?,?,?)
+	`
+
+	SQLSelectUserByEmailAddress = `
+		SELECT
+			id,
+			username,
+			mail_address,
+			password_hash,
+			has_car,
+			capacity,
+			created_at,
+			updated_at
+		FROM users
+		WHERE mail_address = ?
+		LIMIT 1
 	`
 
 	SQLSelectUserByName = `
 		SELECT
 			id,
 			username,
+			mail_address,
 			password_hash,
 			has_car,
 			capacity,
-			soso_points,
 			created_at,
 			updated_at
 		FROM users
@@ -79,10 +94,10 @@ const (
 		SELECT
 			id,
 			username,
+			mail_address,
 			password_hash,
 			has_car,
 			capacity,
-			soso_points,
 			created_at,
 			updated_at
 		FROM users
@@ -116,5 +131,23 @@ const (
 		   SET revoked_at = ?
 		 WHERE id = ?
 		   AND revoked_at IS NULL
+	`
+	SQLCalenderCreate = `
+		INSERT INTO calenders (
+			id, name, description, owner_id
+		) VALUES (?, ?, ?, ?)
+	`
+
+	SQLCalenderFindByName = `
+		SELECT
+			id,
+			name,
+			description,
+			owner_id,
+			created_at,
+			updated_at
+		FROM calenders
+		WHERE name = ?
+		LIMIT 1
 	`
 )

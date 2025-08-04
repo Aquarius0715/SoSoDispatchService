@@ -28,13 +28,16 @@ func TestUserHandler_Register_OK(t *testing.T) {
 	dbm.Mock.ExpectQuery(SQLSelectUserByName).
 		WithArgs("alice").
 		WillReturnRows(sqlmock.NewRows([]string{}))
+	dbm.Mock.ExpectQuery(SQLSelectUserByEmailAddress).
+		WithArgs("hoge@example.com").
+		WillReturnRows(sqlmock.NewRows([]string{}))
 	// INSERT
 	dbm.Mock.ExpectExec(SQLInsertUser).
-		WithArgs(sqlmock.AnyArg(), "alice", sqlmock.AnyArg(), false, 0, 0).
+		WithArgs(sqlmock.AnyArg(), "alice", "hoge@example.com", sqlmock.AnyArg(), false, 0).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 
 	req := httptest.NewRequest(http.MethodPost, "/users/register",
-		bytes.NewBufferString(`{"username":"alice","password":"password123"}`))
+		bytes.NewBufferString(`{"username":"alice", "mailAddress":"hoge@example.com", "password":"password123"}`))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
@@ -55,15 +58,15 @@ func TestUserHandler_Register_Conflict(t *testing.T) {
 
 	now := time.Now()
 	rows := sqlmock.NewRows([]string{
-		"id", "username", "password_hash", "has_car", "capacity", "soso_points", "created_at", "updated_at",
-	}).AddRow("u1", "alice", "hash", false, 0, 0, now, now)
+		"id", "username", "mail_address", "password_hash", "has_car", "capacity", "created_at", "updated_at",
+	}).AddRow("u1", "alice", "hoge@example.com", "hash", false, 0, now, now)
 
 	dbm.Mock.ExpectQuery(SQLSelectUserByName).
 		WithArgs("alice").
 		WillReturnRows(rows)
 
 	req := httptest.NewRequest(http.MethodPost, "/users/register",
-		bytes.NewBufferString(`{"username":"alice","password":"password123"}`))
+		bytes.NewBufferString(`{"username":"alice", "mailAddress":"hoge@example.com", "password":"password123"}`))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
@@ -103,10 +106,21 @@ func TestUserHandler_Register_CapacityRequired(t *testing.T) {
 	h := handlers.NewUserHandler(repo)
 	e := NewEcho()
 
+	dbm.Mock.ExpectQuery(SQLSelectUserByName).
+		WithArgs("alice").
+		WillReturnRows(sqlmock.NewRows([]string{}))
+	dbm.Mock.ExpectQuery(SQLSelectUserByEmailAddress).
+		WithArgs("hoge@example.com").
+		WillReturnRows(sqlmock.NewRows([]string{}))
+	dbm.Mock.ExpectExec(SQLInsertUser).
+		WithArgs(sqlmock.AnyArg(), "alice", "hoge@example.com", sqlmock.AnyArg(), true, 0).
+		WillReturnResult(sqlmock.NewResult(1, 1))
+
 	req := httptest.NewRequest(http.MethodPost, "/users/register",
-		bytes.NewBufferString(`{"username":"bob","password":"password123","has_car":true,"capacity":0}`))
+		bytes.NewBufferString(`{"username":"alice","mailAddress":"hoge@example.com","password":"password123","hasCar":true,"capacity":0}`))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
+
 	c := e.NewContext(req, rec)
 
 	err := h.Register(c)
@@ -125,8 +139,8 @@ func TestUserHandler_Me_OK(t *testing.T) {
 
 	now := time.Now()
 	rows := sqlmock.NewRows([]string{
-		"id", "username", "password_hash", "has_car", "capacity", "soso_points", "created_at", "updated_at",
-	}).AddRow("u1", "alice", "hash", false, 0, 0, now, now)
+		"id", "username", "mail_address", "password_hash", "has_car", "capacity", "created_at", "updated_at",
+	}).AddRow("u1", "alice", "hoge@example.com", "hash", false, 0, now, now)
 
 	dbm.Mock.ExpectQuery(SQLSelectUserByID).
 		WithArgs("u1").

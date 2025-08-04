@@ -9,6 +9,7 @@ func New() *CustomValidator {
 	v := validator.New()
 
 	RegisterUser(v)
+	ResisterCalender(v)
 
 	return &CustomValidator{v: v}
 }

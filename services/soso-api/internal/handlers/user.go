@@ -41,7 +41,7 @@ func (h *UserHandler) Register(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 	// 相関バリデーション（HasCar=true の時 Capacity>0）
-	if req.HasCar && req.Capacity == 0 {
+	if req.HasCar && req.Capacity <= 0 {
 		return echo.NewHTTPError(http.StatusBadRequest, "capacity required when has_car is true")
 	}
 
@@ -72,7 +72,13 @@ func (h *UserHandler) Register(c echo.Context) error {
 	if err := h.UserRepo.Create(ctx, u); err != nil {
 		return err
 	}
-	return c.NoContent(http.StatusCreated)
+	return c.JSON(http.StatusCreated, map[string]any{
+		"id":          u.ID,
+		"username":    u.Username,
+		"mailAddress": u.MailAddress,
+		"hasCar":      u.HasCar,
+		"capacity":    u.Capacity,
+	})
 }
 
 // GET /users/me
