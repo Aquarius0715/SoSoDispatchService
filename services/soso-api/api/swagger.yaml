@@ -304,7 +304,7 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
-  /calenders/list:
+  /calenders/list/me:
     get:
       tags: [Calenders]
       summary: カレンダー一覧取得
