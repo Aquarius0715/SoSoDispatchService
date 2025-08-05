@@ -3,7 +3,7 @@ import React from 'react';
 import SOSOcard from './SOSOListCard'; // SOSOcardコンポーネントをインポート
 
 // SOSOポイント変動履歴のデータの型を定義
-export interface SOSOPointLog {
+export interface SOSOTransaction {
   id: number | string;
   eventName: string; // 画像のようにイベント名も表示
   date: string;
@@ -16,7 +16,7 @@ export interface SOSOPointLog {
 
 // SOSOListが受け取るpropsの型
 interface SOSOListProps {
-  logs: SOSOPointLog[]; // SOSOPointLogの配列
+  logs: SOSOTransaction[]; // SOSOTransactionの配列
 }
 
 function SOSOList({ logs }: SOSOListProps) {
