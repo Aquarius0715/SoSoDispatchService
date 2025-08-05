@@ -132,4 +132,27 @@ const (
 		WHERE name = ?
 		LIMIT 1
 	`
+
+	SQLFindByCalenderIDAndUserID = `
+		SELECT
+			*
+		FROM calender_memberships
+		WHERE calender_id = ?
+		AND user_id = ?
+		LIMIT 1
+	`
+
+	SQLCreateCalenderMembership = `
+		INSERT INTO calender_memberships (
+			calender_id, user_id, role
+		) VALUES (?, ?, ?)
+	`
+
+	SQLFindByCalenderID = `
+		SELECT
+			*
+		FROM calender_memberships
+		WHERE calender_id = ?
+		LIMIT 1
+	`
 )
