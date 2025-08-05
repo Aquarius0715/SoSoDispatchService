@@ -7,7 +7,6 @@ interface Props {
   userName?: string;
   hasCar?: boolean;
   passengerNumber?: number;
-  sosoPoint?: number;
   onEditClick?: () => void;
   children?: React.ReactNode;
 }
@@ -26,7 +25,6 @@ function MyPageSidebar(props: Props) {
         
         {/* ★ 文字色を白や薄いグレーに変更 */}
         <p className='text-md text-gray-100 font-semibold'>{props.userName}</p>
-        <p className='text-sm text-gray-300'>SOSOポイント: {props.sosoPoint}pt</p>
         <p className='text-sm text-gray-300'>車: {props.hasCar ? `あり(${props.passengerNumber}人)` : 'なし'}</p>
         
         {/* childrenはpropsで渡された場合に表示される */}
