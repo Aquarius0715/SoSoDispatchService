@@ -8,6 +8,7 @@ interface Props {
   hasCar?: boolean;
   passengerNumber?: number;
   sosoPoint?: number;
+  onEditClick?: () => void;
   children?: React.ReactNode;
 }
 
@@ -30,7 +31,9 @@ function MyPageSidebar(props: Props) {
         
         {/* childrenはpropsで渡された場合に表示される */}
         {props.children}
-        <Button className="mt-4 bg-gray-800 hover:bg-gray-850 text-white">ステータス編集</Button>
+        <Button 
+          onClick={props.onEditClick}
+          className="mt-4 bg-gray-800 hover:bg-gray-850 text-white">ステータス編集</Button>
       </div>
 
       {/* 今後、他のメニュー項目などをここに追加できます */}
