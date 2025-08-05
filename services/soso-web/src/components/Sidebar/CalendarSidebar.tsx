@@ -11,7 +11,7 @@ interface Props {
 }
 
 
-function CalendarLestSidebar(props: Props) {
+function CalendarLeftSidebar(props: Props) {
   // ★ 編集モーダルの表示状態を管理
   const [isModalOpen, setIsModalOpen] = useState(false);
   // ★ 編集対象のメンバーを管理
