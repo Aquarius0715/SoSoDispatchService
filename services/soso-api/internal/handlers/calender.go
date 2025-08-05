@@ -23,6 +23,35 @@ type CalenderCreateRequest struct {
 	Description string `json:"description" validate:"description"`
 }
 
+func (h *CalenderHandler) FindMyCalenders(c echo.Context) error {
+	tok, ok := c.Get("user").(*jwt.Token)
+	if !ok {
+		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized")
+	}
+	claims, ok := tok.Claims.(*jwt.RegisteredClaims)
+	if !ok || claims.Subject == "" {
+		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized")
+	}
+	userID := claims.Subject
+
+	ctx := c.Request().Context()
+	cals, err := h.CalenderRepo.FindCalendersByUserId(ctx, userID)
+	if err != nil {
+		return err
+	}
+
+	resp := make([]map[string]any, len(cals))
+	for i, ca := range cals {
+		resp[i] = map[string]any{
+			"id":          ca.ID,
+			"name":        ca.Name,
+			"description": ca.Description,
+			"ownerId":     ca.OwnerId,
+		}
+	}
+	return c.JSON(http.StatusOK, resp)
+}
+
 func (h *CalenderHandler) Create(c echo.Context) error {
 	var req CalenderCreateRequest
 
