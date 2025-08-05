@@ -173,4 +173,18 @@ const (
 		WHERE calender_id = ?
 		LIMIT 1
 	`
+
+	SQLFindCalendersByUserID = `
+		SELECT
+			c.id	AS id,
+			c.name	AS name,
+			c.description AS description,
+			c.owner_id AS owner_id,
+		FROM
+			calender_memberships AS cm
+			INNER JOIN calenders AS c
+				ON c.id = cm.calender_id
+		WHERE
+			cm.user_id = ?
+	`
 )
