@@ -147,4 +147,12 @@ const (
 			calender_id, user_id, role
 		) VALUES (?, ?, ?)
 	`
+
+	SQLFindByCalenderID = `
+		SELECT
+			*
+		FROM calender_memberships
+		WHERE calender_id = ?
+		LIMIT 1
+	`
 )

@@ -15,6 +15,27 @@ func NewCalenderMembershipRepository(db *sql.DB) *CalenderMembershipRepository {
 	return &CalenderMembershipRepository{DB: db}
 }
 
+func (r *CalenderMembershipRepository) FindByCalenderID(ctx context.Context, calenderID string) (*model.CalenderMembership, error) {
+	row := r.DB.QueryRowContext(ctx, `
+		SELECT
+			*
+		FROM calender_memberships
+		WHERE calender_id = ?
+		LIMIT 1
+	`, calenderID)
+
+	var cm model.CalenderMembership
+	if err := row.Scan(
+		&cm.CalenderID, &cm.UserID, &cm.Role, &cm.SoSoPoint, &cm.JoinedAt,
+	); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return &cm, nil
+}
+
 func (r *CalenderMembershipRepository) FindByCalenderIDAndUserID(ctx context.Context, calenderId string, userId string) (*model.CalenderMembership, error) {
 	row := r.DB.QueryRowContext(ctx, `
 		SELECT

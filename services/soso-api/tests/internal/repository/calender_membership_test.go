@@ -57,3 +57,23 @@ func TestCalenderMembershipRepository_FindByCalenderIDAndUserID(t *testing.T) {
 	assert.Equal(t, "uu1", c.UserID)
 	assert.NoError(t, mock.ExpectationsWereMet())
 }
+
+func TestCalenderMembershipRepository_FindByCalenderID_OK(t *testing.T) {
+	repo, mock, close := newCalenderMembershipRepoMock(t)
+	defer close()
+
+	now := time.Now()
+	rows := sqlmock.NewRows([]string{
+		"calender_id", "user_id", "role", "soso_point", "joind_at",
+	}).AddRow("cu1", "uu1", "admin", 0, now)
+
+	mock.ExpectQuery(SQLFindByCalenderID).
+		WithArgs("cu1").
+		WillReturnRows(rows)
+
+	c, err := repo.FindByCalenderID(context.Background(), "cu1")
+	assert.NoError(t, err)
+	assert.NotNil(t, c)
+	assert.Equal(t, "cu1", c.CalenderID)
+	assert.NoError(t, mock.ExpectationsWereMet())
+}
