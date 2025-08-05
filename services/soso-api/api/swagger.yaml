@@ -27,7 +27,7 @@ paths:
   /auth/login:
     post:
       tags: [Auth]
-      summary: ユーザーログイン
+      summary: ユーザーログイン(実装済み)
       description: |
         ユーザーを認証し、アクセスJWTを返却。リフレッシュトークンは HttpOnly Cookie `rt` に設定されます。
       security:
@@ -62,7 +62,7 @@ paths:
   /auth/refresh:
     post:
       tags: [Auth]
-      summary: アクセストークン再発行
+      summary: アクセストークン再発行(実装済み)
       description: |
         有効なリフレッシュトークンCookieを用いてアクセストークンを再発行し、リフレッシュトークンもローテーションします。
       security:
@@ -88,7 +88,7 @@ paths:
   /auth/logout:
     post:
       tags: [Auth]
-      summary: ログアウト
+      summary: ログアウト（実装済み）
       description: リフレッシュトークンを無効化し、Cookieを削除します。
       security:
         - RefreshCookie: []
@@ -106,7 +106,7 @@ paths:
   /auth/csrf:
     get:
       tags: [Auth]
-      summary: CSRFトークン取得
+      summary: CSRFトークン取得(実装済み)
       description: CSRFトークンを返却し、必要に応じてCookieにも設定します。
       responses:
         '200':
@@ -121,7 +121,7 @@ paths:
   /users/register:
     post:
       tags: [Users]
-      summary: ユーザー登録
+      summary: ユーザー登録(実装済み)
       description: 新規ユーザー登録
       operationId: createUser
       security:
@@ -149,7 +149,7 @@ paths:
   /users/me:
     get:
       tags: [Users]
-      summary: 自分のユーザー情報取得
+      summary: 自分のユーザー情報取得(実装済み)
       security:
         - AccessToken: []
       responses:
@@ -307,7 +307,7 @@ paths:
   /calenders/my/:
     get:
       tags: [Calenders]
-      summary: カレンダー一覧取得
+      summary: 自身の所属カレンダー一覧を取得（実装済み）
       operationId: listCalenders
       security:
         - AccessToken: []
@@ -327,7 +327,7 @@ paths:
   /calenders/create:
     post:
         tags: [Calenders]
-        summary: カレンダー作成
+        summary: カレンダー作成(実装済み)
         operationId: createCalender
         security:
           - AccessToken: []
@@ -425,7 +425,7 @@ paths:
   /calenders/{calenderId}/join:
     post:
       tags: [Calenders]
-      summary: カレンダー参加申請
+      summary: カレンダー参加申請(実装済み)
       operationId: joinCalender
       security:
         - AccessToken: []
