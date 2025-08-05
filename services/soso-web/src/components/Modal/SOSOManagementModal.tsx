@@ -7,6 +7,64 @@ import { SOSOTransaction } from '../SOSOList/SOSOList';
 import SOSOEditModal from './SOSOEditModal';
 import { useState } from 'react';
 
+interface Props {
+  className?: string;
+  eventName : string;
+}
+
+function SOSOManagementModal({ eventName, className }: Props) {
+    // ★ モーダルの状態を管理するuseState
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedMember, setSelectedMember] = useState<Member | null>(null);
+
+  // ★ 編集ボタンが押されたときのハンドラー
+  const handleEditMember = (member: Member) => {
+    setSelectedMember(member); // 編集対象のメンバーをセット
+    setIsEditModalOpen(true);   // 編集モーダルを開く
+  };
+
+  // ★ 編集モーダルを閉じる関数
+  const handleCloseEditModal = () => {
+    setIsEditModalOpen(false);
+    setSelectedMember(null);
+  };
+
+  // ★ 編集内容を保存する関数
+  const handleSaveEditedMember = (editedData: Member & { reason: string }) => {
+    // ここにメンバーリストを更新するロジックを実装
+    console.log('保存:', editedData);
+    handleCloseEditModal();
+  };
+
+  return (
+    <div className={clsx('fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center', className)}>
+      <div className={clsx('bg-white p-6 rounded-lg shadow-xl w-96 flex')}>
+        <div className='flex-1 pr-4'>
+          <h2 className='text-xl text-black font-bold mb-4'>メンバー一覧</h2>
+          {/* <MemberList members={DUMMY_MEMBERS} onEditMember={handleEditMember} /> */}
+            <MemberList members={[]} onEditMember={handleEditMember} />
+        </div>
+        <div className='flex-1 pl-4'>
+          <h2 className='text-xl text-black font-bold mb-4'>トランザクション履歴</h2>
+          {/* <SOSOList logs={DUMMY_TRANSACTIONS} /> */}
+          <SOSOList  logs={[]} /> 
+        </div>
+      </div>
+      {/* ★ 編集対象が選択された場合のみSOSOEditModalを表示 */}
+      {selectedMember && (
+        <SOSOEditModal
+          isOpen={isEditModalOpen}
+          onClose={handleCloseEditModal}
+          onSave={handleSaveEditedMember}
+          initialData={selectedMember}
+        />
+      )}
+    </div>
+  );
+}
+
+export default SOSOManagementModal;
+
 // テスト用ダミーデータ
 // export const DUMMY_MEMBERS: Member[] = [
 //   {
@@ -73,61 +131,3 @@ import { useState } from 'react';
 //     reason: '遅刻したため',
 //   },
 // ];
-
-interface Props {
-  className?: string;
-  eventName : string;
-}
-
-function SOSOManagementModal({ eventName, className }: Props) {
-    // ★ モーダルの状態を管理するuseState
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [selectedMember, setSelectedMember] = useState<Member | null>(null);
-
-  // ★ 編集ボタンが押されたときのハンドラー
-  const handleEditMember = (member: Member) => {
-    setSelectedMember(member); // 編集対象のメンバーをセット
-    setIsEditModalOpen(true);   // 編集モーダルを開く
-  };
-
-  // ★ 編集モーダルを閉じる関数
-  const handleCloseEditModal = () => {
-    setIsEditModalOpen(false);
-    setSelectedMember(null);
-  };
-
-  // ★ 編集内容を保存する関数
-  const handleSaveEditedMember = (editedData: Member & { reason: string }) => {
-    // ここにメンバーリストを更新するロジックを実装
-    console.log('保存:', editedData);
-    handleCloseEditModal();
-  };
-
-  return (
-    <div className={clsx('fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center', className)}>
-      <div className={clsx('bg-white p-6 rounded-lg shadow-xl w-96 flex')}>
-        <div className='flex-1 pr-4'>
-          <h2 className='text-xl text-black font-bold mb-4'>メンバー一覧</h2>
-          {/* <MemberList members={DUMMY_MEMBERS} onEditMember={handleEditMember} /> */}
-            <MemberList members={[]} onEditMember={handleEditMember} />
-        </div>
-        <div className='flex-1 pl-4'>
-          <h2 className='text-xl text-black font-bold mb-4'>トランザクション履歴</h2>
-          {/* <SOSOList logs={DUMMY_TRANSACTIONS} /> */}
-          <SOSOList  logs={[]} /> 
-        </div>
-      </div>
-      {/* ★ 編集対象が選択された場合のみSOSOEditModalを表示 */}
-      {selectedMember && (
-        <SOSOEditModal
-          isOpen={isEditModalOpen}
-          onClose={handleCloseEditModal}
-          onSave={handleSaveEditedMember}
-          initialData={selectedMember}
-        />
-      )}
-    </div>
-  );
-}
-
-export default SOSOManagementModal;
