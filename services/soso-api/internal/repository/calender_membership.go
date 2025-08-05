@@ -15,6 +15,49 @@ func NewCalenderMembershipRepository(db *sql.DB) *CalenderMembershipRepository {
 	return &CalenderMembershipRepository{DB: db}
 }
 
+func (r *CalenderMembershipRepository) FindMembersByCalenderID(
+	ctx context.Context,
+	calenderID string,
+) ([]*model.CalenderMember, error) {
+
+	rows, err := r.DB.QueryContext(ctx, `
+		SELECT
+			cm.user_id,
+			u.username,
+			u.has_car,
+			u.capacity,
+			cm.soso_point
+		FROM calender_memberships AS cm
+		INNER JOIN users AS u ON u.id = cm.user_id
+		WHERE cm.calender_id = ?
+	`, calenderID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	members := make([]*model.CalenderMember, 0)
+	for rows.Next() {
+		var m model.CalenderMember
+		if err := rows.Scan(
+			&m.UserID,
+			&m.Username,
+			&m.HasCar,
+			&m.Capacity,
+			&m.SoSoPoint,
+		); err != nil {
+			return nil, err
+		}
+		members = append(members, &m)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return members, nil
+}
+
 func (r *CalenderMembershipRepository) FindByCalenderID(ctx context.Context, calenderID string) (*model.CalenderMembership, error) {
 	row := r.DB.QueryRowContext(ctx, `
 		SELECT

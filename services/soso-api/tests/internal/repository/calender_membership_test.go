@@ -77,3 +77,42 @@ func TestCalenderMembershipRepository_FindByCalenderID_OK(t *testing.T) {
 	assert.Equal(t, "cu1", c.CalenderID)
 	assert.NoError(t, mock.ExpectationsWereMet())
 }
+
+func TestCalenderMembershipRepository_FindMembersByCalenderID_OK(t *testing.T) {
+	repo, mock, close := newCalenderMembershipRepoMock(t)
+	defer close()
+
+	calenderID := "cu1"
+	rows := sqlmock.NewRows([]string{
+		"user_id", "username", "has_car", "capacity", "soso_point",
+	}).
+		AddRow("uu1", "alice", 1, 4, 10).
+		AddRow("uu2", "bob", 0, 2, 3)
+
+	mock.ExpectQuery(SQLFindMembersByCalenderID).
+		WithArgs(calenderID).
+		WillReturnRows(rows)
+
+	members, err := repo.FindMembersByCalenderID(context.Background(), calenderID)
+	assert.NoError(t, err)
+	assert.Len(t, members, 2)
+
+	want0 := &model.CalenderMember{
+		UserID:    "uu1",
+		Username:  "alice",
+		HasCar:    true,
+		Capacity:  4,
+		SoSoPoint: 10,
+	}
+	want1 := &model.CalenderMember{
+		UserID:    "uu2",
+		Username:  "bob",
+		HasCar:    false,
+		Capacity:  2,
+		SoSoPoint: 3,
+	}
+
+	assert.Equal(t, want0, members[0])
+	assert.Equal(t, want1, members[1])
+	assert.NoError(t, mock.ExpectationsWereMet())
+}

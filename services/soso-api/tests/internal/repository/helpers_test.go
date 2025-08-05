@@ -168,4 +168,15 @@ const (
 		WHERE
 			cm.user_id = ?
 	`
+	SQLFindMembersByCalenderID = `
+		SELECT
+			cm.user_id,
+			u.username,
+			u.has_car,
+			u.capacity,
+			cm.soso_point
+		FROM calender_memberships AS cm
+		INNER JOIN users AS u ON u.id = cm.user_id
+		WHERE cm.calender_id = ?
+	`
 )

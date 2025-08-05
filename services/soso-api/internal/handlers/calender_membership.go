@@ -20,6 +20,66 @@ func NewCalenderMembershipHandler(r *repository.CalenderMembershipRepository) *C
 type CalenderMembershipRequest struct {
 }
 
+// DTO (JSON のキーは camelCase)
+type CalenderMemberResponse struct {
+	UserID    string `json:"userId"`
+	Username  string `json:"username"`
+	HasCar    bool   `json:"hasCar"`
+	Capacity  int    `json:"capacity"`
+	SoSoPoint int    `json:"sosoPoint"`
+}
+
+// GET /calenders/:calender_id/members
+func (h *CalenderMembershipHandler) List(c echo.Context) error {
+	// --- 認証 -------------------------------------------------------------
+	tok, ok := c.Get("user").(*jwt.Token)
+	if !ok {
+		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized")
+	}
+	claims, ok := tok.Claims.(*jwt.RegisteredClaims)
+	if !ok || claims.Subject == "" {
+		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized")
+	}
+	userID := claims.Subject
+
+	// --- パスパラメータ -----------------------------------------------------
+	calenderID := c.Param("calender_id")
+	if calenderID == "" {
+		return echo.NewHTTPError(http.StatusBadRequest, "calender_id is required")
+	}
+
+	ctx := c.Request().Context()
+
+	// --- 所属チェック -------------------------------------------------------
+	member, err := h.CalenderMembershipRepo.FindByCalenderIDAndUserID(ctx, calenderID, userID)
+	if err != nil {
+		return err
+	}
+	if member == nil {
+		return echo.NewHTTPError(http.StatusForbidden, "forbidden")
+	}
+
+	// --- 一覧取得 -----------------------------------------------------------
+	members, err := h.CalenderMembershipRepo.FindMembersByCalenderID(ctx, calenderID)
+	if err != nil {
+		return err
+	}
+
+	// --- DTO 変換 -----------------------------------------------------------
+	resp := make([]*CalenderMemberResponse, 0, len(members))
+	for _, m := range members {
+		resp = append(resp, &CalenderMemberResponse{
+			UserID:    m.UserID,
+			Username:  m.Username,
+			HasCar:    m.HasCar,
+			Capacity:  m.Capacity,
+			SoSoPoint: m.SoSoPoint,
+		})
+	}
+
+	return c.JSON(http.StatusOK, resp)
+}
+
 func (h *CalenderMembershipHandler) Create(c echo.Context) error {
 	var req CalenderMembershipRequest
 
