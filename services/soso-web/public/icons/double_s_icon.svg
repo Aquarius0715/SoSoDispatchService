@@ -1,0 +1,40 @@
+<svg width="200" height="120" viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg">
+  <!-- 左側のS（下側） -->
+  <g>
+    <!-- S字の上部 -->
+    <rect x="40" y="50" width="50" height="12" fill="black"/>
+    <!-- S字の中央横線 -->
+    <rect x="40" y="74" width="50" height="12" fill="black"/>
+    <!-- S字の下部 -->
+    <rect x="40" y="98" width="50" height="12" fill="black"/>
+    
+    <!-- S字の左縦線（上部） -->
+    <rect x="40" y="50" width="12" height="36" fill="black"/>
+    <!-- S字の右縦線（下部） -->
+    <rect x="78" y="74" width="12" height="36" fill="black"/>
+    
+    <!-- 下半分のオレンジ色の四角 -->
+    <rect x="50" y="85" width="20" height="15" fill="orange"/>
+  </g>
+  
+  <!-- 右側のS（上側、左のSの右上に配置） -->
+  <g>
+    <!-- S字の上部 -->
+    <rect x="110" y="10" width="50" height="12" fill="black"/>
+    <!-- S字の中央横線 -->
+    <rect x="110" y="34" width="50" height="12" fill="black"/>
+    <!-- S字の下部 -->
+    <rect x="110" y="58" width="50" height="12" fill="black"/>
+    
+    <!-- S字の左縦線（上部） -->
+    <rect x="110" y="10" width="12" height="36" fill="black"/>
+    <!-- S字の右縦線（下部） -->
+    <rect x="148" y="34" width="12" height="36" fill="black"/>
+    
+    <!-- 下半分の黄色の四角 -->
+    <rect x="130" y="45" width="20" height="15" fill="yellow"/>
+  </g>
+  
+  <!-- 連結部分：左のSの上端と右のSの下端をつなぐ -->
+  <rect x="90" y="50" width="20" height="20" fill="black"/>
+</svg>
