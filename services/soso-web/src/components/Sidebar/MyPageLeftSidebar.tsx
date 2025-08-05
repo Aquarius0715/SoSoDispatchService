@@ -11,7 +11,7 @@ interface Props {
   children?: React.ReactNode;
 }
 
-function MyPageSidebar(props: Props) {
+function MyPageLeftSidebar(props: Props) {
     return (
         <aside 
       className={clsx(
@@ -39,4 +39,4 @@ function MyPageSidebar(props: Props) {
     </aside>
     );
 }
-export default MyPageSidebar;
+export default MyPageLeftSidebar;

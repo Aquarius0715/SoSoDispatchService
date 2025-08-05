@@ -10,7 +10,8 @@ interface Props {
   children?: React.ReactNode;
 }
 
-function CalendarSidebar(props: Props) {
+
+function CalendarLestSidebar(props: Props) {
   // ★ 編集モーダルの表示状態を管理
   const [isModalOpen, setIsModalOpen] = useState(false);
   // ★ 編集対象のメンバーを管理
@@ -34,6 +35,7 @@ function CalendarSidebar(props: Props) {
     setIsModalOpen(false);
     setSelectedMember(null); // 編集対象をリセット
   };
+
   return (
     <aside
       className={clsx(
@@ -56,4 +58,4 @@ function CalendarSidebar(props: Props) {
   );
 }
 
-export default CalendarSidebar;
+export default CalendarLeftSidebar;
