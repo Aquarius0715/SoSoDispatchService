@@ -18,7 +18,6 @@ func NewCalenderMembershipHandler(r *repository.CalenderMembershipRepository) *C
 }
 
 type CalenderMembershipRequest struct {
-	CalenderID string `json:"calenderId"`
 }
 
 func (h *CalenderMembershipHandler) Create(c echo.Context) error {
@@ -40,34 +39,37 @@ func (h *CalenderMembershipHandler) Create(c echo.Context) error {
 	if err := c.Validate(&req); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
+	if c.Param("calender_id") == "" {
+		return echo.NewHTTPError(http.StatusBadRequest, "calender_id is required")
+	}
 	ctx := c.Request().Context()
 
-	if exist, err := h.CalenderMembershipRepo.FindByCalenderIDAndUserID(ctx, c.Param("calenderId"), userId); err != nil {
+	if exist, err := h.CalenderMembershipRepo.FindByCalenderIDAndUserID(ctx, c.Param("calender_id"), userId); err != nil {
 		return err
 	} else if exist != nil {
 		return echo.NewHTTPError(http.StatusConflict, "You already join this calender")
 	}
-	if exist, err := h.CalenderMembershipRepo.FindByCalenderID(ctx, c.Param("calenderId")); err != nil {
+	if exist, err := h.CalenderMembershipRepo.FindByCalenderID(ctx, c.Param("calender_id")); err != nil {
 		return err
-	} else if exist != nil {
+	} else if exist == nil {
 		cm := &model.CalenderMembership{
-			CalenderID: c.Param("calenderId"),
+			CalenderID: c.Param("calender_id"),
 			UserID:     userId,
 			Role:       model.ADMIN,
 		}
 		if err := h.CalenderMembershipRepo.Create(ctx, cm); err != nil {
 			return err
 		}
-		return c.NoContent(http.StatusAccepted)
+		return c.NoContent(http.StatusCreated)
 	} else {
 		cm := &model.CalenderMembership{
-			CalenderID: c.Param("calenderId"),
+			CalenderID: c.Param("calender_id"),
 			UserID:     userId,
 			Role:       model.MEMBER,
 		}
 		if err := h.CalenderMembershipRepo.Create(ctx, cm); err != nil {
 			return err
 		}
-		return c.NoContent(http.StatusAccepted)
+		return c.NoContent(http.StatusCreated)
 	}
 }

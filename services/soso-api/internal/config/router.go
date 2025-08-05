@@ -116,7 +116,7 @@ func SetupRouter(cfg *Config) *echo.Echo {
 	// Calenders
 	calG := e.Group("/calenders", csrfMW, echojwt.WithConfig(jwtCfg))
 	calG.POST("/create", calenderH.Create)
-	calG.POST("/:calenderId/join", calenderMembershipH.Create)
+	calG.POST("/:calender_id/join", calenderMembershipH.Create)
 
 	// シャットダウン時クローズ
 	e.Server.RegisterOnShutdown(func() { _ = db.Close() })
