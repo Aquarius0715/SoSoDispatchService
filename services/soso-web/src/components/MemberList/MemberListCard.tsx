@@ -21,8 +21,8 @@ function MemberListCard(props: Props) {
     <div className={clsx('font-semibold flex justify-between items-center bg-primary-1 rounded-lg', className)}>
       <div>
         <p className='text-md text-gray-800'>{props.memberName}</p>
-        <p className='text-sm text-gray-600'>SOSOポイント: {props.sosoPoint}pt</p>
         <p className='text-sm text-gray-600'>車: {props.hasCar ? `あり(${props.passengerNumber}人)` : 'なし'}</p>
+        <p className='text-sm text-gray-600'>SOSOポイント: {props.sosoPoint}pt</p>
         {props.children}
       </div>
       <Button 
