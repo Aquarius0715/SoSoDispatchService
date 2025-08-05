@@ -42,13 +42,32 @@ func (h *CalenderMembershipHandler) Create(c echo.Context) error {
 	}
 	ctx := c.Request().Context()
 
-	if exist, err := h.CalenderMembershipRepo.FindByCalenderIDAndUserID(ctx, req.CalenderID, userId); err != nil {
+	if exist, err := h.CalenderMembershipRepo.FindByCalenderIDAndUserID(ctx, c.Param("calenderId"), userId); err != nil {
 		return err
 	} else if exist != nil {
 		return echo.NewHTTPError(http.StatusConflict, "You already join this calender")
 	}
-	cm := &model.CalenderMembership{
-		CalenderID: req.CalenderID,
-		UserID:     userId,
+	if exist, err := h.CalenderMembershipRepo.FindByCalenderID(ctx, c.Param("calenderId")); err != nil {
+		return err
+	} else if exist != nil {
+		cm := &model.CalenderMembership{
+			CalenderID: c.Param("calenderId"),
+			UserID:     userId,
+			Role:       model.ADMIN,
+		}
+		if err := h.CalenderMembershipRepo.Create(ctx, cm); err != nil {
+			return err
+		}
+		return c.NoContent(http.StatusAccepted)
+	} else {
+		cm := &model.CalenderMembership{
+			CalenderID: c.Param("calenderId"),
+			UserID:     userId,
+			Role:       model.MEMBER,
+		}
+		if err := h.CalenderMembershipRepo.Create(ctx, cm); err != nil {
+			return err
+		}
+		return c.NoContent(http.StatusAccepted)
 	}
 }
