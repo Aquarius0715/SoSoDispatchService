@@ -1,3 +1,4 @@
+//SOSOList.tsx
 import React from 'react';
 import SOSOcard from './SOSOListCard'; // SOSOcardコンポーネントをインポート
 
