@@ -2,6 +2,9 @@
 
 import { useState, useEffect } from 'react'
 import axios from 'axios'
+
+
+
 export default function Home() {
   const [username, setUsername] = useState('')
   const [mailAddress, setMailAddress] = useState('')
@@ -75,8 +78,14 @@ export default function Home() {
     }
   }
 
+  const handleEdit = () => {
+    alert('ステータス編集ボタンがクリックされました！');
+  };
+
   return (
     <div className="p-4 max-w-md mx-auto space-y-4">
+
+      
       <h1 className="text-xl font-bold">ユーザー登録 & ログイン</h1>
 
       <input
