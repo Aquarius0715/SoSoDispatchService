@@ -97,3 +97,42 @@ func TestCalenderRepository_FindByName_NotFound(t *testing.T) {
 	assert.Nil(t, c)
 	assert.NoError(t, mock.ExpectationsWereMet())
 }
+
+func TestCalenderRepository_FindCalendersByUserId_Hit(t *testing.T) {
+	repo, mock, close := newCalenderRepoMock(t)
+	defer close()
+
+	rows := sqlmock.NewRows([]string{
+		"id", "name", "description", "owner_id",
+	}).AddRow("cal1", "Calendar 1", "desc1", "u1").
+		AddRow("cal2", "Calendar 2", "desc2", "u1")
+
+	mock.ExpectQuery(SQLFindCalendersByUserID).
+		WithArgs("u1").
+		WillReturnRows(rows)
+
+	list, err := repo.FindCalendersByUserId(context.Background(), "u1")
+	assert.NoError(t, err)
+	assert.Len(t, list, 2)
+	assert.Equal(t, "cal1", list[0].ID)
+	assert.Equal(t, "Calendar 2", list[1].Name)
+	assert.NoError(t, mock.ExpectationsWereMet())
+}
+
+func TestCalenderRepository_FindCalendersByUserId_NotFound(t *testing.T) {
+	repo, mock, close := newCalenderRepoMock(t)
+	defer close()
+
+	emptyRows := sqlmock.NewRows([]string{
+		"id", "name", "description", "owner_id",
+	}) // カラムは必要。行は追加しない。
+
+	mock.ExpectQuery(SQLFindCalendersByUserID).
+		WithArgs("u1").
+		WillReturnRows(emptyRows)
+
+	list, err := repo.FindCalendersByUserId(context.Background(), "u1")
+	assert.NoError(t, err)
+	assert.Len(t, list, 0)
+	assert.NoError(t, mock.ExpectationsWereMet())
+}

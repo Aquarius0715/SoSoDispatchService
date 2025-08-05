@@ -24,10 +24,7 @@ function MemberList({ members, onEditMember }: MemberListProps) {
       {members.map((member) => (
         <MemberListCard
           key={member.id} // ループで表示する要素には必ずユニークなkeyを指定
-          memberName={member.memberName}
-          hasCar={member.hasCar}
-          passengerNumber={member.passengerNumber}
-          sosoPoint={member.sosoPoint}
+          member={member} // メンバー情報を渡す
           onEditClick={() => onEditMember(member)}
         />
       ))}
