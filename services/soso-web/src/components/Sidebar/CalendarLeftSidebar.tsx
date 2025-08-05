@@ -9,7 +9,7 @@ interface Props {
   children?: React.ReactNode;
 }
 
-function CalendarSidebar(props: Props) {
+function CalendarLeftSidebar(props: Props) {
   return (
     <aside
       className={clsx(
@@ -32,4 +32,4 @@ function CalendarSidebar(props: Props) {
   );
 }
 
-export default CalendarSidebar;
+export default CalendarLeftSidebar;
