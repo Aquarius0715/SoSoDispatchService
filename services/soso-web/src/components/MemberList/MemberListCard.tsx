@@ -8,6 +8,7 @@ interface Props {
   hasCar?: boolean;
   passengerNumber?: number;
   sosoPoint?: number;
+  onEditClick?: () => void; // ★ 編集ボタンクリック時の関数を受け取る
   children?: React.ReactNode;
 }
 
@@ -24,7 +25,9 @@ function MemberListCard(props: Props) {
         <p className='text-sm text-gray-600'>車: {props.hasCar ? `あり(${props.passengerNumber}人)` : 'なし'}</p>
         {props.children}
       </div>
-      <Button className="py-1 px-3 bg-gray-500 hover:bg-gray-600 text-white text-sm">編集</Button>
+      <Button 
+      onClick={props.onEditClick}
+      className="py-1 px-3 bg-gray-500 hover:bg-gray-600 text-white text-sm">編集</Button>
     </div>
   );
 }

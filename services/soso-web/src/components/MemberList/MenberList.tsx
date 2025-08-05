@@ -13,9 +13,10 @@ export interface Member {
 // MemberListコンポーネントが受け取るProps
 interface MemberListProps {
   members: Member[]; // Memberの配列
+  onEditMember: (member: Member) => void; // ★ メンバー情報を引数に取る関数
 }
 
-function MemberList({ members }: MemberListProps) {
+function MemberList({ members, onEditMember }: MemberListProps) {
   return (
     // flex-colで縦に並べ、gap-4でカード間の余白を設定
     <div className="flex flex-col gap-4">
@@ -27,6 +28,7 @@ function MemberList({ members }: MemberListProps) {
           hasCar={member.hasCar}
           passengerNumber={member.passengerNumber}
           sosoPoint={member.sosoPoint}
+          onEditClick={() => onEditMember(member)}
         />
       ))}
     </div>
