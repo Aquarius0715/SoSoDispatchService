@@ -118,6 +118,7 @@ func SetupRouter(cfg *Config) *echo.Echo {
 	calG.POST("/create", calenderH.Create)
 	calG.POST("/:calender_id/join", calenderMembershipH.Create)
 	calG.GET("/my", calenderH.FindMyCalenders)
+	calG.GET("/:calender_id/members", calenderMembershipH.MemberList)
 
 	// シャットダウン時クローズ
 	e.Server.RegisterOnShutdown(func() { _ = db.Close() })

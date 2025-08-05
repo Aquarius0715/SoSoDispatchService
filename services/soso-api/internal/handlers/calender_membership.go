@@ -9,6 +9,14 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+type CalenderMemberResponse struct {
+	UserID    string `json:"userId"`
+	Username  string `json:"username"`
+	HasCar    bool   `json:"hasCar"`
+	Capacity  int    `json:"capacity"`
+	SoSoPoint int    `json:"sosoPoint"`
+}
+
 type CalenderMembershipHandler struct {
 	CalenderMembershipRepo *repository.CalenderMembershipRepository
 }
@@ -18,6 +26,51 @@ func NewCalenderMembershipHandler(r *repository.CalenderMembershipRepository) *C
 }
 
 type CalenderMembershipRequest struct {
+}
+
+func (h *CalenderMembershipHandler) MemberList(c echo.Context) error {
+	tok, ok := c.Get("user").(*jwt.Token)
+	if !ok {
+		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized")
+	}
+	claims, ok := tok.Claims.(*jwt.RegisteredClaims)
+	if !ok || claims.Subject == "" {
+		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized")
+	}
+	userID := claims.Subject
+
+	calenderID := c.Param("calender_id")
+	if calenderID == "" {
+		return echo.NewHTTPError(http.StatusBadRequest, "calender_id is required")
+	}
+
+	ctx := c.Request().Context()
+
+	member, err := h.CalenderMembershipRepo.FindByCalenderIDAndUserID(ctx, calenderID, userID)
+	if err != nil {
+		return err
+	}
+	if member == nil {
+		return echo.NewHTTPError(http.StatusForbidden, "forbidden")
+	}
+
+	members, err := h.CalenderMembershipRepo.FindMembersByCalenderID(ctx, calenderID)
+	if err != nil {
+		return err
+	}
+
+	res := make([]*CalenderMemberResponse, 0, len(members))
+	for _, m := range members {
+		res = append(res, &CalenderMemberResponse{
+			UserID:    m.UserID,
+			Username:  m.Username,
+			HasCar:    m.HasCar,
+			Capacity:  m.Capacity,
+			SoSoPoint: m.SoSoPoint,
+		})
+	}
+
+	return c.JSON(http.StatusOK, res)
 }
 
 func (h *CalenderMembershipHandler) Create(c echo.Context) error {
