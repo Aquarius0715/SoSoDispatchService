@@ -24,7 +24,7 @@ export default function MyPage() {
   const drives: Drive[] = [
     {
       id: 1,
-      calenderName: 'テニスサークル',
+      calendarName: 'テニスサークル',
       eventName: '新歓コンパ',
       driveState: DriveState.PICK_UP,
       eventDate: '2024/04/15',
@@ -33,7 +33,7 @@ export default function MyPage() {
     },
     {
       id: 2,
-      calenderName: '軽音学部',
+      calendarName: '軽音学部',
       eventName: 'ライブ打ち上げ',
       driveState: DriveState.DROP_OFF,
       eventDate: '2024/04/20',
@@ -42,7 +42,7 @@ export default function MyPage() {
     },
     {
       id: 3,
-      calenderName: 'ゼミ',
+      calendarName: 'ゼミ',
       eventName: '歓迎会',
       driveState: DriveState.PICK_UP,
       eventDate: '2024/04/25',
