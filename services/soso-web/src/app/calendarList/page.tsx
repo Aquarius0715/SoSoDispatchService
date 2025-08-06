@@ -8,6 +8,7 @@ import { Drive, DriveState } from '@/src/components/DriverList/DriverList';
 import Button from '@/src/components/Button/Button';
 import clsx from 'clsx';
 import StatusEditModal from '@/src/components/Modal/StatusEditModal';
+import { useRouter } from 'next/navigation';
 
 export interface CalendarEntry {
   id: number | string;
@@ -23,6 +24,7 @@ interface UserStatus {
 }
 
 export default function MyPage() {
+  const router = useRouter();
 // モーダルの表示状態を管理するステート
   const [isStatusEditModalOpen, setIsStatusEditModalOpen] = useState(false);
 
@@ -72,6 +74,7 @@ export default function MyPage() {
   ];
 
   const handleLogout = () => {
+    router.push('../');
     alert('ログアウトしました');
   };
 
@@ -83,10 +86,15 @@ export default function MyPage() {
     alert('ロゴがクリックされました');
   };
 
-  const onCalendarClick = (id: number | string) => {
-    alert(`カレンダーID: ${id} がクリックされました`);
+  const onCalendarClick = (name: string) => {
+    router.push('/dashboard/' + name);
+    alert(`カレンダーID: ${name} がクリックされました`);
   };
-
+  // const onCalendarClick = (id: number | string) => {
+  //   router.push('../calendar/' + id);
+  //   alert(`カレンダーID: ${id} がクリックされました`);
+  // };
+  
   // onSaveに渡す関数
   // この関数が、モーダルからの編集内容を受け取る
   // ★ ここを修正
@@ -118,7 +126,7 @@ export default function MyPage() {
             {calendars.map((calendar) => (
               <Button
                 key={calendar.id}
-                onClick={() => onCalendarClick(calendar.id)}
+                onClick={() => onCalendarClick(calendar.name)} // ★ calendar.idからcalendar.nameに変更
                 className="p-4 bg-white rounded-lg shadow-md border border-gray-200 text-gray-800 hover:bg-gray-100"
               >
                 <p className="font-semibold">{calendar.name}</p>

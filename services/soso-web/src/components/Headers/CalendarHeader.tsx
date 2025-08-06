@@ -38,24 +38,27 @@ function CalendarHeader({ className, pageTitle, onLogout, onClickLogo, calendarU
   };
   return (
     <header className={clsx("bg-gray-500 shadow-md p-4 flex justify-between items-center", className)}>
-      <div className="flex items-center">
-      <button onClick={onClickLogo} className="flex items-center">
-        <Image
-          src="/icons/soso_icon.svg"
-          alt="SoSo Logo"
-          width={40}
-          height={40}
-          className=""
-        />
-      </button>
-      <h1 className="text-2xl font-bold text-gray-800">{pageTitle}</h1>
-    </div>
+      <div className="flex items-center gap-3"> {/* gap-3で間隔を調整 */}
+        {/* アイコン部分 */}
+        <button onClick={onClickLogo}>
+          <Image
+            src="/icons/soso_icon.svg"
+            alt="SoSo Logo"
+            width={40}
+            height={40}
+          />
+        </button>
+        {/* タイトル部分 (重複をなくし、こちらに一本化) */}
+        <h1 className="text-2xl font-bold text-white">{pageTitle}</h1>
+      </div>
+    <div className="flex items-center gap-2">
       <Button  className="bg-gray-400 hover:bg-gray-800" onClick={handleShareClick}>
         カレンダー共有
       </Button>
       <Button className="bg-gray-700 hover:bg-gray-800" onClick={onLogout}>
         ログアウト
       </Button>
+    </div>
     </header>
   );
 }
