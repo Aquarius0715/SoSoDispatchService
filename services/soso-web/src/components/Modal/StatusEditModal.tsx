@@ -48,7 +48,7 @@ const StatusEditModal: FC<StatusEditModalProps> = ({
 
   // ドロップダウンのトリガーとなる部分（現在選択中の人数を表示）
   const dropdownTrigger = (
-    <div className="w-full border border-gray-300 rounded-md px-3 py-2 bg-white flex justify-between items-center cursor-pointer">
+    <div className="w-full text-black border border-gray-300 rounded-md px-3 py-2 bg-white flex justify-between items-center cursor-pointer">
       {capacity}人
       {/* 下向きの矢印 */}
       <span className="text-gray-500">▼</span>
@@ -63,38 +63,38 @@ const StatusEditModal: FC<StatusEditModalProps> = ({
         
         {/* ヘッダー */}
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-bold">ステータス編集</h2>
+          <h2 className="text-xl text-black font-bold">ステータス編集</h2>
           <button onClick={onClose} className="text-gray-500 text-2xl font-light hover:text-black">&times;</button>
         </div>
 
         {/* 3. フォームにメールアドレスの入力欄を追加 */}
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-black  mb-1">
               ユーザー名
             </label>
             <Textarea
               value={userName}
               onChange={(e) => setUserName(e.target.value)}
-              className="!h-11 !rounded-md" 
+              className="!h-11 !rounded-md text-black " 
             />
           </div>
 
           {/* ★ここから追加 */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-black  mb-1">
               メールアドレス
             </label>
             <Textarea
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="!h-11 !rounded-md"
+              className="!h-11 !rounded-md text-black "
             />
           </div>
           {/* ★ここまで追加 */}
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-black  mb-1">
               車の有無
             </label>
             <div className="flex items-center space-x-6">
@@ -103,27 +103,27 @@ const StatusEditModal: FC<StatusEditModalProps> = ({
                   checked={hasCar === true}
                   onChange={() => setHasCar(true)}
                 />
-                <span className="ml-2">あり</span>
+                <span className="text-black ml-2">あり</span>
               </label>
               <label className="flex items-center cursor-pointer">
                 <Radio
                   checked={hasCar === false}
                   onChange={() => setHasCar(false)}
                 />
-                <span className="ml-2">なし</span>
+                <span className="text-black ml-2">なし</span>
               </label>
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-black  mb-1">
               最大乗車可能人数（運転手を除く）
             </label>
-            <Dropdown trigger={dropdownTrigger}>
+            <Dropdown trigger={dropdownTrigger} className="text-black">
               {capacityOptions.map(num => (
                 <div
                   key={num}
-                  className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-center"
+                  className="px-4 py-2 text-black hover:bg-gray-100 cursor-pointer text-center"
                   onClick={() => setCapacity(num)}
                 >
                   {num}人
