@@ -63,7 +63,7 @@ export default function Home() {
       //   withCredentials: true
       // })
       // setToken(res.data.access_token)
-      router.push('/mypage');
+      router.push('/calendarList');
       alert('ログイン成功')
       
     } catch (err: any) {
