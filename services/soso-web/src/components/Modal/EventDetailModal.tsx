@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import Button from '../Button/Button';
 import Input from '../TextFieald/Input';
-import clsx from 'clsx';
 
 interface EventDetails {
   EventTitle: string;
   EventDate: string;
   EventTime: string;
   EventDetail: string;
+  EventURL: string;
   member: string[];
   DropOffNumber: number;
   PickUpNumber: number;
@@ -100,7 +100,13 @@ const EventDetailModal: React.FC<ModalProps> = ({ eventDetails, onClose }) => {
             className="w-full mb-4 text-black "
             type="number"
             value={passengers}
-            onChange={(e) => setPassengers(e.target.value === '' ? '' : Number(e.target.value))}
+            onChange={(e) => {
+            const value = e.target.value;
+            // ここでバリデーション
+            if (value === '' || !isNaN(Number(value))) {
+                setPassengers(value === '' ? '' : Number(value));
+            }
+            }}
           />
           <div className="flex space-x-4">
             <Button
