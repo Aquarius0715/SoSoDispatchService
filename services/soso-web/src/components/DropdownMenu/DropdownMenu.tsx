@@ -3,10 +3,11 @@ import React, { useState, useRef, useEffect, ReactNode, FC } from 'react';
 interface DropdownProps {
   trigger: ReactNode;  // ドロップダウンを開くボタンなど
   children: ReactNode; // ドロップダウンの中身
+  className?: string;
 }
 
 const Dropdown: FC<DropdownProps> = ({ trigger, children }) => {
-  // `isOpen` という名前で、メニューが開いているか(true)閉じてるか(false)を管理する
+ 
   const [isOpen, setIsOpen] = useState(false);
 
   // `dropdownRef` という名前で、DOM要素（HTMLのタグ）に印をつける
@@ -33,7 +34,7 @@ const Dropdown: FC<DropdownProps> = ({ trigger, children }) => {
 
   return (
     // relative: ドロップダウンメニューを配置する時の基準点になる
-    <div ref={dropdownRef} className="relative inline-block">
+    <div ref={dropdownRef} className="relative `${className}`">
 
       {/* 1. トリガー (ボタンなど) */}
       {/* クリックされたら、`isOpen` の状態を反対（true ⇔ false）にする */}
@@ -45,7 +46,7 @@ const Dropdown: FC<DropdownProps> = ({ trigger, children }) => {
       {/* `isOpen` が true の時だけ、中身が表示される */}
       {isOpen && (
         <div
-          className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border"
+          className="absolute left-0 mt-2 w-full bg-white rounded-md shadow-lg border"
         >
           {/* `py-1` は上下の余白 */}
           <div className="py-1">
