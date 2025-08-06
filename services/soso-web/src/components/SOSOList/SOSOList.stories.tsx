@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import SOSOList from './SOSOList';
-import { SOSOPointLog } from './SOSOList';
+import { SOSOTransaction } from './SOSOList';
 
 const meta: Meta<typeof SOSOList> = {
   title: 'Components/SOSOList',
@@ -12,7 +12,7 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-const mockLogs: SOSOPointLog[] = [
+const mockLogs: SOSOTransaction[] = [
   {
     id: 1,
     eventName: '歓送迎会',
