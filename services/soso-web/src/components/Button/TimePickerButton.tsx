@@ -55,7 +55,7 @@ const TimePicker = () => {
           {generateTimeOptions().map((t) => (
             <div
               key={t}
-              className="p-2 cursor-pointer hover:bg-gray-100"
+              className="p-2  text-black cursor-pointer hover:bg-gray-100"
               onClick={() => handleTimeSelect(t)}
             >
               {t}
