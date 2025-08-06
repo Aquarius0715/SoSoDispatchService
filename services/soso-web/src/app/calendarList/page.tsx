@@ -142,13 +142,15 @@ export default function MyPage() {
               </Button>
             ))}
           </div>
-          <Button
-            variant="circle"
-            onClick={handleAddCalendar}
-            className="fixed bottom-8 right-80 z-50" // tailwindのfixed, bottom, rightを追加
-          >
-            <span className="text-2xl">+</span>
-          </Button>
+          {!isTeamAddModalOpen && (
+                <Button
+                variant="circle"
+                onClick={handleAddCalendar}
+                className="fixed bottom-8 right-80 z-50"
+                >
+                <span className="text-2xl">+</span>
+                </Button>
+            )}
         </main>
         <MyPageRightSidebar drives={drives} />
       </div>
