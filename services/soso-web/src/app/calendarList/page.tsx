@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import MyPageHeader from '@/src/components/Headers/MyPageHeader';
 import MyPageLeftSidebar from '@/src/components/Sidebar/MyPageLeftSidebar';
 import MyPageRightSidebar from '@/src/components/Sidebar/MyPageRightSidebar';
-import { Drive, DriveState } from '@/src/components/DriverList/DriverList'; // DriveStateも追加でインポート
+import { Drive, DriveState } from '@/src/components/DriverList/DriverList';
 import Button from '@/src/components/Button/Button';
 import clsx from 'clsx';
 import StatusEditModal from '@/src/components/Modal/StatusEditModal';
@@ -14,12 +14,20 @@ export interface CalendarEntry {
   name: string;
 }
 
+// ユーザー情報の型定義を再利用
+interface UserStatus {
+    userName: string;
+    email: string;
+    hasCar: boolean;
+    capacity: number;
+}
+
 export default function MyPage() {
-// ★ モーダルの表示状態を管理するステート
+// モーダルの表示状態を管理するステート
   const [isStatusEditModalOpen, setIsStatusEditModalOpen] = useState(false);
 
-  // ★ ユーザー情報のステートを追加
-  const [userStatus, setUserStatus] = useState({
+  // ユーザー情報のステートを追加
+  const [userStatus, setUserStatus] = useState<UserStatus>({ // ★ UserStatus型を指定
     userName: '田中 太郎',
     email: 'tanaka.taro@example.com',
     hasCar: true,
@@ -79,13 +87,15 @@ export default function MyPage() {
     alert(`カレンダーID: ${id} がクリックされました`);
   };
 
-  // ★ handleSaveStatus関数を追加
-  const handleSaveStatus = (newStatus: typeof userStatus) => {
-    setUserStatus(newStatus);
-    setIsStatusEditModalOpen(false);
-    alert('ステータスが更新されました！');
-    console.log('保存されたステータス:', newStatus);
+  // onSaveに渡す関数
+  // この関数が、モーダルからの編集内容を受け取る
+  // ★ ここを修正
+  const handleSaveStatus = (newStatus: UserStatus): void => {
+    setUserStatus(newStatus); // ユーザー情報を更新
+    setIsStatusEditModalOpen(false); // モーダルを閉じる
   };
+  // ★ 不要なインターフェースを削除
+  // interface HandleSaveStatusArgs { ... }
 
   return (
     <div className="flex flex-col h-screen bg-gray-100">
@@ -96,9 +106,9 @@ export default function MyPage() {
       />
       <div className="flex flex-grow overflow-hidden">
         <MyPageLeftSidebar
-          userName="田中 太郎"
-          hasCar={true}
-          passengerNumber={3}
+          userName={userStatus.userName} // ★ userStatusから値を取得
+          hasCar={userStatus.hasCar}     // ★ userStatusから値を取得
+          passengerNumber={userStatus.capacity} // ★ userStatusから値を取得
           onEditClick={handleEditStatus}
         />
         <main className={clsx("flex-grow p-8 overflow-y-auto")}>
