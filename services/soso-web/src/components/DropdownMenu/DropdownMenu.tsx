@@ -1,11 +1,13 @@
 import React, { useState, useRef, useEffect, ReactNode, FC } from 'react';
+import clsx from 'clsx';
 
 interface DropdownProps {
   trigger: ReactNode;  // ドロップダウンを開くボタンなど
   children: ReactNode; // ドロップダウンの中身
+  className?: string; // オプションで追加のクラス名
 }
 
-const Dropdown: FC<DropdownProps> = ({ trigger, children }) => {
+const Dropdown: FC<DropdownProps> = ({ trigger, children, className }) => {
   // `isOpen` という名前で、メニューが開いているか(true)閉じてるか(false)を管理する
   const [isOpen, setIsOpen] = useState(false);
 
@@ -45,10 +47,10 @@ const Dropdown: FC<DropdownProps> = ({ trigger, children }) => {
       {/* `isOpen` が true の時だけ、中身が表示される */}
       {isOpen && (
         <div
-          className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border"
+          className={`absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border ${className}`}
         >
           {/* `py-1` は上下の余白 */}
-          <div className="py-1">
+          <div className="py-1 text-black">
             {children}
           </div>
         </div>

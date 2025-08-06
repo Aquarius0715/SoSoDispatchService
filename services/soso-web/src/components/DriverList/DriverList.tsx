@@ -9,7 +9,7 @@ export enum DriveState {
 
 export interface Drive {
   id: number | string;
-  calenderName: string;
+  calendarName: string;
   eventName: string;
   driveState: DriveState;
   eventDate: string;
