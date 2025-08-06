@@ -7,6 +7,7 @@ import MyPageRightSidebar from '@/src/components/Sidebar/MyPageRightSidebar';
 import { Drive, DriveState } from '@/src/components/DriverList/DriverList'; // DriveStateも追加でインポート
 import Button from '@/src/components/Button/Button';
 import clsx from 'clsx';
+import StatusEditModal from '@/src/components/Modal/StatusEditModal';
 
 export interface CalendarEntry {
   id: number | string;
@@ -14,6 +15,17 @@ export interface CalendarEntry {
 }
 
 export default function MyPage() {
+// ★ モーダルの表示状態を管理するステート
+  const [isStatusEditModalOpen, setIsStatusEditModalOpen] = useState(false);
+
+  // ★ ユーザー情報のステートを追加
+  const [userStatus, setUserStatus] = useState({
+    userName: '田中 太郎',
+    email: 'tanaka.taro@example.com',
+    hasCar: true,
+    capacity: 3,
+  });
+
   const [calendars, setCalendars] = useState<CalendarEntry[]>([
     { id: 1, name: 'テニスサークル' },
     { id: 2, name: '軽音学部' },
@@ -56,7 +68,7 @@ export default function MyPage() {
   };
 
   const handleEditStatus = () => {
-    alert('ステータスを編集します');
+    setIsStatusEditModalOpen(true);
   };
 
   const handleLogoClick = () => {
@@ -65,6 +77,14 @@ export default function MyPage() {
 
   const onCalendarClick = (id: number | string) => {
     alert(`カレンダーID: ${id} がクリックされました`);
+  };
+
+  // ★ handleSaveStatus関数を追加
+  const handleSaveStatus = (newStatus: typeof userStatus) => {
+    setUserStatus(newStatus);
+    setIsStatusEditModalOpen(false);
+    alert('ステータスが更新されました！');
+    console.log('保存されたステータス:', newStatus);
   };
 
   return (
@@ -97,6 +117,13 @@ export default function MyPage() {
         </main>
         <MyPageRightSidebar drives={drives} />
       </div>
+
+      <StatusEditModal
+        isOpen={isStatusEditModalOpen}
+        onClose={() => setIsStatusEditModalOpen(false)}
+        onSave={handleSaveStatus}
+        initialStatus={userStatus}
+      />
     </div>
   );
 }
