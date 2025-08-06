@@ -110,6 +110,7 @@ export default function MyPage() {
           hasCar={userStatus.hasCar}     // ★ userStatusから値を取得
           passengerNumber={userStatus.capacity} // ★ userStatusから値を取得
           onEditClick={handleEditStatus}
+          email={userStatus.email} // ★ userStatusから値を取得
         />
         <main className={clsx("flex-grow p-8 overflow-y-auto")}>
           <h2 className="text-3xl font-bold text-gray-800 mb-6">参加しているカレンダー一覧</h2>
