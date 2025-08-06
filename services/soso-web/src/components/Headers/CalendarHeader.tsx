@@ -41,11 +41,11 @@ function CalendarHeader({ className, pageTitle, onLogout, onClickLogo, calendarU
       <div className="flex items-center">
       <button onClick={onClickLogo} className="flex items-center">
         <Image
-          src="/icons/double_s_icon.svg"
+          src="/icons/soso_icon.svg"
           alt="SoSo Logo"
           width={40}
           height={40}
-          className="rounded-full"
+          className=""
         />
       </button>
       <h1 className="text-2xl font-bold text-gray-800">{pageTitle}</h1>
