@@ -49,29 +49,29 @@ const EventDetailModal: React.FC<ModalProps> = ({ eventDetails, onClose }) => {
     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center">
       <div className="bg-white p-6 rounded-lg w-full max-w-md shadow-lg">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold">イベント詳細</h2>
+          <h2 className="text-xl text-black font-bold">イベント詳細</h2>
           <button onClick={onClose} className="text-gray-500 hover:text-gray-700 text-2xl">
             &times;
           </button>
         </div>
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex justify-between   text-black  items-center mb-6">
           <Button>イベント共有</Button>
           <Button>編集</Button>
         </div>
 
-        <div className="mb-6">
+        <div className="text-black mb-6">
           <h3 className="font-bold text-lg mb-2">{eventDetails.EventTitle}</h3>
           <p>日付: {eventDetails.EventDate}</p>
           <p>時刻: {eventDetails.EventTime}</p>
           <p>詳細: {eventDetails.EventDetail}</p>
         </div>
 
-        <div className="mb-6">
+        <div className="text-black mb-6">
           <h3 className="font-bold text-lg mb-2">参加者</h3>
           <p>{eventDetails.member.join(', ')}</p>
         </div>
 
-        <div className="mb-6">
+        <div className="text-black mb-6">
           <h3 className="font-bold text-lg mb-2">送迎</h3>
           <div className="flex justify-between space-x-4 mb-2">
             <div className="bg-gray-100 p-4 rounded-lg flex-1">
@@ -86,7 +86,7 @@ const EventDetailModal: React.FC<ModalProps> = ({ eventDetails, onClose }) => {
           <p>{eventDetails.departurePoint} =&gt; {eventDetails.destination}</p>
         </div>
 
-        <div className="mb-6">
+        <div className="text-black mb-6">
           <h3 className="font-bold text-lg mb-2">配車登録済み</h3>
           {registered.map((item, index) => (
             <p key={index}>{item}</p>
@@ -94,10 +94,10 @@ const EventDetailModal: React.FC<ModalProps> = ({ eventDetails, onClose }) => {
         </div>
 
         <div>
-          <h3 className="font-bold text-lg mb-2">配車登録</h3>
-          <p className="text-sm text-gray-500 mb-2">乗車可能人数</p>
+          <h3 className="text-black font-bold text-lg mb-2">配車登録</h3>
+          <p className="text-sm text-black mb-2">乗車可能人数</p>
           <Input
-            className="w-full mb-4"
+            className="w-full mb-4 text-black "
             type="number"
             value={passengers}
             onChange={(e) => setPassengers(e.target.value === '' ? '' : Number(e.target.value))}
@@ -125,3 +125,17 @@ const EventDetailModal: React.FC<ModalProps> = ({ eventDetails, onClose }) => {
 };
 
 export default EventDetailModal;
+
+//親コンポーネントで呼び出すデータの例
+// const eventData = {
+//     EventTitle: '新歓コンパ',
+//     EventDate: '2024年4月15日',
+//     EventTime: '18:00',
+//     EventDetail: '新入生歓迎コンパを開催します',
+//     member: ['田中太郎', '佐藤花子', '山田次郎', '鈴木三郎'],
+//     DropOffNumber: 2,
+//     PickUpNumber: 3,
+//     departurePoint: '大学',
+//     destination: '居酒屋〇〇',
+//     dispatchRegistered: ['山田次郎 (送り: 2人)'],
+//   };
