@@ -112,3 +112,40 @@ func (r *EventParticipantRepository) FindByEventIDAndType(
 	}
 	return list, nil
 }
+
+/* 参加者とユーザー情報をまとめた DTO */
+type ParticipantInfo struct {
+	UserName string
+	Capacity int
+	Type     model.Type
+}
+
+// FetchUserInfos returns all participants of an event
+// together with their username and capacity.
+func (r *EventParticipantRepository) FetchUserInfos(
+	ctx context.Context,
+	eventID string,
+) ([]ParticipantInfo, error) {
+
+	const q = `
+		SELECT u.username, u.capacity, ep.type
+		FROM event_participants AS ep
+		INNER JOIN users AS u ON u.id = ep.user_id
+		WHERE ep.event_id = ?`
+
+	rows, err := r.DB.QueryContext(ctx, q, eventID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var list []ParticipantInfo
+	for rows.Next() {
+		var p ParticipantInfo
+		if err := rows.Scan(&p.UserName, &p.Capacity, &p.Type); err != nil {
+			return nil, err
+		}
+		list = append(list, p)
+	}
+	return list, rows.Err()
+}

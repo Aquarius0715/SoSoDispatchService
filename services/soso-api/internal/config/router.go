@@ -126,9 +126,10 @@ func SetupRouter(cfg *Config) *echo.Echo {
 	calG.GET(":calender_id/events", eventH.ListByCalender)
 
 	eveG := e.Group("/events", csrfMW, echojwt.WithConfig(jwtCfg))
-	eveG.GET(":eventId", eventH.FindById)
-	eveG.POST(":eventId/pickup", eventH.RegisterPickUp)
-	eveG.POST(":eventId/return", eventH.RegisterReturn)
+	eveG.GET(":event_id", eventH.FindById)
+	eveG.POST(":event_id/pickup", eventH.RegisterPickUp)
+	eveG.POST(":event_id/return", eventH.RegisterReturn)
+	eveG.GET(":event_id/detail", eventH.Detail)
 
 	// シャットダウン時クローズ
 	e.Server.RegisterOnShutdown(func() { _ = db.Close() })

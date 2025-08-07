@@ -214,3 +214,80 @@ func (h *EventHandler) registerParticipant(c echo.Context, tp model.Type) error 
 	}
 	return c.NoContent(http.StatusCreated)
 }
+
+/*
+GET /events/:event_id/detail
+レスポンス例:
+
+	{
+	  "title":"送迎イベント",
+	  "startTime":"2025-09-01T09:00:00Z",
+	  "description":"・・・",
+	  "originLocation":"東京駅",
+	  "destinationLocation":"箱根",
+	  "seatsRequiredGo":3,
+	  "seatsRequiredReturn":3,
+	  "remainingGoSeats":1,
+	  "remainingReturnSeats":0,
+	  "participants":[ "alice","bob","charlie" ]
+	}
+*/
+func (h *EventHandler) Detail(c echo.Context) error {
+	eid := c.Param("event_id")
+
+	// ----- event 本体 -----
+	ev, err := h.EventRepo.FindById(c.Request().Context(), eid)
+	if err != nil {
+		return err
+	}
+	if ev == nil {
+		return echo.NewHTTPError(http.StatusNotFound, "event not found")
+	}
+
+	// ----- 参加者情報 (ユーザ名 + capacity) -----
+	infos, err := h.EventParticipantRepo.FetchUserInfos(c.Request().Context(), eid)
+	if err != nil {
+		return err
+	}
+
+	var (
+		userNames    []string
+		goCapSum     int
+		returnCapSum int
+	)
+	for _, inf := range infos {
+		switch inf.Type {
+		case model.Participants:
+			userNames = append(userNames, inf.UserName)
+		case model.Go:
+			goCapSum += inf.Capacity
+		case model.Return:
+			returnCapSum += inf.Capacity
+		}
+	}
+
+	remainGo := max(ev.SeatsRequiredGo-goCapSum, 0)
+	remainReturn := max(ev.SeatsRequiredReturn-returnCapSum, 0)
+
+	resp := map[string]any{
+		"title":                ev.Title,
+		"startTime":            ev.StartTime,
+		"description":          ev.Description,
+		"originLocation":       ev.OriginLocation,
+		"destinationLocation":  ev.DestinationLocation,
+		"seatsRequiredGo":      ev.SeatsRequiredGo,
+		"seatsRequiredReturn":  ev.SeatsRequiredReturn,
+		"remainingGoSeats":     remainGo,
+		"remainingReturnSeats": remainReturn,
+		"participants":         userNames,
+	}
+	return c.JSON(http.StatusOK, resp)
+}
+
+/* 小さなヘルパ */
+func max(a, b int) int {
+	if a > b {
+		return a
+	}
+	return b
+}
