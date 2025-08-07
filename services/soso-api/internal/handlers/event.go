@@ -291,3 +291,35 @@ func max(a, b int) int {
 	}
 	return b
 }
+
+/*
+	-------------------------------------------------------------
+	  GET /events/:event_id/members  ─ イベント参加メンバー一覧
+	  -------------------------------------------------------------
+	  レスポンス:
+	  [
+	    { "userId":"u1", "username":"alice",  "sosoPoint":10 },
+	    { "userId":"u2", "username":"bob",    "sosoPoint": 7 }
+	  ]
+
+----------------------------------------------------------------
+*/
+func (h *EventHandler) Members(c echo.Context) error {
+	eid := c.Param("event_id")
+
+	members, err := h.EventParticipantRepo.FetchMemberInfos(
+		c.Request().Context(), eid)
+	if err != nil {
+		return err
+	}
+
+	resp := make([]map[string]any, len(members))
+	for i, m := range members {
+		resp[i] = map[string]any{
+			"userId":    m.UserID,
+			"username":  m.UserName,
+			"sosoPoint": m.SoSoPoint,
+		}
+	}
+	return c.JSON(http.StatusOK, resp)
+}

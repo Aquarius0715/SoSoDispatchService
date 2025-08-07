@@ -149,3 +149,47 @@ func (r *EventParticipantRepository) FetchUserInfos(
 	}
 	return list, rows.Err()
 }
+
+// -------------------------
+// メンバー一覧 DTO
+// -------------------------
+
+type MemberInfo struct {
+	UserID    string
+	UserName  string
+	SoSoPoint int
+}
+
+// FetchMemberInfos returns event members (type = "participants")
+// with their SoSo points in the same calendar.
+func (r *EventParticipantRepository) FetchMemberInfos(
+	ctx context.Context,
+	eventID string,
+) ([]MemberInfo, error) {
+
+	const q = `
+		SELECT u.id, u.username, cm.soso_point
+		FROM event_participants AS ep
+		INNER JOIN events   AS e  ON e.id = ep.event_id
+		INNER JOIN calender_memberships AS cm
+		     ON cm.calender_id = e.calender_id AND cm.user_id = ep.user_id
+		INNER JOIN users AS u ON u.id = ep.user_id
+		WHERE ep.event_id = ? AND ep.type = 'participants'
+	`
+
+	rows, err := r.DB.QueryContext(ctx, q, eventID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var list []MemberInfo
+	for rows.Next() {
+		var m MemberInfo
+		if err := rows.Scan(&m.UserID, &m.UserName, &m.SoSoPoint); err != nil {
+			return nil, err
+		}
+		list = append(list, m)
+	}
+	return list, rows.Err()
+}
