@@ -106,11 +106,11 @@ const EventDetailModal: React.FC<ModalProps> = ({ eventDetails, onClose }) => {
             <Input
               className="w-1/4 mr-2"
               type="number"
-              value={passengers}
+              value={seatsRequired}
               onChange={(e) => {
                 const value = e.target.value;
                 if (value === '' || (!isNaN(Number(value)) && Number(value) >= 0)) {
-                  setPassengers(value === '' ? '' : Number(value));
+                  setSeatsRequired(value === '' ? '' : Number(value));
                 }
               }}
             />
@@ -120,14 +120,14 @@ const EventDetailModal: React.FC<ModalProps> = ({ eventDetails, onClose }) => {
             <Button
               className="bg-gray-700 px-0 py-4 hover:bg-gray-600 flex-1 text-white"
               onClick={() => handleRegister('pickUp')}
-              disabled={typeof passengers !== 'number' || passengers <= 0}
+              disabled={typeof seatsRequired !== 'number' || seatsRequired <= 0}
             >
               迎え登録
             </Button>
             <Button
               className="bg-gray-700 px-0 py-4 hover:bg-gray-600 flex-1 text-white"
               onClick={() => handleRegister('dropOff')}
-              disabled={typeof passengers !== 'number' || passengers <= 0}
+              disabled={typeof seatsRequired !== 'number' || seatsRequired <= 0}
 
             >
               送り登録
