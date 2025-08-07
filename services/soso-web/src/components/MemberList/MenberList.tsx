@@ -6,7 +6,7 @@ export interface Member {
   id: number | string; // リスト表示のためのユニークなID
   memberName: string;
   hasCar: boolean;
-  passengerNumber?: number; // 車の有無に応じて乗車人数をオプションに
+  seatsRequired?: number; // 車の有無に応じて乗車人数をオプションに
   sosoPoint: number;
 }
 

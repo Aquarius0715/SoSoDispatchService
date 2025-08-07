@@ -67,6 +67,8 @@ function SOSOEditModal({ isOpen, onClose, onSave, initialData }: Props) {
               >
                 <span className="text-2xl">&times;</span>
               </button>
+
+              
             </div>
             <div className="flex justify-between items-center my-4">
               <h2 className='text-xl text-black font-bold'>メンバー情報</h2>

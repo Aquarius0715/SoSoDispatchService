@@ -1,7 +1,6 @@
 'use client';
 
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NextPage } from 'next';
 import { useRouter } from 'next/navigation';
 
@@ -14,7 +13,6 @@ import { EventInput } from '@fullcalendar/core';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
-import jaLocale from '@fullcalendar/core/locales/ja'; // 日本語化
 import SOSOEditModal from '@/src/components/Modal/SOSOEditModal';
 
 // サイドバーで必要となるデータの型をインポート
@@ -26,65 +24,74 @@ interface EditedMemberData extends Member {
   reason: string;
 }
 
-// ページのPropsの型定義
+// ページのPropsの型定義をNext.js 15に対応
 interface DashboardPageProps {
-  params: {
+  params: Promise<{
     name: string;
-  };
+  }>;
 }
 
 // ページ本体のコンポーネント
 const DashboardPage: NextPage<DashboardPageProps> = ({ params }) => {
   const router = useRouter();
-  const { name } = params;
-  const decodedTitle = decodeURIComponent(name);
+  const [name, setName] = useState<string>('');
+  const [decodedTitle, setDecodedTitle] = useState<string>('');
+
+  // paramsを非同期で処理
+  useEffect(() => {
+    const resolveParams = async () => {
+      const resolvedParams = await params;
+      setName(resolvedParams.name);
+      setDecodedTitle(decodeURIComponent(resolvedParams.name));
+    };
+    resolveParams();
+  }, [params]);
+
   const [events, setEvents] = useState<EventInput[]>([
     { id: '1', title: 'チームミーティング', start: '2025-08-11T10:30:00', end: '2025-08-11T12:00:00' },
   ]);
 
-    // ▼ モーダル管理用のState（例）
+  // ▼ モーダル管理用のState（例）
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<EventInput | null>(null);
   const [selectedDate, setSelectedDate] = useState<string>('');
 
   // ▼ イベントクリック時の処理
-const handleEventClick = (clickInfo: any) => {
-  // クリックされたイベントの情報をStateに保存
-  setSelectedEvent({
-    id: clickInfo.event.id,
-    title: clickInfo.event.title,
-    start: clickInfo.event.startStr,
-    end: clickInfo.event.endStr,
-  });
-  // 編集モーダルを開く
-  setIsEditModalOpen(true);
-};
+  const handleEventClick = (clickInfo: any) => {
+    // クリックされたイベントの情報をStateに保存
+    setSelectedEvent({
+      id: clickInfo.event.id,
+      title: clickInfo.event.title,
+      start: clickInfo.event.startStr,
+      end: clickInfo.event.endStr,
+    });
+    // 編集モーダルを開く
+    setIsEditModalOpen(true);
+  };
 
+  // ▼ プラスボタンクリック時の処理
+  const handleAddEventClick = (e: React.MouseEvent, arg: any) => {
+    // 親要素のdateClickイベントが発火するのを防ぐ
+    e.stopPropagation(); 
 
-// ▼ プラスボタンクリック時の処理
-const handleAddEventClick = (e: React.MouseEvent, arg: any) => {
-  // 親要素のdateClickイベントが発火するのを防ぐ
-  e.stopPropagation(); 
-
-  // クリックされた日付をStateに保存
-  setSelectedDate(arg.dateStr);
-  
-  // 新規追加モーダルを開く
-  setIsAddModalOpen(true);
-};
+    // クリックされた日付をStateに保存
+    setSelectedDate(arg.dateStr);
+    
+    // 新規追加モーダルを開く
+    setIsAddModalOpen(true);
+  };
 
   // --- ▼▼▼ State管理 ▼▼▼ ---
 
   const [members, setMembers] = useState<Member[]>([
-    { id: 1, memberName: '佐藤 健太', hasCar: true, passengerNumber: 4, sosoPoint: 150 },
+    { id: 1, memberName: '佐藤 健太', hasCar: true, seatsRequired: 4, sosoPoint: 150 },
     { id: 2, memberName: '鈴木 陽子', hasCar: false, sosoPoint: 50 },
     { id: 3, memberName: '高橋 一郎', hasCar: false, sosoPoint: 80 },
-    { id: 4, memberName: '伊藤 花子', hasCar: true, passengerNumber: 6, sosoPoint: 200 },
+    { id: 4, memberName: '伊藤 花子', hasCar: true, seatsRequired: 6, sosoPoint: 200 },
   ]);
 
   const [logs, setLogs] = useState<SOSOTransaction[]>([]);
-
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
 
@@ -94,6 +101,7 @@ const handleAddEventClick = (e: React.MouseEvent, arg: any) => {
     router.push('/');
     alert('ログアウトしました');
   };
+
   const handleLogoClick = () => {
     router.push('/mypage');
   };
@@ -114,7 +122,7 @@ const handleAddEventClick = (e: React.MouseEvent, arg: any) => {
     );
 
     // 2. ポイント変動履歴に新しいログを追加
-    if (selectedMember) { // ★★★ 修正点1: `editedData.reason`のチェックを削除
+    if (selectedMember) {
       const pointChange = editedData.sosoPoint - selectedMember.sosoPoint;
       
       // ポイントに変動があった場合のみログを追加
@@ -127,7 +135,6 @@ const handleAddEventClick = (e: React.MouseEvent, arg: any) => {
           changer: '管理者',
           changee: editedData.memberName,
           sosoPoints: pointChange,
-          // ★★★ 修正点2: 理由が空の場合、代替テキストを表示
           reason: editedData.reason || '（理由の記載なし）',
         };
         setLogs(prevLogs => [newLog, ...prevLogs]);

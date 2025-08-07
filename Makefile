@@ -17,6 +17,10 @@ build:
 	$(DC) build soso-api
 	$(DC) up -d soso-api
 
+api:
+	$(DC) build soso-api soso-database soso-api-document
+	$(DC) up -d soso-api soso-database soso-api-document
+
 ## 全ビルドし直して起動（キャッシュなし）
 rebuild:
 	$(DC) down
