@@ -69,3 +69,46 @@ func (r *EventParticipantRepository) BulkInsert(
 	}
 	return tx.Commit()
 }
+
+func (r *EventParticipantRepository) FindByEventIDAndType(
+	ctx context.Context,
+	eventID string,
+	pt model.Type,
+) ([]*model.EventParticipant, error) {
+
+	const q = `
+		SELECT
+			event_id,
+			user_id,
+			status,
+			type,
+			registered_at
+		FROM event_participants
+		WHERE event_id = ? AND type = ?
+	`
+
+	rows, err := r.DB.QueryContext(ctx, q, eventID, string(pt))
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var list []*model.EventParticipant
+	for rows.Next() {
+		var ep model.EventParticipant
+		if err := rows.Scan(
+			&ep.EventID,
+			&ep.UserID,
+			&ep.Status,
+			&ep.Type,
+			&ep.RegisteredAt,
+		); err != nil {
+			return nil, err
+		}
+		list = append(list, &ep)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return list, nil
+}

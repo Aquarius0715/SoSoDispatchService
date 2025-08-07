@@ -100,3 +100,52 @@ func TestEventParticipantRepository_BulkInsert_Error(t *testing.T) {
 	assert.Error(t, err)
 	assert.NoError(t, mock.ExpectationsWereMet())
 }
+
+// -------------------------
+// FindByEventIDAndType 正常系
+// -------------------------
+func TestEventParticipantRepository_FindByEventIDAndType_OK(t *testing.T) {
+	repo, mock, closeFn := newEventParticipantRepoMock(t)
+	defer closeFn()
+
+	const (
+		eventID = "ev1"
+		pt      = model.PickUp
+	)
+	now := time.Now()
+
+	rows := sqlmock.NewRows([]string{
+		"event_id", "user_id", "status", "type", "registered_at",
+	}).AddRow(eventID, "u1", "registered", string(pt), now).
+		AddRow(eventID, "u2", "registered", string(pt), now)
+
+	mock.ExpectQuery(`SELECT\s+event_id`).
+		WithArgs(eventID, string(pt)).
+		WillReturnRows(rows)
+
+	got, err := repo.FindByEventIDAndType(context.Background(), eventID, pt)
+	assert.NoError(t, err)
+	assert.Len(t, got, 2)
+	assert.Equal(t, "u1", got[0].UserID)
+	assert.Equal(t, model.PickUp, got[0].Type)
+	assert.NoError(t, mock.ExpectationsWereMet())
+}
+
+// -------------------------
+// FindByEventIDAndType 0 件
+// -------------------------
+func TestEventParticipantRepository_FindByEventIDAndType_Empty(t *testing.T) {
+	repo, mock, closeFn := newEventParticipantRepoMock(t)
+	defer closeFn()
+
+	mock.ExpectQuery(`SELECT\s+event_id`).
+		WithArgs("ev2", string(model.DropOff)).
+		WillReturnRows(sqlmock.NewRows([]string{
+			"event_id", "user_id", "status", "type", "registered_at",
+		})) // 空
+
+	got, err := repo.FindByEventIDAndType(context.Background(), "ev2", model.DropOff)
+	assert.NoError(t, err)
+	assert.Empty(t, got)
+	assert.NoError(t, mock.ExpectationsWereMet())
+}
