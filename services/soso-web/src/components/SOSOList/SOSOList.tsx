@@ -6,8 +6,7 @@ import SOSOcard from './SOSOListCard'; // SOSOcardコンポーネントをイン
 export interface SOSOTransaction {
   id: number | string;
   eventName: string; // 画像のようにイベント名も表示
-  date: string;
-  time: string;
+  dateTime: string; // YYYY-MM-DD HH:MM:SS 形式の文字列
   changer: string;
   changee: string;
   sosoPoints: number;
@@ -26,8 +25,7 @@ function SOSOList({ logs }: SOSOListProps) {
       {logs.map((log) => (
         <SOSOcard
           key={log.id} // 各要素にユニークなkeyを指定
-          date={log.date}
-          time={log.time}
+          dateTime={log.dateTime}
           changer={log.changer}
           changee={log.changee}
           sosoPoints={log.sosoPoints}

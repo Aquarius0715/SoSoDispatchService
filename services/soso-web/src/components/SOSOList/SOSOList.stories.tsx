@@ -16,8 +16,7 @@ const mockLogs: SOSOTransaction[] = [
   {
     id: 1,
     eventName: '歓送迎会',
-    date: '2024/04/15',
-    time: '22:00',
+    dateTime: '2024/04/15 22:00',
     changer: '佐藤花子',
     changee: '田中太郎',
     sosoPoints: -1,
@@ -26,8 +25,7 @@ const mockLogs: SOSOTransaction[] = [
   {
     id: 2,
     eventName: '新歓コンパ',
-    date: '2024/04/15',
-    time: '21:15',
+    dateTime: '2024/04/15 21:15',
     changer: '山田次郎',
     changee: '鈴木三郎',
     sosoPoints: 2,
@@ -36,8 +34,7 @@ const mockLogs: SOSOTransaction[] = [
   {
     id: 3,
     eventName: '新歓コンパ',
-    date: '2024/04/15',
-    time: '20:30',
+    dateTime: '2024/04/15 20:30',
     changer: '田中太郎',
     changee: '佐藤花子',
     sosoPoints: 3,
@@ -46,8 +43,7 @@ const mockLogs: SOSOTransaction[] = [
   {
     id: 4,
     eventName: '歓送迎会',
-    date: '2024/04/10',
-    time: '23:45',
+    dateTime: '2024/04/15 21:00',
     changer: '鈴木三郎',
     changee: '山田次郎',
     sosoPoints: 1,

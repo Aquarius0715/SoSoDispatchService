@@ -130,8 +130,7 @@ const DashboardPage: NextPage<DashboardPageProps> = ({ params }) => {
         const newLog: SOSOTransaction = {
           id: Date.now(),
           eventName: '手動調整',
-          date: new Date().toLocaleDateString('ja-JP'),
-          time: new Date().toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' }),
+          dateTime: new Date().toISOString(), // 現在の日時をISO形式で保存
           changer: '管理者',
           changee: editedData.memberName,
           sosoPoints: pointChange,

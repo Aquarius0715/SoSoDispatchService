@@ -4,8 +4,7 @@ import Input from '../TextFieald/Input';
 
 interface EventDetails {
   EventTitle: string;
-  EventDate: string;
-  EventTime: string;
+  EventDateTime: string; // YYYY-MM-DD HH:MM:SS 形式の文字列
   EventDetail: string;
   EventURL: string;
   member: string[];
@@ -61,8 +60,7 @@ const EventDetailModal: React.FC<ModalProps> = ({ eventDetails, onClose }) => {
 
         <div className="text-black mb-6">
           <h3 className="font-bold text-lg mb-2">{eventDetails.EventTitle}</h3>
-          <p>日付: {eventDetails.EventDate}</p>
-          <p>時刻: {eventDetails.EventTime}</p>
+          <p>日時: {eventDetails.EventDateTime}</p>
           <p>詳細: {eventDetails.EventDetail}</p>
         </div>
 
