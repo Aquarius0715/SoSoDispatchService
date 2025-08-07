@@ -72,7 +72,7 @@ export default function MyPage() {
     {
       id: 3,
       calendarName: 'ゼミ',
-      eventName: '歓迎会',
+      eventName: '歓迎会', 
       driveState: DriveState.PICK_UP,
       eventDate: '2024/04/25',
       driveTime: '19:00',
