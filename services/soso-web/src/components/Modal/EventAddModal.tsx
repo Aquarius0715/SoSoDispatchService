@@ -9,8 +9,8 @@ import Input from '../TextFieald/Input';
 interface EventStatus {
   title: string;
   details: string;
-  dropOffTime: string; // 送り時刻
-  pickUpTime: string;  // 迎え時刻
+  dropOffTime: string; // 送り時刻 // YYYY-MM-DD HH:MM:SS 形式の文字列
+  pickUpTime: string;  // 迎え時刻 // YYYY-MM-DD HH:MM:SS 形式の文字列
   dropOffCount: number; // 送り人数
   pickUpCount: number;  // 迎え人数
   departurePoint: string;
