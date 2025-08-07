@@ -22,7 +22,7 @@ type CalenderMembershipRequest struct {
 
 // DTO (JSON のキーは camelCase)
 type CalenderMemberResponse struct {
-	UserID    string `json:"userId"`
+	UserID    string `json:"id"`
 	Username  string `json:"username"`
 	HasCar    bool   `json:"hasCar"`
 	Capacity  int    `json:"capacity"`

@@ -341,10 +341,7 @@ paths:
         responses:
           '201':
             description: 作成成功
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/CalenderResponse'
+            $ref: '#/components/schemas/CalenderResponse'
           '400':
             $ref: '#/components/responses/BadRequest'
           '401':
@@ -938,14 +935,7 @@ components:
 
     CalenderCreateRequest:
       type: object
-      required: [name]
       properties:
-        name:
-          type: string
-          example: 開発チーム
-        description:
-          type: string
-          example: 社内配車管理用チーム
 
     CalenderResponse:
       type: object
@@ -962,26 +952,26 @@ components:
         ownerId:
           type: string
           example: usr_12345
-        createdAt:
-          type: string
-          format: date-time
-        updatedAt:
-          type: string
-          format: date-time
 
     CalenderMemberResponse:
       type: object
-      required: [userId]
+      required: [id]
       properties:
-        userId:
+        id:
           type: string
           example: usr_12345
-        role:
+        username:
           type: string
-          example: member
-        joinedAt:
-          type: string
-          format: date-time
+          example: masakikinota
+        hasCar:
+          type: boolean
+          example: true
+        capacity:
+          type: int32
+          example: 4
+        sosoPoint:
+          type: int32
+          example: 10
 
     ReservationCreateRequest:
       type: object
