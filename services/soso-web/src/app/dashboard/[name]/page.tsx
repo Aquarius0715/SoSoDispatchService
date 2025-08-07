@@ -14,6 +14,7 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import SOSOEditModal from '@/src/components/Modal/SOSOEditModal';
+import jaLocale from '@fullcalendar/core/locales/ja';
 
 // サイドバーで必要となるデータの型をインポート
 import { Member } from '@/src/components/MemberList/MenberList';
@@ -131,8 +132,7 @@ const handleAddEventClick = (e: React.MouseEvent, arg: any) => {
         const newLog: SOSOTransaction = {
           id: Date.now(),
           eventName: '手動調整',
-          date: new Date().toLocaleDateString('ja-JP'),
-          time: new Date().toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' }),
+          dateTime: new Date().toISOString(),
           changer: '管理者',
           changee: editedData.username,
           sosoPoints: pointChange,
