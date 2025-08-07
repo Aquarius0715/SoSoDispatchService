@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+
 	"soso/internal/model"
 )
 
@@ -15,7 +16,10 @@ func NewEventRepository(db *sql.DB) *EventRepository {
 	return &EventRepository{DB: db}
 }
 
-// Create inserts a new event record.
+/* ----------------------------------------------------------------
+   Create
+   ---------------------------------------------------------------- */
+
 func (r *EventRepository) Create(ctx context.Context, e *model.Event) error {
 	_, err := r.DB.ExecContext(ctx, `
 		INSERT INTO events (
@@ -28,14 +32,19 @@ func (r *EventRepository) Create(ctx context.Context, e *model.Event) error {
 			end_time,
 			origin_location,
 			destination_location,
-			seats_required
-		) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-	`, e.ID, e.CalenderId, e.CreatorId, e.Title, e.Description,
-		e.StartTime, e.EndTime, e.OriginLocation, e.DestinationLocation, e.SeatsRequired)
+			seats_required_go,
+			seats_required_return
+		) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+	`, e.ID, e.CalenderID, e.CreatorID, e.Title, e.Description,
+		e.StartTime, e.EndTime, e.OriginLocation, e.DestinationLocation,
+		e.SeatsRequiredGo, e.SeatsRequiredReturn)
 	return err
 }
 
-// FindEventsByCalenderId returns all events that belong to a specific calender.
+/* ----------------------------------------------------------------
+   List by Calender
+   ---------------------------------------------------------------- */
+
 func (r *EventRepository) FindEventsByCalenderId(ctx context.Context, calenderID string) ([]*model.Event, error) {
 	rows, err := r.DB.QueryContext(ctx, `
 		SELECT
@@ -48,7 +57,8 @@ func (r *EventRepository) FindEventsByCalenderId(ctx context.Context, calenderID
 			end_time,
 			origin_location,
 			destination_location,
-			seats_required,
+			seats_required_go,
+			seats_required_return,
 			created_at,
 			updated_at
 		FROM events
@@ -65,9 +75,19 @@ func (r *EventRepository) FindEventsByCalenderId(ctx context.Context, calenderID
 		var desc, origin, dest sql.NullString
 
 		if err := rows.Scan(
-			&ev.ID, &ev.CalenderId, &ev.CreatorId, &ev.Title, &desc,
-			&ev.StartTime, &ev.EndTime, &origin, &dest, &ev.SeatsRequired,
-			&ev.CreatedAt, &ev.UpdatedAt,
+			&ev.ID,
+			&ev.CalenderID,
+			&ev.CreatorID,
+			&ev.Title,
+			&desc,
+			&ev.StartTime,
+			&ev.EndTime,
+			&origin,
+			&dest,
+			&ev.SeatsRequiredGo,
+			&ev.SeatsRequiredReturn,
+			&ev.CreatedAt,
+			&ev.UpdatedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -84,7 +104,10 @@ func (r *EventRepository) FindEventsByCalenderId(ctx context.Context, calenderID
 	return list, nil
 }
 
-// FindById returns a single event by its ID.
+/* ----------------------------------------------------------------
+   Find by ID
+   ---------------------------------------------------------------- */
+
 func (r *EventRepository) FindById(ctx context.Context, eventID string) (*model.Event, error) {
 	row := r.DB.QueryRowContext(ctx, `
 		SELECT
@@ -97,7 +120,8 @@ func (r *EventRepository) FindById(ctx context.Context, eventID string) (*model.
 			end_time,
 			origin_location,
 			destination_location,
-			seats_required,
+			seats_required_go,
+			seats_required_return,
 			created_at,
 			updated_at
 		FROM events
@@ -108,9 +132,19 @@ func (r *EventRepository) FindById(ctx context.Context, eventID string) (*model.
 	var ev model.Event
 	var desc, origin, dest sql.NullString
 	if err := row.Scan(
-		&ev.ID, &ev.CalenderId, &ev.CreatorId, &ev.Title, &desc,
-		&ev.StartTime, &ev.EndTime, &origin, &dest, &ev.SeatsRequired,
-		&ev.CreatedAt, &ev.UpdatedAt,
+		&ev.ID,
+		&ev.CalenderID,
+		&ev.CreatorID,
+		&ev.Title,
+		&desc,
+		&ev.StartTime,
+		&ev.EndTime,
+		&origin,
+		&dest,
+		&ev.SeatsRequiredGo,
+		&ev.SeatsRequiredReturn,
+		&ev.CreatedAt,
+		&ev.UpdatedAt,
 	); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, nil

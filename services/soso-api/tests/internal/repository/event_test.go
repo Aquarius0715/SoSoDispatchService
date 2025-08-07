@@ -37,20 +37,22 @@ func TestEventRepository_Create_OK(t *testing.T) {
 
 	e := &model.Event{
 		ID:                  "ev1",
-		CalenderId:          "cal1",
-		CreatorId:           "u1",
+		CalenderID:          "cal1",
+		CreatorID:           "u1",
 		Title:               "Event 1",
 		Description:         "desc",
 		StartTime:           time.Now(),
 		EndTime:             time.Now().Add(time.Hour),
 		OriginLocation:      "A",
 		DestinationLocation: "B",
-		SeatsRequired:       2,
+		SeatsRequiredGo:     2,
+		SeatsRequiredReturn: 1,
 	}
 
 	mock.ExpectExec(SQLEventCreate).
-		WithArgs(e.ID, e.CalenderId, e.CreatorId, e.Title, e.Description,
-			e.StartTime, e.EndTime, e.OriginLocation, e.DestinationLocation, e.SeatsRequired).
+		WithArgs(e.ID, e.CalenderID, e.CreatorID, e.Title, e.Description,
+			e.StartTime, e.EndTime, e.OriginLocation, e.DestinationLocation,
+			e.SeatsRequiredGo, e.SeatsRequiredReturn).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 
 	err := repo.Create(context.Background(), e)
@@ -64,20 +66,22 @@ func TestEventRepository_Create_DuplicateID(t *testing.T) {
 
 	e := &model.Event{
 		ID:                  "ev1",
-		CalenderId:          "cal1",
-		CreatorId:           "u1",
+		CalenderID:          "cal1",
+		CreatorID:           "u1",
 		Title:               "Event 1",
 		Description:         "desc",
 		StartTime:           time.Now(),
 		EndTime:             time.Now().Add(time.Hour),
 		OriginLocation:      "A",
 		DestinationLocation: "B",
-		SeatsRequired:       2,
+		SeatsRequiredGo:     2,
+		SeatsRequiredReturn: 1,
 	}
 
 	mock.ExpectExec(SQLEventCreate).
-		WithArgs(e.ID, e.CalenderId, e.CreatorId, e.Title, e.Description,
-			e.StartTime, e.EndTime, e.OriginLocation, e.DestinationLocation, e.SeatsRequired).
+		WithArgs(e.ID, e.CalenderID, e.CreatorID, e.Title, e.Description,
+			e.StartTime, e.EndTime, e.OriginLocation, e.DestinationLocation,
+			e.SeatsRequiredGo, e.SeatsRequiredReturn).
 		WillReturnError(&mysql.MySQLError{
 			Number:  1062,
 			Message: "Duplicate entry 'ev1' for key 'events.PRIMARY'",
@@ -102,11 +106,12 @@ func TestEventRepository_FindById_Hit(t *testing.T) {
 	rows := sqlmock.NewRows([]string{
 		"id", "calender_id", "creator_id", "title", "description",
 		"start_time", "end_time", "origin_location", "destination_location",
-		"seats_required", "created_at", "updated_at",
+		"seats_required_go", "seats_required_return",
+		"created_at", "updated_at",
 	}).AddRow(
 		"ev1", "cal1", "u1", "Event 1", "desc",
 		now, now.Add(time.Hour), "A", "B",
-		2, now, now,
+		2, 1, now, now,
 	)
 
 	mock.ExpectQuery(SQLEventFindById).
@@ -116,7 +121,8 @@ func TestEventRepository_FindById_Hit(t *testing.T) {
 	ev, err := repo.FindById(context.Background(), "ev1")
 	assert.NoError(t, err)
 	assert.NotNil(t, ev)
-	assert.Equal(t, "Event 1", ev.Title)
+	assert.Equal(t, 2, ev.SeatsRequiredGo)
+	assert.Equal(t, 1, ev.SeatsRequiredReturn)
 	assert.NoError(t, mock.ExpectationsWereMet())
 }
 
@@ -148,15 +154,16 @@ func TestEventRepository_FindEventsByCalenderId_Hit(t *testing.T) {
 	rows := sqlmock.NewRows([]string{
 		"id", "calender_id", "creator_id", "title", "description",
 		"start_time", "end_time", "origin_location", "destination_location",
-		"seats_required", "created_at", "updated_at",
+		"seats_required_go", "seats_required_return",
+		"created_at", "updated_at",
 	}).AddRow(
 		"ev1", "cal1", "u1", "Event 1", "desc1",
 		now, now.Add(time.Hour), "A1", "B1",
-		1, now, now,
+		1, 0, now, now,
 	).AddRow(
 		"ev2", "cal1", "u2", "Event 2", "desc2",
 		now.Add(2*time.Hour), now.Add(3*time.Hour), "A2", "B2",
-		3, now, now,
+		3, 3, now, now,
 	)
 
 	mock.ExpectQuery(SQLEventFindByCalenderID).
@@ -166,8 +173,8 @@ func TestEventRepository_FindEventsByCalenderId_Hit(t *testing.T) {
 	list, err := repo.FindEventsByCalenderId(context.Background(), "cal1")
 	assert.NoError(t, err)
 	assert.Len(t, list, 2)
-	assert.Equal(t, "ev1", list[0].ID)
-	assert.Equal(t, "Event 2", list[1].Title)
+	assert.Equal(t, 1, list[0].SeatsRequiredGo)
+	assert.Equal(t, 3, list[1].SeatsRequiredReturn)
 	assert.NoError(t, mock.ExpectationsWereMet())
 }
 
@@ -178,7 +185,8 @@ func TestEventRepository_FindEventsByCalenderId_NotFound(t *testing.T) {
 	emptyRows := sqlmock.NewRows([]string{
 		"id", "calender_id", "creator_id", "title", "description",
 		"start_time", "end_time", "origin_location", "destination_location",
-		"seats_required", "created_at", "updated_at",
+		"seats_required_go", "seats_required_return",
+		"created_at", "updated_at",
 	})
 
 	mock.ExpectQuery(SQLEventFindByCalenderID).

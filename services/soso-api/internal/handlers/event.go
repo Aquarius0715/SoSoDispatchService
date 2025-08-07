@@ -1,3 +1,4 @@
+// internal/handlers/event.go
 package handlers
 
 import (
@@ -31,21 +32,23 @@ type EventCreateRequest struct {
 	EndTime             time.Time `json:"endTime"              validate:"required"`
 	OriginLocation      string    `json:"originLocation"       validate:"max=255"`
 	DestinationLocation string    `json:"destinationLocation"  validate:"max=255"`
-	SeatsRequired       int       `json:"seatsRequired"        validate:"required,min=1"`
+	SeatsRequiredGo     int       `json:"seatsRequiredGo"      validate:"min=0"`
+	SeatsRequiredReturn int       `json:"seatsRequiredReturn"  validate:"min=0"`
 }
 
 func toEventResponse(e *model.Event) map[string]any {
 	return map[string]any{
 		"id":                  e.ID,
-		"calenderId":          e.CalenderId,
-		"creatorId":           e.CreatorId,
+		"calenderId":          e.CalenderID,
+		"creatorId":           e.CreatorID,
 		"title":               e.Title,
 		"description":         e.Description,
 		"startTime":           e.StartTime,
 		"endTime":             e.EndTime,
 		"originLocation":      e.OriginLocation,
 		"destinationLocation": e.DestinationLocation,
-		"seatsRequired":       e.SeatsRequired,
+		"seatsRequiredGo":     e.SeatsRequiredGo,
+		"seatsRequiredReturn": e.SeatsRequiredReturn,
 	}
 }
 
@@ -57,7 +60,7 @@ func toEventResponse(e *model.Event) map[string]any {
 func (h *EventHandler) Create(c echo.Context) error {
 	calenderID := c.Param("calender_id")
 
-	// JWT からユーザ ID を取得
+	// 認証ユーザID取得
 	tok, ok := c.Get("user").(*jwt.Token)
 	if !ok {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized")
@@ -68,7 +71,7 @@ func (h *EventHandler) Create(c echo.Context) error {
 	}
 	creatorID := claims.Subject
 
-	// リクエストボディ
+	// リクエストパース & バリデーション
 	var req EventCreateRequest
 	if err := c.Bind(&req); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid payload")
@@ -79,25 +82,28 @@ func (h *EventHandler) Create(c echo.Context) error {
 	if !req.EndTime.After(req.StartTime) {
 		return echo.NewHTTPError(http.StatusBadRequest, "endTime must be after startTime")
 	}
+	if req.SeatsRequiredGo == 0 && req.SeatsRequiredReturn == 0 {
+		return echo.NewHTTPError(http.StatusBadRequest, "at least one of seatsRequiredGo or seatsRequiredReturn must be > 0")
+	}
 
-	// 登録
+	// 登録用エンティティ
 	ev := &model.Event{
 		ID:                  uuid.NewString(),
-		CalenderId:          calenderID,
-		CreatorId:           creatorID,
+		CalenderID:          calenderID,
+		CreatorID:           creatorID,
 		Title:               req.Title,
 		Description:         req.Description,
 		StartTime:           req.StartTime,
 		EndTime:             req.EndTime,
 		OriginLocation:      req.OriginLocation,
 		DestinationLocation: req.DestinationLocation,
-		SeatsRequired:       req.SeatsRequired,
+		SeatsRequiredGo:     req.SeatsRequiredGo,
+		SeatsRequiredReturn: req.SeatsRequiredReturn,
 	}
 
 	if err := h.EventRepo.Create(c.Request().Context(), ev); err != nil {
 		return err
 	}
-
 	return c.JSON(http.StatusCreated, toEventResponse(ev))
 }
 
@@ -105,13 +111,13 @@ func (h *EventHandler) Create(c echo.Context) error {
 func (h *EventHandler) ListByCalender(c echo.Context) error {
 	calenderID := c.Param("calender_id")
 
-	list, err := h.EventRepo.FindEventsByCalenderId(c.Request().Context(), calenderID)
+	events, err := h.EventRepo.FindEventsByCalenderId(c.Request().Context(), calenderID)
 	if err != nil {
 		return err
 	}
 
-	resp := make([]map[string]any, len(list))
-	for i, ev := range list {
+	resp := make([]map[string]any, len(events))
+	for i, ev := range events {
 		resp[i] = toEventResponse(ev)
 	}
 	return c.JSON(http.StatusOK, resp)
