@@ -54,19 +54,28 @@ function SOSOEditModal({ isOpen, onClose, onSave, initialData }: Props) {
     onClose();
   };
 
-  return mounted
-    ? createPortal(
-        <div className='fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center z-50'>
-          <div className={clsx('bg-white p-6 rounded-lg shadow-xl w-96')}>
-            {/* ▼▼▼ ここから下を元のレイアウトに復元しました ▼▼▼ */}
-            <div className="p-4 border-b flex justify-between items-center">
-              <h3 className="text-xl font-bold text-black">SOSOポイント編集</h3>
-              <button 
-                onClick={onClose}
-                className="text-gray-500 hover:text-gray-800"
-              >
-                <span className="text-2xl">&times;</span>
-              </button>
+  return (
+    <div className='fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center'>
+      <div className={clsx('bg-white p-6 rounded-lg shadow-xl w-96')}>
+        <div className="p-4 border-b flex justify-between items-center">
+          {/* ヘッダーのタイトルを黒文字に修正 */}
+          <h3 className="text-xl font-bold text-black">予定追加</h3>
+          <button 
+            onClick={onClose}
+            className="text-gray-500 hover:text-gray-800"
+          >
+            <span className="text-2xl">&times;</span>
+          </button>
+        </div>
+        <div className="flex justify-between items-center mb-4">
+          <h2 className='text-xl text-black font-bold'>メンバー情報</h2>
+          
+        </div>
+
+        <div className='space-y-4'>
+          {/* ニックネーム */}
+          <p className='text-black'>ニックネーム: {editedData.username}</p>
+
 
               
             </div>
