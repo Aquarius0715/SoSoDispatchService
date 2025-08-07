@@ -35,6 +35,7 @@ func SetupRouter(cfg *Config) *echo.Echo {
 	calRepo := &repository.CalenderRepository{DB: db}
 	calMRepo := &repository.CalenderMembershipRepository{DB: db}
 	eveRepo := &repository.EventRepository{DB: db}
+	evePRepo := &repository.EventParticipantRepository{DB: db}
 
 	cookieCfg := handlers.CookieConf{
 		Name:     cfg.CookieNameRT,
@@ -47,7 +48,7 @@ func SetupRouter(cfg *Config) *echo.Echo {
 	userH := handlers.NewUserHandler(userRepo)
 	calenderH := handlers.NewCalenderHandler(calRepo)
 	calenderMembershipH := handlers.NewCalenderMembershipHandler(calMRepo)
-	eventH := handlers.NewEventHandler(eveRepo)
+	eventH := handlers.NewEventHandler(eveRepo, evePRepo)
 
 	// Echo標準ミドルウェア
 	e.Use(echoMW.Logger())

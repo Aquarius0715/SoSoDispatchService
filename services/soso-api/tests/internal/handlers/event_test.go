@@ -15,24 +15,24 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-/*
-----------------------------------------------------------------
+/* ----------------------------------------------------------------
+   モック生成ヘルパ
+   ---------------------------------------------------------------- */
 
-	テスト用モック生成ヘルパ
-	----------------------------------------------------------------
-*/
 func newEventHandler(t *testing.T) (*handlers.EventHandler, sqlmock.Sqlmock, func(), *echo.Echo) {
 	dbm := NewSQLMock(t)
-	repo := repository.NewEventRepository(dbm.DB)
-	h := handlers.NewEventHandler(repo)
+
+	er := repository.NewEventRepository(dbm.DB)
+	epr := repository.NewEventParticipantRepository(dbm.DB)
+
+	h := handlers.NewEventHandler(er, epr)
 	return h, dbm.Mock, dbm.Close, NewEcho()
 }
 
-/*
-================================================================
- 1. Create
-    ================================================================
-*/
+/* ----------------------------------------------------------------
+   Create
+   ---------------------------------------------------------------- */
+
 func TestEventCreate_OK(t *testing.T) {
 	h, mock, closeFn, e := newEventHandler(t)
 	defer closeFn()
@@ -42,6 +42,7 @@ func TestEventCreate_OK(t *testing.T) {
 			sqlmock.AnyArg(), sqlmock.AnyArg(), "A", "B", 2, 1).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 
+	// 参加者を空配列にすると BulkInsert は呼ばれず SQL モック不要
 	body := `{
 		"title":"Event 1",
 		"description":"desc",
@@ -50,7 +51,8 @@ func TestEventCreate_OK(t *testing.T) {
 		"originLocation":"A",
 		"destinationLocation":"B",
 		"seatsRequiredGo":2,
-		"seatsRequiredReturn":1
+		"seatsRequiredReturn":1,
+		"participantUserIds":[]
 	}`
 
 	req := httptest.NewRequest(http.MethodPost, "/calenders/cal1/events", bytes.NewBufferString(body))
@@ -102,11 +104,10 @@ func TestEventCreate_Unauthorized(t *testing.T) {
 	assert.Equal(t, http.StatusUnauthorized, he.Code)
 }
 
-/*
-================================================================
- 2. ListByCalender
-    ================================================================
-*/
+/* ----------------------------------------------------------------
+   ListByCalender
+   ---------------------------------------------------------------- */
+
 func TestEventListByCalender_OK(t *testing.T) {
 	h, mock, closeFn, e := newEventHandler(t)
 	defer closeFn()
@@ -177,17 +178,22 @@ func TestEventListByCalender_NotFound(t *testing.T) {
 	assert.NoError(t, mock.ExpectationsWereMet())
 }
 
-/*
-================================================================
- 3. FindById
-    ================================================================
-*/
+/* ----------------------------------------------------------------
+   FindById
+   ---------------------------------------------------------------- */
+
+// 参加者クエリ用定数
+const SQLEventParticipantsByEventID = `
+SELECT event_id, user_id, status, type, registered_at
+FROM event_participants
+WHERE event_id = ? AND type = ?`
+
 func TestEventFindById_OK(t *testing.T) {
 	h, mock, closeFn, e := newEventHandler(t)
 	defer closeFn()
 
 	now := time.Now()
-	rows := sqlmock.NewRows([]string{
+	eventRows := sqlmock.NewRows([]string{
 		"id", "calender_id", "creator_id", "title", "description",
 		"start_time", "end_time", "origin_location", "destination_location",
 		"seats_required_go", "seats_required_return",
@@ -195,10 +201,18 @@ func TestEventFindById_OK(t *testing.T) {
 	}).AddRow("ev1", "cal1", "u1", "Event 1", "desc1",
 		now, now.Add(time.Hour), "A", "B", 2, 1, now, now,
 	)
-
 	mock.ExpectQuery(SQLEventFindById).
 		WithArgs("ev1").
-		WillReturnRows(rows)
+		WillReturnRows(eventRows)
+
+	// 参加者 2 名
+	partRows := sqlmock.NewRows([]string{
+		"event_id", "user_id", "status", "type", "registered_at",
+	}).AddRow("ev1", "user123", "registered", "participants", now).
+		AddRow("ev1", "user456", "registered", "participants", now)
+	mock.ExpectQuery(SQLEventParticipantsByEventID).
+		WithArgs("ev1", "participants").
+		WillReturnRows(partRows)
 
 	req := httptest.NewRequest(http.MethodGet, "/events/ev1", nil)
 	rec := httptest.NewRecorder()
@@ -213,7 +227,7 @@ func TestEventFindById_OK(t *testing.T) {
 
 	var got map[string]any
 	assert.NoError(t, json.Unmarshal(rec.Body.Bytes(), &got))
-	assert.Equal(t, float64(2), got["seatsRequiredGo"])
+	assert.Equal(t, []any{"user123", "user456"}, got["participantUserIds"])
 	assert.NoError(t, mock.ExpectationsWereMet())
 }
 
