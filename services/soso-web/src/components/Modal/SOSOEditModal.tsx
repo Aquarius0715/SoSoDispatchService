@@ -70,7 +70,7 @@ function SOSOEditModal({ isOpen, onClose, onSave, initialData }: Props) {
           <p className='text-black'>ニックネーム: {editedData.memberName}</p>
 
           {/* 車の有無 */}
-          <p className='text-black'>車: {editedData.hasCar ? `あり (${editedData.passengerNumber}人)` : 'なし'}</p>
+          <p className='text-black'>車: {editedData.hasCar ? `あり (${editedData.seatsRequired}人)` : 'なし'}</p>
 
           <hr className="border-gray-300" />
           

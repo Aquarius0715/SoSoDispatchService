@@ -22,21 +22,21 @@ interface ModalProps {
 }
 
 const EventDetailModal: React.FC<ModalProps> = ({ eventDetails, onClose }) => {
-  const [passengers, setPassengers] = useState<number | ''>('');
+  const [seatsRequired, setSeatsRequired] = useState<number | ''>('');
   const [dropOffRemaining, setDropOffRemaining] = useState(eventDetails.DropOffNumber);
   const [pickUpRemaining, setPickUpRemaining] = useState(eventDetails.PickUpNumber);
   const [registered, setRegistered] = useState(eventDetails.dispatchRegistered);
 
   const handleRegister = (type: 'dropOff' | 'pickUp') => {
-    if (typeof passengers === 'number' && passengers > 0) {
-      if (type === 'dropOff' && passengers <= dropOffRemaining) {
-        setDropOffRemaining(dropOffRemaining - passengers);
-        setRegistered(prev => [...prev, `山田次郎 (送り: ${passengers}人)`]);
-        alert(`送りで${passengers}人登録しました。`);
-      } else if (type === 'pickUp' && passengers <= pickUpRemaining) {
-        setPickUpRemaining(pickUpRemaining - passengers);
-        setRegistered(prev => [...prev, `山田次郎 (迎え: ${passengers}人)`]);
-        alert(`迎えで${passengers}人登録しました。`);
+    if (typeof seatsRequired === 'number' && seatsRequired > 0) {
+      if (type === 'dropOff' && seatsRequired <= dropOffRemaining) {
+        setDropOffRemaining(dropOffRemaining - seatsRequired);
+        setRegistered(prev => [...prev, `山田次郎 (送り: ${seatsRequired}人)`]);
+        alert(`送りで${seatsRequired}人登録しました。`);
+      } else if (type === 'pickUp' && seatsRequired <= pickUpRemaining) {
+        setPickUpRemaining(pickUpRemaining - seatsRequired);
+        setRegistered(prev => [...prev, `山田次郎 (迎え: ${seatsRequired}人)`]);
+        alert(`迎えで${seatsRequired}人登録しました。`);
       } else {
         alert('指定された人数は登録できません。');
       }
@@ -99,12 +99,12 @@ const EventDetailModal: React.FC<ModalProps> = ({ eventDetails, onClose }) => {
           <Input
             className="w-full mb-4 text-black "
             type="number"
-            value={passengers}
+            value={seatsRequired}
             onChange={(e) => {
             const value = e.target.value;
             // ここでバリデーション
             if (value === '' || !isNaN(Number(value))) {
-                setPassengers(value === '' ? '' : Number(value));
+                setSeatsRequired(value === '' ? '' : Number(value));
             }
             }}
           />
@@ -112,14 +112,14 @@ const EventDetailModal: React.FC<ModalProps> = ({ eventDetails, onClose }) => {
             <Button
               className="bg-blue-500 hover:bg-blue-600 flex-1"
               onClick={() => handleRegister('dropOff')}
-              disabled={typeof passengers !== 'number' || passengers <= 0}
+              disabled={typeof seatsRequired !== 'number' || seatsRequired <= 0}
             >
               送り登録
             </Button>
             <Button
               className="bg-green-500 hover:bg-green-600 flex-1"
               onClick={() => handleRegister('pickUp')}
-              disabled={typeof passengers !== 'number' || passengers <= 0}
+              disabled={typeof seatsRequired !== 'number' || seatsRequired <= 0}
             >
               迎え登録
             </Button>
