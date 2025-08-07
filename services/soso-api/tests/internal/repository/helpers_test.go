@@ -179,4 +179,52 @@ const (
 		INNER JOIN users AS u ON u.id = cm.user_id
 		WHERE cm.calender_id = ?
 	`
+	SQLEventCreate = `
+		INSERT INTO events (
+			id,
+			calender_id,
+			creator_id,
+			title,
+			description,
+			start_time,
+			end_time,
+			origin_location,
+			destination_location,
+			seats_required
+		) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+
+	SQLEventFindById = `
+		SELECT
+			id,
+			calender_id,
+			creator_id,
+			title,
+			description,
+			start_time,
+			end_time,
+			origin_location,
+			destination_location,
+			seats_required,
+			created_at,
+			updated_at
+		FROM events
+		WHERE id = ?
+		LIMIT 1`
+
+	SQLEventFindByCalenderID = `
+		SELECT
+			id,
+			calender_id,
+			creator_id,
+			title,
+			description,
+			start_time,
+			end_time,
+			origin_location,
+			destination_location,
+			seats_required,
+			created_at,
+			updated_at
+		FROM events
+		WHERE calender_id = ?`
 )
