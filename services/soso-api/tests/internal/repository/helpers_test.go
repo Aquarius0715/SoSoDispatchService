@@ -190,26 +190,9 @@ const (
 			end_time,
 			origin_location,
 			destination_location,
-			seats_required
-		) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
-
-	SQLEventFindById = `
-		SELECT
-			id,
-			calender_id,
-			creator_id,
-			title,
-			description,
-			start_time,
-			end_time,
-			origin_location,
-			destination_location,
-			seats_required,
-			created_at,
-			updated_at
-		FROM events
-		WHERE id = ?
-		LIMIT 1`
+			seats_required_go,
+			seats_required_return
+		) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
 
 	SQLEventFindByCalenderID = `
 		SELECT
@@ -222,9 +205,29 @@ const (
 			end_time,
 			origin_location,
 			destination_location,
-			seats_required,
+			seats_required_go,
+			seats_required_return,
 			created_at,
 			updated_at
 		FROM events
 		WHERE calender_id = ?`
+
+	SQLEventFindById = `
+		SELECT
+			id,
+			calender_id,
+			creator_id,
+			title,
+			description,
+			start_time,
+			end_time,
+			origin_location,
+			destination_location,
+			seats_required_go,
+			seats_required_return,
+			created_at,
+			updated_at
+		FROM events
+		WHERE id = ?
+		LIMIT 1`
 )
