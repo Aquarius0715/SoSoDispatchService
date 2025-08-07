@@ -14,7 +14,7 @@ import { EventInput } from '@fullcalendar/core';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
-import jaLocale from '@fullcalendar/core/locales/ja'; // 日本語化
+import jaLocale from '@fullcalendar/core/locales/ja.js';
 import SOSOEditModal from '@/src/components/Modal/SOSOEditModal';
 
 // サイドバーで必要となるデータの型をインポート
