@@ -379,7 +379,7 @@ paths:
   /calenders/{calenderId}/members:
     get:
       tags: [Calenders]
-      summary: チームメンバー一覧取得
+      summary: チームメンバー一覧取得（実装済み）
       operationId: listCalenderMembers
       security:
         - AccessToken: []
