@@ -58,7 +58,7 @@ export default function MyPage() {
       driveState: DriveState.PICK_UP,
       eventDate: '2024/04/15',
       driveTime: '18:00',
-      passengerNumber: 3,
+      seatsRequired: 3,
     },
     {
       id: 2,
@@ -67,16 +67,16 @@ export default function MyPage() {
       driveState: DriveState.DROP_OFF,
       eventDate: '2024/04/20',
       driveTime: '21:00',
-      passengerNumber: 2,
+      seatsRequired: 2,
     },
     {
       id: 3,
       calendarName: 'ゼミ',
-      eventName: '歓迎会',
+      eventName: '歓迎会', 
       driveState: DriveState.PICK_UP,
       eventDate: '2024/04/25',
       driveTime: '19:00',
-      passengerNumber: 4,
+      seatsRequired: 4,
     },
   ];
 
