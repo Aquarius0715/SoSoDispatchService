@@ -15,8 +15,7 @@ type Story = StoryObj<typeof meta>;
 // 1. ポイント付与（プラス）のストーリー
 export const PointAdded: Story = {
   args: {
-    date: '2024/04/15',
-    time: '21:10',
+    dateTime: '2024/04/10 22:30',
     changer: '山田次郎',
     changee: '鈴木三郎',
     sosoPoints: 1,
@@ -27,8 +26,7 @@ export const PointAdded: Story = {
 // 2. ポイント減算（マイナス）のストーリー
 export const PointDeducted: Story = {
   args: {
-    date: '2024/04/15',
-    time: '22:00',
+    dateTime: '2024/04/15 22:00',
     changer: '佐藤花子',
     changee: '田中太郎',
     sosoPoints: -1,
@@ -39,8 +37,7 @@ export const PointDeducted: Story = {
 // 3. ポイント変動なし（ゼロ）のストーリー
 export const NoChange: Story = {
   args: {
-    date: '2024/04/16',
-    time: '09:00',
+    dateTime: '2024/04/20 23:00',
     changer: '管理者',
     changee: '全員',
     sosoPoints: 0,

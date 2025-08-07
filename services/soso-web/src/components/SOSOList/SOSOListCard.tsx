@@ -5,8 +5,7 @@ import React from 'react';
 
 interface Props {
   className?: string;
-  date: string;
-  time: string;
+  dateTime: string; // 日時を一つのフィールドにまとめる
   changer: string;
   changee: string;
   sosoPoints: number;
@@ -14,14 +13,14 @@ interface Props {
 }
 
 
-function SOSOcard({ className, date, time, changer, changee, sosoPoints, reason }: Props) {
+function SOSOcard({ className, dateTime, changer, changee, sosoPoints, reason }: Props) {
   const pointTextColor = sosoPoints >= 0 ? 'text-green-600' : 'text-red-600';
   const pointText = sosoPoints > 0 ? `+${sosoPoints}pt` : `${sosoPoints}pt`;
 
 
   return (
     <div className={clsx('bg-gray-50 rounded-md p-3 shadow-sm', className)}>
-      <div className="text-xs text-gray-500 mb-1">{date} {time}</div>
+      <div className="text-xs text-gray-500 mb-1">{dateTime}</div>
       <p className="text-sm font-semibold text-gray-800">
         {changer} が {changee} のSOSOポイントを <span className={pointTextColor}>{pointText}</span> 変更
       </p>
