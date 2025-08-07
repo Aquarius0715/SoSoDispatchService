@@ -20,10 +20,10 @@ function DriverListCard({className,drive,children}: Props) {
 
   return (
     <div className={clsx('flex flex-col bg-primary-1 rounded-lg', finalClassName)}>
-      <p className='text-sm text-gray-600'>{drive.calenderName}</p>
+      <p className='text-sm text-gray-600'>{drive.calendarName}</p>
       <p className='font-medium text-gray-800'>{drive.eventName}</p>
       <p className='text-sm text-gray-600'>{drive.eventDate} {drive.driveTime}</p>
-      <p className='text-sm text-gray-600'>{drive.driveState !== undefined && driveStateText[drive.driveState]}: {drive.passengerNumber}</p>
+      <p className='text-sm text-gray-600'>{drive.driveState !== undefined && driveStateText[drive.driveState]}: {drive.seatsRequired}</p>
       {children}
     </div>
   );

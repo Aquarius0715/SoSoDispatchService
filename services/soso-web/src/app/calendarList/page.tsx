@@ -58,7 +58,7 @@ export default function MyPage() {
       driveState: DriveState.PICK_UP,
       eventDate: '2024/04/15',
       driveTime: '18:00',
-      passengerNumber: 3,
+      seatsRequired: 3,
     },
     {
       id: 2,
@@ -67,7 +67,7 @@ export default function MyPage() {
       driveState: DriveState.DROP_OFF,
       eventDate: '2024/04/20',
       driveTime: '21:00',
-      passengerNumber: 2,
+      seatsRequired: 2,
     },
     {
       id: 3,
@@ -76,7 +76,7 @@ export default function MyPage() {
       driveState: DriveState.PICK_UP,
       eventDate: '2024/04/25',
       driveTime: '19:00',
-      passengerNumber: 4,
+      seatsRequired: 4,
     },
   ];
 
@@ -136,9 +136,9 @@ export default function MyPage() {
         <MyPageLeftSidebar
           userName={userStatus.userName} // ★ userStatusから値を取得
           hasCar={userStatus.hasCar}     // ★ userStatusから値を取得
-          passengerNumber={userStatus.capacity} // ★ userStatusから値を取得
+          seatsRequired={userStatus.capacity} // ★ userStatusから値を取得
           onEditClick={handleEditStatus}
-          email={userStatus.mailAddress} // ★ userStatusから値を取得
+          mailAddress={userStatus.mailAddress} // ★ userStatusから値を取得
         />
         <main className={clsx("flex-grow p-8 overflow-y-auto")}>
           <h2 className="text-3xl font-bold text-gray-800 mb-6">参加しているカレンダー一覧</h2>
