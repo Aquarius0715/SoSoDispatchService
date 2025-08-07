@@ -71,10 +71,10 @@ const DashboardPage: NextPage<DashboardPageProps> = ({ params }) => {
     setIsEditModalOpen(true);
   };
 
-  // ▼ プラスボタンクリック時の処理
-  const handleAddEventClick = (e: React.MouseEvent, arg: any) => {
-    // 親要素のdateClickイベントが発火するのを防ぐ
-    e.stopPropagation(); 
+// ▼ プラスボタンクリック時の処理
+const handleAddEventClick = (e: React.MouseEvent, arg: any) => {
+  // 親要素のdateClickイベントが発火するのを防ぐ
+  e.stopPropagation();
 
     // クリックされた日付をStateに保存
     setSelectedDate(arg.dateStr);
