@@ -469,7 +469,7 @@ paths:
   /calenders/{calenderId}/events:
     get:
       tags: [events]
-      summary: 配車希望一覧取得
+      summary: 配車希望一覧取得（実装済み）
       operationId: listevents
       security:
         - AccessToken: []
@@ -506,7 +506,7 @@ paths:
           $ref: '#/components/responses/ForbiddenError'
     post:
       tags: [events]
-      summary: 配車希望登録
+      summary: 配車希望登録(実装済み)
       operationId: createevent
       security:
         - AccessToken: []
@@ -540,7 +540,7 @@ paths:
   /events/{eventId}:
     get:
       tags: [events]
-      summary: 配車希望取得
+      summary: 配車希望取得(実装済み)
       operationId: getevent
       security:
         - AccessToken: []
