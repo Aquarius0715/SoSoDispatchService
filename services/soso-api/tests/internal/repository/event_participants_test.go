@@ -149,3 +149,46 @@ func TestEventParticipantRepository_FindByEventIDAndType_Empty(t *testing.T) {
 	assert.Empty(t, got)
 	assert.NoError(t, mock.ExpectationsWereMet())
 }
+
+/* ----------------------------------------------------------------
+   4. FetchUserInfos
+   ---------------------------------------------------------------- */
+
+func TestEventParticipantRepository_FetchUserInfos_OK(t *testing.T) {
+	repo, mock, closeFn := newEventParticipantRepoMock(t)
+	defer closeFn()
+
+	const eid = "ev1"
+
+	rows := sqlmock.NewRows([]string{
+		"username", "capacity", "type",
+	}).AddRow("alice", 2, string(model.Participants)).
+		AddRow("bob", 4, string(model.Go)).
+		AddRow("carol", 3, string(model.Return))
+
+	mock.ExpectQuery(`SELECT\s+u\.username`).
+		WithArgs(eid).
+		WillReturnRows(rows)
+
+	got, err := repo.FetchUserInfos(context.Background(), eid)
+	assert.NoError(t, err)
+	assert.Len(t, got, 3)
+	assert.Equal(t, "alice", got[0].UserName)
+	assert.Equal(t, 4, got[1].Capacity)
+	assert.Equal(t, model.Return, got[2].Type)
+	assert.NoError(t, mock.ExpectationsWereMet())
+}
+
+func TestEventParticipantRepository_FetchUserInfos_Empty(t *testing.T) {
+	repo, mock, closeFn := newEventParticipantRepoMock(t)
+	defer closeFn()
+
+	mock.ExpectQuery(`SELECT\s+u\.username`).
+		WithArgs("evX").
+		WillReturnRows(sqlmock.NewRows([]string{"username", "capacity", "type"}))
+
+	got, err := repo.FetchUserInfos(context.Background(), "evX")
+	assert.NoError(t, err)
+	assert.Empty(t, got)
+	assert.NoError(t, mock.ExpectationsWereMet())
+}

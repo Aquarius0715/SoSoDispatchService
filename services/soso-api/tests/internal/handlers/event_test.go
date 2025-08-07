@@ -330,3 +330,89 @@ func TestRegisterPickUp_Unauthorized(t *testing.T) {
 	he := err.(*echo.HTTPError)
 	assert.Equal(t, http.StatusUnauthorized, he.Code)
 }
+
+/* ----------------------------------------------------------------
+   Detail
+   ---------------------------------------------------------------- */
+
+// FindById に使う既存定数 (そのまま利用)
+//
+// 参加者 + ユーザー情報取得クエリ（FetchUserInfos）
+//
+//	※ QueryMatcherEqual を使っているため *完全一致* させる
+const SQLFetchParticipantInfos = `
+		SELECT u.username, u.capacity, ep.type
+		FROM event_participants AS ep
+		INNER JOIN users AS u ON u.id = ep.user_id
+		WHERE ep.event_id = ?`
+
+func TestEventDetail_OK(t *testing.T) {
+	h, mock, closeFn, e := newEventHandler(t)
+	defer closeFn()
+
+	/* ---------- event 本体 ---------- */
+	now := time.Now()
+	evRows := sqlmock.NewRows([]string{
+		"id", "calender_id", "creator_id", "title", "description",
+		"start_time", "end_time", "origin_location", "destination_location",
+		"seats_required_go", "seats_required_return",
+		"created_at", "updated_at",
+	}).AddRow("ev1", "cal1", "u1", "送迎イベント", "詳細説明",
+		now, now.Add(2*time.Hour), "東京駅", "箱根", 3, 4, now, now)
+	mock.ExpectQuery(SQLEventFindById).
+		WithArgs("ev1").
+		WillReturnRows(evRows)
+
+	/* ---------- 参加者 + capacity ---------- */
+	partRows := sqlmock.NewRows([]string{
+		"username", "capacity", "type",
+	}).AddRow("alice", 2, "participants"). // 表示用
+						AddRow("bob", 2, "go").      // 行き capacity=2
+						AddRow("carol", 1, "return") // 帰り capacity=1
+	mock.ExpectQuery(SQLFetchParticipantInfos).
+		WithArgs("ev1").
+		WillReturnRows(partRows)
+
+	/* ---------- 呼び出し ---------- */
+	req := httptest.NewRequest(http.MethodGet, "/events/ev1/detail", nil)
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+	c.SetPath("/events/:event_id/detail")
+	c.SetParamNames("event_id")
+	c.SetParamValues("ev1")
+
+	err := h.Detail(c)
+	assert.NoError(t, err)
+	assert.Equal(t, http.StatusOK, rec.Code)
+
+	var got map[string]any
+	assert.NoError(t, json.Unmarshal(rec.Body.Bytes(), &got))
+
+	// 残席計算: go 3 - 2 = 1, return 4 - 1 = 3
+	assert.Equal(t, float64(1), got["remainingGoSeats"])
+	assert.Equal(t, float64(3), got["remainingReturnSeats"])
+	assert.Equal(t, []any{"alice"}, got["participants"])
+
+	assert.NoError(t, mock.ExpectationsWereMet())
+}
+
+func TestEventDetail_NotFound(t *testing.T) {
+	h, mock, closeFn, e := newEventHandler(t)
+	defer closeFn()
+
+	mock.ExpectQuery(SQLEventFindById).
+		WithArgs("evX").
+		WillReturnRows(sqlmock.NewRows([]string{}))
+
+	req := httptest.NewRequest(http.MethodGet, "/events/evX/detail", nil)
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+	c.SetPath("/events/:event_id/detail")
+	c.SetParamNames("event_id")
+	c.SetParamValues("evX")
+
+	err := h.Detail(c)
+	he := err.(*echo.HTTPError)
+	assert.Equal(t, http.StatusNotFound, he.Code)
+	assert.NoError(t, mock.ExpectationsWereMet())
+}
