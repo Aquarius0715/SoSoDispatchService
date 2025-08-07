@@ -43,8 +43,8 @@ CREATE TABLE `calender_memberships` (
     ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- 4. reservations テーブル
-CREATE TABLE `reservations` (
+-- 4. events テーブル
+CREATE TABLE `events` (
   `id`                   VARCHAR(36)       NOT NULL,
   `calender_id`              VARCHAR(36)       NOT NULL,
   `creator_id`           VARCHAR(36)       NOT NULL,
@@ -58,25 +58,26 @@ CREATE TABLE `reservations` (
   `created_at`           DATETIME(6)       NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
   `updated_at`           DATETIME(6)       NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
   PRIMARY KEY (`id`),
-  INDEX `idx_reservations_calender` (`calender_id`),
-  CONSTRAINT `fk_reservations_calender`
+  INDEX `idx_events_calender` (`calender_id`),
+  CONSTRAINT `fk_events_calender`
     FOREIGN KEY (`calender_id`) REFERENCES `calenders`(`id`)
     ON DELETE CASCADE,
-  CONSTRAINT `fk_reservations_creator`
+  CONSTRAINT `fk_events_creator`
     FOREIGN KEY (`creator_id`) REFERENCES `users`(`id`)
     ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- 5. reservation_participants テーブル
-CREATE TABLE `reservation_participants` (
-  `reservation_id`       VARCHAR(36)                        NOT NULL,
+-- 5. event_participants テーブル
+CREATE TABLE `event_participants` (
+  `event_id`             VARCHAR(36)                        NOT NULL,
   `user_id`              VARCHAR(36)                        NOT NULL,
   `status`               ENUM('registered','cancelled')     NOT NULL DEFAULT 'registered',
+  `type`                 ENUM('participants', 'pick_up', 'drop_off') NOT NULL,
   `registered_at`        DATETIME(6)                        NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
-  PRIMARY KEY (`reservation_id`,`user_id`),
+  PRIMARY KEY (`event_id`,`user_id`),
   INDEX `idx_rp_user` (`user_id`),
-  CONSTRAINT `fk_rp_reservation`
-    FOREIGN KEY (`reservation_id`) REFERENCES `reservations`(`id`)
+  CONSTRAINT `fk_rp_event`
+    FOREIGN KEY (`event_id`) REFERENCES `events`(`id`)
     ON DELETE CASCADE,
   CONSTRAINT `fk_rp_user`
     FOREIGN KEY (`user_id`) REFERENCES `users`(`id`)
@@ -103,7 +104,7 @@ CREATE TABLE `soso_point_histories` (
   `user_id`        VARCHAR(36) NOT NULL,
   `changed_at`     DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
   `changed_by`     VARCHAR(36),  -- 操作したユーザー（NULL = システム）
-  `reservation_id` VARCHAR(36),  -- 関連する予約（NULL可）
+  `event_id` VARCHAR(36),  -- 関連する予約（NULL可）
   `old_point`      INT NOT NULL,
   `new_point`      INT NOT NULL,
   `point_delta`    INT NOT NULL,  -- new_point - old_point
@@ -111,7 +112,7 @@ CREATE TABLE `soso_point_histories` (
 
   INDEX `idx_sph_user` (`user_id`),
   INDEX `idx_sph_calender` (`calender_id`),
-  INDEX `idx_sph_reservation` (`reservation_id`),
+  INDEX `idx_sph_event` (`event_id`),
 
   CONSTRAINT `fk_sph_calender`
     FOREIGN KEY (`calender_id`) REFERENCES `calenders`(`id`)
@@ -122,7 +123,7 @@ CREATE TABLE `soso_point_histories` (
   CONSTRAINT `fk_sph_changed_by`
     FOREIGN KEY (`changed_by`) REFERENCES `users`(`id`)
     ON DELETE SET NULL,
-  CONSTRAINT `fk_sph_reservation`
-    FOREIGN KEY (`reservation_id`) REFERENCES `reservations`(`id`)
+  CONSTRAINT `fk_sph_event`
+    FOREIGN KEY (`event_id`) REFERENCES `events`(`id`)
     ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
