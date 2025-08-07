@@ -127,6 +127,8 @@ func SetupRouter(cfg *Config) *echo.Echo {
 
 	eveG := e.Group("/events", csrfMW, echojwt.WithConfig(jwtCfg))
 	eveG.GET(":eventId", eventH.FindById)
+	eveG.POST(":eventId/pickup", eventH.RegisterPickUp)
+	eveG.POST(":eventId/return", eventH.RegisterReturn)
 
 	// シャットダウン時クローズ
 	e.Server.RegisterOnShutdown(func() { _ = db.Close() })
