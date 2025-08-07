@@ -1,4 +1,36 @@
  @import "tailwindcss";
+
+/* 日付の下のイベント群全体を少し下に配置する */
+.fc-daygrid-day-events {
+  margin-top: 18px !important;
+}
+
+/* イベント間の余分なスペースをなくす */
+.fc-daygrid-event {
+  margin-bottom: 2px !important;
+}
+
+/* イベントの基本スタイル（薄いグレー背景） */
+.fc-daygrid-event {
+  background-color: #f3f4f6 !important; /* 薄いグレー (Tailwindのgray-100相当) */
+  border-color: #e5e7eb !important;     /* 枠線は少し濃いグレー (gray-200) */
+  padding: 4px !important; /* パディングを少し広げる */
+}
+
+/* イベントの文字色を黒に */
+.fc-daygrid-event .fc-event-title {
+  color: #1f2937 !important; /* 黒 (gray-800) */
+}
+
+/* イベントにマウスカーソルを乗せた時のスタイル */
+.fc-daygrid-event:hover {
+  background-color: #e5e7eb !important; /* 少し濃いグレー (gray-200) */
+}
+
+/* FullCalendarのイベントの先頭にある青い丸を非表示にする */
+.fc-daygrid-event-dot {
+  display: none !important;
+}
 /*
 :root {
   --background: #ffffff;
