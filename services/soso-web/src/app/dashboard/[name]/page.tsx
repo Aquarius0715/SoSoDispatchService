@@ -195,7 +195,7 @@ dayCellContent={(arg) => (
       {/* ★3. ボタンは right-1 で「右上」に固定 */}
       <button 
         onClick={(e) => handleAddEventClick(e, arg)}
-        className="absolute top-1 right-1 text-black text-xl font-bold hover:opacity-70 z-10"
+        className="absolute top-[-4px] right-[-2px] text-black text-xl font-bold hover:opacity-70 z-10 hover:bg-gray-200 rounded-full w-8 h-8 flex items-center justify-center"
         aria-label="予定を追加"
       >
         +
