@@ -1,4 +1,3 @@
-// internal/validator/event.go
 package validator
 
 import (
@@ -9,8 +8,6 @@ import (
 )
 
 // RegisterEvent sets up struct-level validation rules for model.Event.
-//
-// 利用例:
 //
 //	v := validator.New()
 //	validator.RegisterEvent(v)
@@ -23,28 +20,35 @@ func RegisterEvent(v *validator.Validate) {
 func eventStructValidation(sl validator.StructLevel) {
 	ev := sl.Current().Interface().(model.Event)
 
-	// --- Title: 1–128 文字必須 ---
+	/* ---------- Title ---------- */
 	if l := len(ev.Title); l == 0 || l > 128 {
-		sl.ReportError(ev.Title, "Title", "title", "titlelen", "1~128")
+		sl.ReportError(ev.Title, "Title", "title", "titlelen", "1-128")
 	}
 
-	// --- SeatsRequired: 1 以上 ---
-	if ev.SeatsRequired < 1 {
-		sl.ReportError(ev.SeatsRequired, "SeatsRequired", "seats_required", "seatmin", ">=1")
+	/* ---------- SeatsRequiredGo / SeatsRequiredReturn ---------- */
+	if ev.SeatsRequiredGo < 0 {
+		sl.ReportError(ev.SeatsRequiredGo, "SeatsRequiredGo", "seats_required_go", "nonneg", ">=0")
+	}
+	if ev.SeatsRequiredReturn < 0 {
+		sl.ReportError(ev.SeatsRequiredReturn, "SeatsRequiredReturn", "seats_required_return", "nonneg", ">=0")
+	}
+	// いずれも 0 の場合は “相乗りしない” 意味で許容する。
+	if ev.SeatsRequiredGo == 0 && ev.SeatsRequiredReturn == 0 {
+		sl.ReportError(ev.SeatsRequiredGo, "SeatsRequiredGo", "seats_required_go", "bothzero", "")
 	}
 
-	// --- StartTime / EndTime: EndTime は StartTime より後 ---
+	/* ---------- Start / End 時刻 ---------- */
 	if ev.StartTime.IsZero() {
 		sl.ReportError(ev.StartTime, "StartTime", "start_time", "required", "")
 	}
 	if ev.EndTime.IsZero() {
 		sl.ReportError(ev.EndTime, "EndTime", "end_time", "required", "")
 	}
-	if !ev.EndTime.After(ev.StartTime) {
+	if !ev.StartTime.IsZero() && !ev.EndTime.IsZero() && !ev.EndTime.After(ev.StartTime) {
 		sl.ReportError(ev.EndTime, "EndTime", "end_time", "endafterstart", "")
 	}
 
-	// --- OriginLocation / DestinationLocation: 最大 255 文字 ---
+	/* ---------- 文字長制限 ---------- */
 	if len(ev.OriginLocation) > 255 {
 		sl.ReportError(ev.OriginLocation, "OriginLocation", "origin_location", "max255", "")
 	}
@@ -52,8 +56,8 @@ func eventStructValidation(sl validator.StructLevel) {
 		sl.ReportError(ev.DestinationLocation, "DestinationLocation", "destination_location", "max255", "")
 	}
 
-	// --- 任意で: StartTime は未来の日付であること ---
-	if time.Now().After(ev.StartTime) {
+	/* ---------- StartTime は未来 ---------- */
+	if !ev.StartTime.IsZero() && time.Now().After(ev.StartTime) {
 		sl.ReportError(ev.StartTime, "StartTime", "start_time", "future", "")
 	}
 }
