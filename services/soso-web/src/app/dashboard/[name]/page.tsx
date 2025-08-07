@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -57,6 +56,7 @@ const DashboardPage: NextPage<DashboardPageProps> = ({ params }) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<EventInput | null>(null);
   const [selectedDate, setSelectedDate] = useState<string>('');
+
 
   // ▼ イベントクリック時の処理
   const handleEventClick = (clickInfo: any) => {
@@ -215,8 +215,9 @@ const DashboardPage: NextPage<DashboardPageProps> = ({ params }) => {
           onSave={handleSaveSosoChange}
           initialData={selectedMember}
         />
-
       )}
+
+
     </div>
   );
 };
