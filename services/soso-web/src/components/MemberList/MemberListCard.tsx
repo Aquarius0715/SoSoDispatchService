@@ -25,7 +25,7 @@ function MemberListCard({ member, onEditClick, className, children }: Props) {
   return (
     <div className={clsx('font-semibold flex justify-between items-center bg-primary-1 rounded-lg', cardClassName)}>
       <div>
-        <p className='text-md text-gray-800'>{member.memberName}</p>
+        <p className='text-md text-gray-800'>{member.username}</p>
         <p className='text-sm text-gray-600'>車: {member.hasCar ? `あり(${member.seatsRequired}人)` : 'なし'}</p>
         <p className='text-sm text-gray-600'>SOSOポイント: {member.sosoPoint}pt</p>
         {children}
