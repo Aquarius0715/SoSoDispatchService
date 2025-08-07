@@ -16,24 +16,22 @@ import (
 )
 
 /*
--------------------------------------------------------------
+----------------------------------------------------------------
 
 	テスト用モック生成ヘルパ
-	-------------------------------------------------------------
+	----------------------------------------------------------------
 */
 func newEventHandler(t *testing.T) (*handlers.EventHandler, sqlmock.Sqlmock, func(), *echo.Echo) {
 	dbm := NewSQLMock(t)
 	repo := repository.NewEventRepository(dbm.DB)
 	h := handlers.NewEventHandler(repo)
-	e := NewEcho()
-	return h, dbm.Mock, dbm.Close, e
+	return h, dbm.Mock, dbm.Close, NewEcho()
 }
 
 /*
--------------------------------------------------------------
-
-	Create
-	-------------------------------------------------------------
+================================================================
+ 1. Create
+    ================================================================
 */
 func TestEventCreate_OK(t *testing.T) {
 	h, mock, closeFn, e := newEventHandler(t)
@@ -41,7 +39,7 @@ func TestEventCreate_OK(t *testing.T) {
 
 	mock.ExpectExec(SQLEventCreate).
 		WithArgs(sqlmock.AnyArg(), "cal1", "u1", "Event 1", "desc",
-			sqlmock.AnyArg(), sqlmock.AnyArg(), "A", "B", 2).
+			sqlmock.AnyArg(), sqlmock.AnyArg(), "A", "B", 2, 1).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 
 	body := `{
@@ -51,7 +49,8 @@ func TestEventCreate_OK(t *testing.T) {
 		"endTime":"2025-08-08T11:00:00Z",
 		"originLocation":"A",
 		"destinationLocation":"B",
-		"seatsRequired":2
+		"seatsRequiredGo":2,
+		"seatsRequiredReturn":1
 	}`
 
 	req := httptest.NewRequest(http.MethodPost, "/calenders/cal1/events", bytes.NewBufferString(body))
@@ -61,7 +60,6 @@ func TestEventCreate_OK(t *testing.T) {
 	c.SetPath("/calenders/:calender_id/events")
 	c.SetParamNames("calender_id")
 	c.SetParamValues("cal1")
-
 	SetJWTUser(c, "u1")
 
 	err := h.Create(c)
@@ -81,11 +79,9 @@ func TestEventCreate_InvalidPayload(t *testing.T) {
 	c.SetPath("/calenders/:calender_id/events")
 	c.SetParamNames("calender_id")
 	c.SetParamValues("cal1")
-
 	SetJWTUser(c, "u1")
 
 	err := h.Create(c)
-	assert.Error(t, err)
 	he := err.(*echo.HTTPError)
 	assert.Equal(t, http.StatusBadRequest, he.Code)
 }
@@ -102,16 +98,14 @@ func TestEventCreate_Unauthorized(t *testing.T) {
 	c.SetParamValues("cal1")
 
 	err := h.Create(c)
-	assert.Error(t, err)
 	he := err.(*echo.HTTPError)
 	assert.Equal(t, http.StatusUnauthorized, he.Code)
 }
 
 /*
--------------------------------------------------------------
-
-	ListByCalender
-	-------------------------------------------------------------
+================================================================
+ 2. ListByCalender
+    ================================================================
 */
 func TestEventListByCalender_OK(t *testing.T) {
 	h, mock, closeFn, e := newEventHandler(t)
@@ -121,13 +115,12 @@ func TestEventListByCalender_OK(t *testing.T) {
 	rows := sqlmock.NewRows([]string{
 		"id", "calender_id", "creator_id", "title", "description",
 		"start_time", "end_time", "origin_location", "destination_location",
-		"seats_required", "created_at", "updated_at",
-	}).AddRow(
-		"ev1", "cal1", "u1", "Event 1", "desc1",
-		now, now.Add(time.Hour), "A1", "B1", 1, now, now,
-	).AddRow(
-		"ev2", "cal1", "u2", "Event 2", "desc2",
-		now.Add(2*time.Hour), now.Add(3*time.Hour), "A2", "B2", 3, now, now,
+		"seats_required_go", "seats_required_return",
+		"created_at", "updated_at",
+	}).AddRow("ev1", "cal1", "u1", "Event 1", "desc1",
+		now, now.Add(time.Hour), "A1", "B1", 1, 0, now, now,
+	).AddRow("ev2", "cal1", "u2", "Event 2", "desc2",
+		now.Add(2*time.Hour), now.Add(3*time.Hour), "A2", "B2", 3, 3, now, now,
 	)
 
 	mock.ExpectQuery(SQLEventFindByCalenderID).
@@ -148,9 +141,8 @@ func TestEventListByCalender_OK(t *testing.T) {
 	var got []map[string]any
 	assert.NoError(t, json.Unmarshal(rec.Body.Bytes(), &got))
 	assert.Len(t, got, 2)
-	assert.Equal(t, "ev1", got[0]["id"])
-	assert.Equal(t, "Event 2", got[1]["title"])
-
+	assert.Equal(t, float64(1), got[0]["seatsRequiredGo"])
+	assert.Equal(t, float64(3), got[1]["seatsRequiredReturn"])
 	assert.NoError(t, mock.ExpectationsWereMet())
 }
 
@@ -161,7 +153,8 @@ func TestEventListByCalender_NotFound(t *testing.T) {
 	empty := sqlmock.NewRows([]string{
 		"id", "calender_id", "creator_id", "title", "description",
 		"start_time", "end_time", "origin_location", "destination_location",
-		"seats_required", "created_at", "updated_at",
+		"seats_required_go", "seats_required_return",
+		"created_at", "updated_at",
 	})
 	mock.ExpectQuery(SQLEventFindByCalenderID).
 		WithArgs("cal1").
@@ -181,15 +174,13 @@ func TestEventListByCalender_NotFound(t *testing.T) {
 	var got []map[string]any
 	assert.NoError(t, json.Unmarshal(rec.Body.Bytes(), &got))
 	assert.Len(t, got, 0)
-
 	assert.NoError(t, mock.ExpectationsWereMet())
 }
 
 /*
--------------------------------------------------------------
-
-	FindById
-	-------------------------------------------------------------
+================================================================
+ 3. FindById
+    ================================================================
 */
 func TestEventFindById_OK(t *testing.T) {
 	h, mock, closeFn, e := newEventHandler(t)
@@ -199,10 +190,10 @@ func TestEventFindById_OK(t *testing.T) {
 	rows := sqlmock.NewRows([]string{
 		"id", "calender_id", "creator_id", "title", "description",
 		"start_time", "end_time", "origin_location", "destination_location",
-		"seats_required", "created_at", "updated_at",
-	}).AddRow(
-		"ev1", "cal1", "u1", "Event 1", "desc1",
-		now, now.Add(time.Hour), "A", "B", 2, now, now,
+		"seats_required_go", "seats_required_return",
+		"created_at", "updated_at",
+	}).AddRow("ev1", "cal1", "u1", "Event 1", "desc1",
+		now, now.Add(time.Hour), "A", "B", 2, 1, now, now,
 	)
 
 	mock.ExpectQuery(SQLEventFindById).
@@ -222,8 +213,7 @@ func TestEventFindById_OK(t *testing.T) {
 
 	var got map[string]any
 	assert.NoError(t, json.Unmarshal(rec.Body.Bytes(), &got))
-	assert.Equal(t, "Event 1", got["title"])
-
+	assert.Equal(t, float64(2), got["seatsRequiredGo"])
 	assert.NoError(t, mock.ExpectationsWereMet())
 }
 
@@ -243,9 +233,7 @@ func TestEventFindById_NotFound(t *testing.T) {
 	c.SetParamValues("ev1")
 
 	err := h.FindById(c)
-	assert.Error(t, err)
 	he := err.(*echo.HTTPError)
 	assert.Equal(t, http.StatusNotFound, he.Code)
-
 	assert.NoError(t, mock.ExpectationsWereMet())
 }
