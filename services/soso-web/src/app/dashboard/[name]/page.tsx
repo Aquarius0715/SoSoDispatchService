@@ -137,6 +137,8 @@ const handleAddEventClick = (e: React.MouseEvent, arg: any) => {
     setIsModalOpen(false);
   };
 
+
+
   return (
     <div className="flex flex-col h-screen bg-gray-100">
       
@@ -167,28 +169,30 @@ const handleAddEventClick = (e: React.MouseEvent, arg: any) => {
               initialView="dayGridMonth" // 表示形式を「月」に設定
               locale={jaLocale} // 言語を日本語に設定
               headerToolbar={{ // ヘッダーのボタン設定
-              left: 'prev,next today',
+              left: 'prev,next',
               center: 'title',
               right: 'dayGridMonth,dayGridWeek' // 将来的に週表示も追加可能
               }} 
               events={events} // 表示するイベントデータを渡す
               eventClick={handleEventClick} // ★ 既存イベントのクリック処理
-              dayCellContent={(arg) => (
-    // 親コンテナを相対位置(relative)の基準にする
-    <div className="relative h-full w-full">
-      {/* 日付の数字 (左上へ絶対配置) */}
-      <span className="absolute top-1 left-1 text-sm text-gray-800">
-        {arg.dayNumberText.replace('日', '')}
+dayCellContent={(arg) => (
+    // ★1. direction-ltr で座標の向きを「左から右」に強制的に正常化
+    <div className="relative h-full w-full direction-ltr">
+      
+      {/* ★2. 数字は left-2 で「左上」に固定 */}
+      <span className="absolute top-1 right-20 text-sm text-gray-800 z-10">
+        {arg.date.getDate()}
       </span>
       
-      {/* プラスボタン (右上へ絶対配置) */}
+      {/* ★3. ボタンは right-1 で「右上」に固定 */}
       <button 
         onClick={(e) => handleAddEventClick(e, arg)}
-        className="absolute top-1 right-1 text-black text-xl font-bold hover:opacity-70"
+        className="absolute top-1 right-1 text-black text-xl font-bold hover:opacity-70 z-10"
         aria-label="予定を追加"
       >
         +
       </button>
+
     </div>
   )}
             />
