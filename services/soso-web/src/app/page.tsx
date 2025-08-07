@@ -36,18 +36,18 @@ export default function Home() {
 
   const register = async () => {
     try {
-      await axios.post(`${API_BASE}/users/register`, {
-        username,
-        mailAddress,
-        password,
-        hasCar: true,
-        capacity: 4
-      }, {
-        headers: { 'X-CSRF-Token': csrfToken },
-        withCredentials: true
-      })
-      alert('登録成功')
+      // await axios.post(`${API_BASE}/users/register`, {
+      //   username,
+      //   mailAddress,
+      //   password,
+      //   hasCar: true,
+      //   capacity: 4
+      // }, {
+      //   headers: { 'X-CSRF-Token': csrfToken },
+      //   withCredentials: true
+      // })
       router.push('/resister');
+      alert('登録成功')
     } catch (err: any) {
       alert('登録失敗: ' + err.response?.data?.message)
     }
@@ -63,7 +63,7 @@ export default function Home() {
       //   withCredentials: true
       // })
       // setToken(res.data.access_token)
-      router.push('/mypage');
+      router.push('/calendarList');
       alert('ログイン成功')
       
     } catch (err: any) {
