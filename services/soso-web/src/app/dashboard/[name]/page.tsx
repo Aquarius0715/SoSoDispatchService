@@ -13,6 +13,7 @@ import { EventInput } from '@fullcalendar/core';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
+import EventAddModal from '@/src/components/Modal/EventAddModal';
 import SOSOEditModal from '@/src/components/Modal/SOSOEditModal';
 import jaLocale from '@fullcalendar/core/locales/ja';
 
@@ -30,6 +31,19 @@ interface DashboardPageProps {
   params: Promise<{
     name: string;
   }>;
+}
+
+// EventStatus型をインポート（または再定義）
+interface EventStatus {
+  title: string;
+  details: string;
+  dropOffTime: string;
+  pickUpTime: string;
+  dropOffCount: number;
+  pickUpCount: number;
+  departurePoint: string;
+  destinationPoint: string;
+  members: string[];
 }
 
 // ページ本体のコンポーネント
@@ -54,9 +68,36 @@ const DashboardPage: NextPage<DashboardPageProps> = ({ params }) => {
 
   // ▼ モーダル管理用のState（例）
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<EventInput | null>(null);
   const [selectedDate, setSelectedDate] = useState<string>('');
+
+  // ▼ 新規イベント追加時の初期ステータス
+  const initialEventStatus: EventStatus = {
+    title: '',
+    details: '',
+    dropOffTime: '',
+    pickUpTime: '',
+    dropOffCount: 0,
+    pickUpCount: 0,
+    departurePoint: '',
+    destinationPoint: '',
+    members: []
+  };
+
+  // ▼ 新規イベント保存時の処理
+  const handleSaveNewEvent = (eventData: any) => {
+    const newEvent: EventInput = {
+      id: Date.now().toString(),
+      title: eventData.title,
+      start: eventData.start,
+      end: eventData.end,
+      // 他の必要なプロパティがあれば追加
+    };
+    setEvents(prevEvents => [...prevEvents, newEvent]);
+    setIsAddModalOpen(false);
+  };
 
 
   // ▼ イベントクリック時の処理
@@ -92,9 +133,8 @@ const handleAddEventClick = (e: React.MouseEvent, arg: any) => {
     { id: 3, username: '高橋 一郎', hasCar: false, sosoPoint: 80 },
     { id: 4, username: '伊藤 花子', hasCar: true, seatsRequired: 6, sosoPoint: 200 },
   ]);
-
   const [logs, setLogs] = useState<SOSOTransaction[]>([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSosoModalOpen, setIsSosoModalOpen] = useState(false);
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
 
   // --- ▼▼▼ ハンドラ関数 ▼▼▼ ---
@@ -110,24 +150,20 @@ const handleAddEventClick = (e: React.MouseEvent, arg: any) => {
 
   const handleEditMember = (member: Member) => {
     setSelectedMember(member);
-    setIsModalOpen(true);
+    setIsSosoModalOpen(true);
   };
 
-  const handleSaveSosoChange = (editedData: EditedMemberData) => {
-    // 1. メンバーリスト内のポイントを更新
+  const handleSaveSosoChange = (editedData: EditedMemberData): void => {
+    // 1. メンバーのSOSOポイントを更新
     setMembers(currentMembers =>
       currentMembers.map(member =>
-        member.id === editedData.id
-          ? { ...member, sosoPoint: editedData.sosoPoint }
-          : member
+        member.id === editedData.id ? { ...member, sosoPoint: editedData.sosoPoint } : member
       )
     );
-
+    
     // 2. ポイント変動履歴に新しいログを追加
     if (selectedMember) {
       const pointChange = editedData.sosoPoint - selectedMember.sosoPoint;
-      
-      // ポイントに変動があった場合のみログを追加
       if (pointChange !== 0) {
         const newLog: SOSOTransaction = {
           id: Date.now(),
@@ -141,86 +177,69 @@ const handleAddEventClick = (e: React.MouseEvent, arg: any) => {
         setLogs(prevLogs => [newLog, ...prevLogs]);
       }
     }
-
-    setIsModalOpen(false);
+    
+    // 3. モーダルを閉じる
+    setIsSosoModalOpen(false);
   };
-
-
 
   return (
     <div className="flex flex-col h-screen bg-gray-100">
-      
-      {/* 1. ヘッダーの配置 */}
       <CalendarHeader
         pageTitle={decodedTitle}
         onLogout={handleLogout}
         onClickLogo={handleLogoClick}
         calendarUrl={`https://example.com/dashboard/share/${name}`}
       />
-
-      {/* ヘッダー以外の全領域 */}
       <div className="flex flex-grow overflow-hidden">
-
-        {/* 2. 左サイドバーの配置 */}
-        <CalendarLeftSidebar
-          members={members}
-          onEditMember={handleEditMember}
-          className="h-full"
-        />
-
-        {/* 3. メインコンテンツエリア */}
+        <CalendarLeftSidebar members={members} onEditMember={handleEditMember} className="h-full" />
         <main className="flex-grow p-6 overflow-y-auto">
-         {/* ここにカレンダーを設置 */}
           <div className="p-4 bg-white rounded-lg shadow">
             <FullCalendar
-              plugins={[dayGridPlugin, interactionPlugin]} // プラグインを読み込む
-              initialView="dayGridMonth" // 表示形式を「月」に設定
-              locale={jaLocale} // 言語を日本語に設定
-              headerToolbar={{ // ヘッダーのボタン設定
-              left: 'prev,next',
-              center: 'title',
-              right: 'dayGridMonth,dayGridWeek' // 将来的に週表示も追加可能
-              }} 
-              events={events} // 表示するイベントデータを渡す
-              eventClick={handleEventClick} // ★ 既存イベントのクリック処理
-dayCellContent={(arg) => (
-    // ★1. direction-ltr で座標の向きを「左から右」に強制的に正常化
-    <div className="relative h-full w-full direction-ltr">
-      
-      {/* ★2. 数字は left-2 で「左上」に固定 */}
-      <span className="absolute top-1 right-20 text-sm text-gray-800 z-10">
-        {arg.date.getDate()}
-      </span>
-      
-      {/* ★3. ボタンは right-1 で「右上」に固定 */}
-      <button 
-        onClick={(e) => handleAddEventClick(e, arg)}
-        className="absolute top-[-4px] right-[-2px] text-black text-xl font-bold hover:opacity-70 z-10 hover:bg-gray-200 rounded-full w-8 h-8 flex items-center justify-center"
-        aria-label="予定を追加"
-      >
-        +
-      </button>
-
-    </div>
-  )}
+              plugins={[dayGridPlugin, interactionPlugin]}
+              initialView="dayGridMonth"
+              locale={jaLocale}
+              headerToolbar={{
+                left: 'prev,next',
+                center: 'title',
+                right: 'dayGridMonth,dayGridWeek'
+              }}
+              events={events}
+              dayCellContent={(arg) => (
+                <div className="relative h-full w-full">
+                  <span className="absolute top-1 left-2 text-sm text-gray-800">
+                    {arg.dayNumberText.replace('日', '')}
+                  </span>
+                  <button
+                    onClick={(e) => handleAddEventClick(e, arg)}
+                    className="absolute top-[-6px] right-1 text-gray-400 hover:bg-gray-200 rounded-full p-2"
+                    aria-label="予定を追加"
+                  >
+                    +
+                  </button>
+                </div>
+              )}
             />
           </div>
         </main>
-
-        {/* 4. 右サイドバーの配置 */}
-        <CalendarRightSidebar
-          logs={logs}
-          className="h-full"
-        />
+        <CalendarRightSidebar logs={logs} className="h-full" />
       </div>
 
-      {/* モーダルはselectedMemberが存在する場合のみレンダリング */}
+      {/* --- ▼▼▼ モーダル領域 ▼▼▼ --- */}
       {selectedMember && (
         <SOSOEditModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
+          isOpen={isSosoModalOpen}
+          onClose={() => setIsSosoModalOpen(false)}
           onSave={handleSaveSosoChange}
           initialData={selectedMember}
+        />
+      )}
+      {isAddModalOpen && (
+        <EventAddModal
+          isOpen={isAddModalOpen}
+          onClose={() => setIsAddModalOpen(false)}
+          onSave={handleSaveNewEvent}
+          initialStatus={initialEventStatus}
+          date={selectedDate}
         />
       )}
 
