@@ -67,7 +67,7 @@ function SOSOEditModal({ isOpen, onClose, onSave, initialData }: Props) {
 
         <div className='space-y-4'>
           {/* ニックネーム */}
-          <p className='text-black'>ニックネーム: {editedData.memberName}</p>
+          <p className='text-black'>ニックネーム: {editedData.username}</p>
 
           {/* 車の有無 */}
           <p className='text-black'>車: {editedData.hasCar ? `あり (${editedData.seatsRequired}人)` : 'なし'}</p>

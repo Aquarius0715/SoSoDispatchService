@@ -85,10 +85,10 @@ const DashboardPage: NextPage<DashboardPageProps> = ({ params }) => {
   // --- ▼▼▼ State管理 ▼▼▼ ---
 
   const [members, setMembers] = useState<Member[]>([
-    { id: 1, memberName: '佐藤 健太', hasCar: true, seatsRequired: 4, sosoPoint: 150 },
-    { id: 2, memberName: '鈴木 陽子', hasCar: false, sosoPoint: 50 },
-    { id: 3, memberName: '高橋 一郎', hasCar: false, sosoPoint: 80 },
-    { id: 4, memberName: '伊藤 花子', hasCar: true, seatsRequired: 6, sosoPoint: 200 },
+    { id: 1, username: '佐藤 健太', hasCar: true, seatsRequired: 4, sosoPoint: 150 },
+    { id: 2, username: '鈴木 陽子', hasCar: false, sosoPoint: 50 },
+    { id: 3, username: '高橋 一郎', hasCar: false, sosoPoint: 80 },
+    { id: 4, username: '伊藤 花子', hasCar: true, seatsRequired: 6, sosoPoint: 200 },
   ]);
 
   const [logs, setLogs] = useState<SOSOTransaction[]>([]);
@@ -133,7 +133,7 @@ const DashboardPage: NextPage<DashboardPageProps> = ({ params }) => {
           date: new Date().toLocaleDateString('ja-JP'),
           time: new Date().toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' }),
           changer: '管理者',
-          changee: editedData.memberName,
+          changee: editedData.username,
           sosoPoints: pointChange,
           reason: editedData.reason || '（理由の記載なし）',
         };
