@@ -156,3 +156,61 @@ func (h *EventHandler) ListByCalender(c echo.Context) error {
 	}
 	return c.JSON(http.StatusOK, resp)
 }
+
+/*
+	-------------------------------------------------------------
+	  POST /events/:event_id/pickup   (迎え登録)
+
+-------------------------------------------------------------
+*/
+func (h *EventHandler) RegisterPickUp(c echo.Context) error {
+	return h.registerParticipant(c, model.Go) // Type.Go
+}
+
+/*
+	-------------------------------------------------------------
+	  POST /events/:event_id/return  (送り登録)
+
+-------------------------------------------------------------
+*/
+func (h *EventHandler) RegisterReturn(c echo.Context) error {
+	return h.registerParticipant(c, model.Return) // Type.Return
+}
+
+/*
+=============================================================
+
+	共通ロジック
+	=============================================================
+*/
+func (h *EventHandler) registerParticipant(c echo.Context, tp model.Type) error {
+	eventID := c.Param("event_id")
+
+	/* ---- 認証ユーザ ID ---- */
+	tok, ok := c.Get("user").(*jwt.Token)
+	if !ok {
+		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized")
+	}
+	claims, ok := tok.Claims.(*jwt.RegisteredClaims)
+	if !ok || claims.Subject == "" {
+		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized")
+	}
+	userID := claims.Subject
+
+	/* ---- 1 行だけ Insert ---- */
+	ep := model.EventParticipant{
+		EventID:      eventID,
+		UserID:       userID,
+		Status:       model.Registered,
+		Type:         tp,
+		RegisteredAt: time.Now(),
+	}
+
+	if err := h.EventParticipantRepo.BulkInsert(
+		c.Request().Context(),
+		[]model.EventParticipant{ep},
+	); err != nil {
+		return err
+	}
+	return c.NoContent(http.StatusCreated)
+}

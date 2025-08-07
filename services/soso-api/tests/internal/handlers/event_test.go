@@ -251,3 +251,82 @@ func TestEventFindById_NotFound(t *testing.T) {
 	assert.Equal(t, http.StatusNotFound, he.Code)
 	assert.NoError(t, mock.ExpectationsWereMet())
 }
+
+/*
+----------------------------------------------------------------
+
+	INSERT (Tx) 用定数
+	----------------------------------------------------------------
+*/
+const SQLInsertEventParticipant = `
+		INSERT INTO event_participants (event_id, user_id, status, type, registered_at) VALUES (?, ?, ?, ?, ?)
+	`
+
+/* =================================================================
+   4. Register Pick-Up / Return
+   ================================================================= */
+
+func TestRegisterPickUp_OK(t *testing.T) {
+	h, mock, closeFn, e := newEventHandler(t)
+	defer closeFn()
+
+	// トランザクション: BEGIN → EXEC → COMMIT
+	mock.ExpectBegin()
+	mock.ExpectExec(SQLInsertEventParticipant).
+		WithArgs("ev1", "u1", "registered", "go", sqlmock.AnyArg()).
+		WillReturnResult(sqlmock.NewResult(1, 1))
+	mock.ExpectCommit()
+
+	req := httptest.NewRequest(http.MethodPost, "/events/ev1/pickup", nil)
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+	c.SetPath("/events/:event_id/pickup")
+	c.SetParamNames("event_id")
+	c.SetParamValues("ev1")
+	SetJWTUser(c, "u1")
+
+	err := h.RegisterPickUp(c)
+	assert.NoError(t, err)
+	assert.Equal(t, http.StatusCreated, rec.Code)
+	assert.NoError(t, mock.ExpectationsWereMet())
+}
+
+func TestRegisterReturn_OK(t *testing.T) {
+	h, mock, closeFn, e := newEventHandler(t)
+	defer closeFn()
+
+	mock.ExpectBegin()
+	mock.ExpectExec(SQLInsertEventParticipant).
+		WithArgs("ev1", "u2", "registered", "return", sqlmock.AnyArg()).
+		WillReturnResult(sqlmock.NewResult(1, 1))
+	mock.ExpectCommit()
+
+	req := httptest.NewRequest(http.MethodPost, "/events/ev1/return", nil)
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+	c.SetPath("/events/:event_id/return")
+	c.SetParamNames("event_id")
+	c.SetParamValues("ev1")
+	SetJWTUser(c, "u2")
+
+	err := h.RegisterReturn(c)
+	assert.NoError(t, err)
+	assert.Equal(t, http.StatusCreated, rec.Code)
+	assert.NoError(t, mock.ExpectationsWereMet())
+}
+
+func TestRegisterPickUp_Unauthorized(t *testing.T) {
+	h, _, closeFn, e := newEventHandler(t)
+	defer closeFn()
+
+	req := httptest.NewRequest(http.MethodPost, "/events/ev1/pickup", nil)
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+	c.SetPath("/events/:event_id/pickup")
+	c.SetParamNames("event_id")
+	c.SetParamValues("ev1")
+
+	err := h.RegisterPickUp(c)
+	he := err.(*echo.HTTPError)
+	assert.Equal(t, http.StatusUnauthorized, he.Code)
+}
