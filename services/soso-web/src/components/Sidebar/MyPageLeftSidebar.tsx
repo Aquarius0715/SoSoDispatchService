@@ -6,8 +6,8 @@ interface Props {
   className?: string;
   userName?: string;
   hasCar?: boolean;
-  email?: string;
-  passengerNumber?: number;
+  mailAddress?: string;
+  seatsRequired?: number;
   onEditClick?: () => void;
   children?: React.ReactNode;
 }
@@ -26,9 +26,9 @@ function MyPageLeftSidebar(props: Props) {
         
         {/* ★ 文字色を白や薄いグレーに変更 */}
         <p className='text-md text-gray-100 font-semibold'>{props.userName}</p>
-        <p className='text-sm text-gray-300 font-semibold'>{props.email}</p>
-        <p className='text-sm text-gray-300'>車: {props.hasCar ? `あり(${props.passengerNumber}人)` : 'なし'}</p>
-        
+        <p className='text-sm text-gray-300 font-semibold'>{props.mailAddress}</p>
+        <p className='text-sm text-gray-300'>車: {props.hasCar ? `あり(${props.seatsRequired}人)` : 'なし'}</p>
+
         {/* childrenはpropsで渡された場合に表示される */}
         {props.children}
         <Button 

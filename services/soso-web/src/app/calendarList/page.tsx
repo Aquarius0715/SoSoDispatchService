@@ -20,7 +20,7 @@ export interface CalendarEntry {
 // ユーザー情報の型定義を再利用
 interface UserStatus {
     userName: string;
-    email: string;
+    mailAddress: string;
     hasCar: boolean;
     capacity: number;
 }
@@ -38,7 +38,7 @@ export default function MyPage() {
   // ユーザー情報のステートを追加
   const [userStatus, setUserStatus] = useState<UserStatus>({ // ★ UserStatus型を指定
     userName: '田中 太郎',
-    email: 'tanaka.taro@example.com',
+    mailAddress: 'tanaka.taro@example.com',
     hasCar: true,
     capacity: 3,
   });
@@ -136,9 +136,9 @@ export default function MyPage() {
         <MyPageLeftSidebar
           userName={userStatus.userName} // ★ userStatusから値を取得
           hasCar={userStatus.hasCar}     // ★ userStatusから値を取得
-          passengerNumber={userStatus.capacity} // ★ userStatusから値を取得
+          seatsRequired={userStatus.capacity} // ★ userStatusから値を取得
           onEditClick={handleEditStatus}
-          email={userStatus.email} // ★ userStatusから値を取得
+          mailAddress={userStatus.mailAddress} // ★ userStatusから値を取得
         />
         <main className={clsx("flex-grow p-8 overflow-y-auto")}>
           <h2 className="text-3xl font-bold text-gray-800 mb-6">参加しているカレンダー一覧</h2>

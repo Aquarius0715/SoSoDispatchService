@@ -20,7 +20,7 @@ tags:
     description: ユーザー関連API
   - name: Calenders
     description: カレンダー管理関連API
-  - name: Reservations
+  - name: events
     description: 配車希望／配車登録関連API
 
 paths:
@@ -341,10 +341,7 @@ paths:
         responses:
           '201':
             description: 作成成功
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/CalenderResponse'
+            $ref: '#/components/schemas/CalenderResponse'
           '400':
             $ref: '#/components/responses/BadRequest'
           '401':
@@ -469,11 +466,11 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
-  /calenders/{calenderId}/reservations:
+  /calenders/{calenderId}/events:
     get:
-      tags: [Reservations]
+      tags: [events]
       summary: 配車希望一覧取得
-      operationId: listReservations
+      operationId: listevents
       security:
         - AccessToken: []
       parameters:
@@ -502,15 +499,15 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ReservationResponse'
+                  $ref: '#/components/schemas/eventResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '403':
           $ref: '#/components/responses/ForbiddenError'
     post:
-      tags: [Reservations]
+      tags: [events]
       summary: 配車希望登録
-      operationId: createReservation
+      operationId: createevent
       security:
         - AccessToken: []
         - CsrfToken: []
@@ -525,14 +522,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ReservationCreateRequest'
+              $ref: '#/components/schemas/eventCreateRequest'
       responses:
         '201':
           description: 登録成功
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ReservationResponse'
+                $ref: '#/components/schemas/eventResponse'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -540,15 +537,15 @@ paths:
         '403':
           $ref: '#/components/responses/ForbiddenError'
 
-  /reservations/{reservationId}:
+  /events/{eventId}:
     get:
-      tags: [Reservations]
+      tags: [events]
       summary: 配車希望取得
-      operationId: getReservation
+      operationId: getevent
       security:
         - AccessToken: []
       parameters:
-        - name: reservationId
+        - name: eventId
           in: path
           required: true
           schema:
@@ -559,7 +556,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ReservationResponse'
+                $ref: '#/components/schemas/eventResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '403':
@@ -567,14 +564,14 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
     patch:
-      tags: [Reservations]
+      tags: [events]
       summary: 配車希望更新
-      operationId: updateReservation
+      operationId: updateevent
       security:
         - AccessToken: []
         - CsrfToken: []
       parameters:
-        - name: reservationId
+        - name: eventId
           in: path
           required: true
           schema:
@@ -584,14 +581,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ReservationCreateRequest'
+              $ref: '#/components/schemas/eventCreateRequest'
       responses:
         '200':
           description: 更新成功
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ReservationResponse'
+                $ref: '#/components/schemas/eventResponse'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -601,14 +598,14 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
     delete:
-      tags: [Reservations]
+      tags: [events]
       summary: 配車希望削除
-      operationId: deleteReservation
+      operationId: deleteevent
       security:
         - AccessToken: []
         - CsrfToken: []
       parameters:
-        - name: reservationId
+        - name: eventId
           in: path
           required: true
           schema:
@@ -623,15 +620,15 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
-  /reservations/{reservationId}/members:
+  /events/{eventId}/members:
     get:
-      tags: [Reservations]
+      tags: [events]
       summary: 予約メンバー一覧取得
-      operationId: listReservationMembers
+      operationId: listeventMembers
       security:
         - AccessToken: []
       parameters:
-        - name: reservationId
+        - name: eventId
           in: path
           required: true
           schema:
@@ -661,21 +658,21 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ReservationMemberResponse'
+                  $ref: '#/components/schemas/eventMemberResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '403':
           $ref: '#/components/responses/ForbiddenError'
 
-  /reservations/{reservationId}/histories:
+  /events/{eventId}/histories:
     get:
-      tags: [Reservations]
+      tags: [events]
       summary: SOSOポイント変更履歴取得
       operationId: get sosoPoint histories
       security:
         - AccessToken: []
       parameters:
-        - name: reservationId
+        - name: eventId
           in: path
           required: true
           schema:
@@ -688,22 +685,22 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ReservationHistoryResponse'
+                  $ref: '#/components/schemas/eventHistoryResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '403':
           $ref: '#/components/responses/ForbiddenError'
 
-  /reservations/{reservationId}/participants:
+  /events/{eventId}/participants:
     post:
-      tags: [Reservations]
+      tags: [events]
       summary: 配車登録（参加）
-      operationId: registerReservation
+      operationId: registerevent
       security:
         - AccessToken: []
         - CsrfToken: []
       parameters:
-        - name: reservationId
+        - name: eventId
           in: path
           required: true
           schema:
@@ -719,14 +716,14 @@ paths:
           $ref: '#/components/responses/NotFound'
 
     delete:
-      tags: [Reservations]
+      tags: [events]
       summary: 配車キャンセル
-      operationId: cancelReservation
+      operationId: cancelevent
       security:
         - AccessToken: []
         - CsrfToken: []
       parameters:
-        - name: reservationId
+        - name: eventId
           in: path
           required: true
           schema:
@@ -741,11 +738,11 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
-  /reservations/me:
+  /events/me:
     get:
-      tags: [Reservations]
+      tags: [events]
       summary: 自分の配車登録一覧取得
-      operationId: listMyReservations
+      operationId: listMyevents
       security:
         - AccessToken: []
       parameters:
@@ -762,7 +759,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ReservationResponse'
+                  $ref: '#/components/schemas/eventResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '403':
@@ -938,14 +935,7 @@ components:
 
     CalenderCreateRequest:
       type: object
-      required: [name]
       properties:
-        name:
-          type: string
-          example: 開発チーム
-        description:
-          type: string
-          example: 社内配車管理用チーム
 
     CalenderResponse:
       type: object
@@ -962,28 +952,28 @@ components:
         ownerId:
           type: string
           example: usr_12345
-        createdAt:
-          type: string
-          format: date-time
-        updatedAt:
-          type: string
-          format: date-time
 
     CalenderMemberResponse:
       type: object
-      required: [userId]
+      required: [id]
       properties:
-        userId:
+        id:
           type: string
           example: usr_12345
-        role:
+        username:
           type: string
-          example: member
-        joinedAt:
-          type: string
-          format: date-time
+          example: masakikinota
+        hasCar:
+          type: boolean
+          example: true
+        capacity:
+          type: int32
+          example: 4
+        sosoPoint:
+          type: int32
+          example: 10
 
-    ReservationCreateRequest:
+    eventCreateRequest:
       type: object
       required: [title, startTime, endTime]
       properties:
@@ -1012,7 +1002,7 @@ components:
           format: int32
           example: 3
 
-    ReservationResponse:
+    eventResponse:
       type: object
       required:
         - id
@@ -1056,7 +1046,7 @@ components:
           type: string
           format: date-time
 
-    ReservationHistoryResponse:
+    eventHistoryResponse:
       type: object
       required:
         - executorName
@@ -1080,7 +1070,7 @@ components:
         executeAt: 
           type: string
           format: date-time
-    ReservationMemberResponse:
+    eventMemberResponse:
       type: object
       required: [userId]
       properties:

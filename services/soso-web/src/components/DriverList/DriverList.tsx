@@ -14,7 +14,7 @@ export interface Drive {
   driveState: DriveState;
   eventDate: string;
   driveTime: string;
-  passengerNumber: number;
+  seatsRequired: number;
 }
 
 interface Props {

@@ -5,10 +5,10 @@ import Textarea from '../TextFieald/Textfieald';
 import Radio from '../Button/RadioButton';
 
 
-// 1. モーダルで扱うデータの型定義に`email`を追加
+// 1. モーダルで扱うデータの型定義に`mailAddress`を追加
 interface UserStatus {
   userName: string;
-  email: string; // ★追加
+  mailAddress: string; // ★追加
   hasCar: boolean;
   capacity: number;
 }
@@ -27,15 +27,15 @@ const StatusEditModal: FC<StatusEditModalProps> = ({
   onSave,
   initialStatus,
 }) => {
-  // 2. 各フォームフィールドの状態を管理（emailを追加）
+  // 2. 各フォームフィールドの状態を管理（mailAddressを追加）
   const [userName, setUserName] = useState(initialStatus.userName);
-  const [email, setEmail] = useState(initialStatus.email); // ★追加
+  const [mailAddress, setMailAddress] = useState(initialStatus.mailAddress); // ★追加
   const [hasCar, setHasCar] = useState(initialStatus.hasCar);
   const [capacity, setCapacity] = useState(initialStatus.capacity);
 
-  // 保存ボタンが押されたときの処理（onSaveにemailを渡す）
+  // 保存ボタンが押されたときの処理（onSaveにmailAddressを渡す）
   const handleSave = () => {
-    onSave({ userName, email, hasCar, capacity }); // ★emailを追加
+    onSave({ userName, mailAddress, hasCar, capacity }); // ★mailAddressを追加
   };
   
   // モーダルが開いていなければ何も表示しない
@@ -86,8 +86,8 @@ const StatusEditModal: FC<StatusEditModalProps> = ({
               メールアドレス
             </label>
             <Textarea
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              value={mailAddress}
+              onChange={(e) => setMailAddress(e.target.value)}
               className="!h-11 !rounded-md text-black "
             />
           </div>

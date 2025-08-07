@@ -18,12 +18,12 @@ export const PickUp: Story = {
   args: { // このストーリーでコンポーネントに渡すデータ
     drive: {
       id: 1,
-      calenderName: '定期イベントA',
+      calendarName: '定期イベントA',
       eventName: '会場への移動',
       driveState: DriveState.PICK_UP,
       eventDate: '2025/08/10',
       driveTime: '09:00',
-      passengerNumber: 4,
+      seatsRequired: 4,
     },
   },
 };
@@ -33,12 +33,12 @@ export const DropOff: Story = {
   args: {
     drive: {
       id: 2,
-      calenderName: '定期イベントA',
+      calendarName: '定期イベントA',
       eventName: '会場からの解散',
       driveState: DriveState.DROP_OFF,
       eventDate: '2025/08/10',
       driveTime: '17:30',
-      passengerNumber: 4,
+      seatsRequired: 4,
     },
   },
 };

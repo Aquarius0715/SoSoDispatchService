@@ -11,8 +11,8 @@ interface EventStatus {
   details: string;
   dropOffTime: string; // 送り時刻
   pickUpTime: string;  // 迎え時刻
-  dropOffCount: string; // 送り人数
-  pickUpCount: string;  // 迎え人数
+  dropOffCount: number; // 送り人数
+  pickUpCount: number;  // 迎え人数
   departurePoint: string;
   destinationPoint: string;
   members: string[]; // 参加者
@@ -78,6 +78,14 @@ const EventAddModal: React.FC<EventAddModalProps> = ({
   const handleInputChange = (setter: React.Dispatch<React.SetStateAction<string>>) => {
     return (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       setter(e.target.value);
+    };
+  };
+
+  // 数値用のハンドラーを追加
+  const handleNumberInputChange = (setter: React.Dispatch<React.SetStateAction<number>>) => {
+    return (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value = parseInt(e.target.value) || 0;
+      setter(value);
     };
   };
 
@@ -157,7 +165,7 @@ const EventAddModal: React.FC<EventAddModalProps> = ({
               <label className="block text-sm font-semibold mb-1 text-black">送り人数</label>
               <Input
                 value={dropOffCount}
-                onChange={handleInputChange(setDropOffCount)}
+                onChange={handleNumberInputChange(setDropOffCount)}
                 placeholder="送り人数"
                 className="w-full text-black"
               />
@@ -167,7 +175,7 @@ const EventAddModal: React.FC<EventAddModalProps> = ({
               <label className="block text-sm font-semibold mb-1 text-black">迎え人数</label>
               <Input
                 value={pickUpCount}
-                onChange={handleInputChange(setPickUpCount)}
+                onChange={handleNumberInputChange(setPickUpCount)}
                 placeholder="迎え人数"
                 className="w-full text-black"
               />
