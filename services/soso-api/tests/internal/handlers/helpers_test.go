@@ -4,6 +4,7 @@ package handlers_test
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"testing"
 
 	sqlmock "github.com/DATA-DOG/go-sqlmock"
@@ -47,6 +48,11 @@ func NewSQLMock(t *testing.T) DBMock {
 			_ = db.Close()
 		},
 	}
+}
+
+func logJSON(t *testing.T, label string, v any) {
+	j, _ := json.MarshalIndent(v, "", "  ")
+	t.Logf("%s:\n%s\n", label, string(j))
 }
 
 // Ctx は context.Background() のショートカット（必要なら）
