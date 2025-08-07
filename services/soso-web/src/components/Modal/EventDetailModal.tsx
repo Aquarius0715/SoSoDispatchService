@@ -47,12 +47,12 @@ const EventDetailModal: React.FC<ModalProps> = ({ eventDetails, onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center p-4">
-      <div className="bg-white p-6 rounded-lg w-full max-w-md shadow-lg border border-gray-300">
+      <div className="bg-white p-6 rounded-lg w-full max-w-md shadow-lg border border-gray-300 max-h-screen overflow-y-auto">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl text-black font-bold">イベント詳細</h2>
+          <h2 className="text-xl text-zinc-600 font-bold">イベント詳細</h2>
           <div className="flex items-center space-x-2">
             <Button className="bg-gray-700 text-white px-4 py-2 rounded text-sm">編集</Button>
-            <button onClick={onClose} className="text-gray-500 hover:text-gray-700 text-2xl font-light">
+            <button onClick={onClose} className="text-zinc-600 hover:text-gray-700 text-2xl font-light">
               &times;
             </button>
           </div>
@@ -61,48 +61,46 @@ const EventDetailModal: React.FC<ModalProps> = ({ eventDetails, onClose }) => {
           <Button className="bg-gray-700 text-white px-4 py-2 rounded w-full">イベント共有</Button>
         </div>
 
-        <div className="bg-gray-100 p-4 rounded-lg mb-4 text-black">
-          <h3 className="font-bold text-lg mb-2">{eventDetails.EventTitle}</h3>
+        <div className="bg-gray-100 p-4 rounded-lg mb-4 text-zinc-600">
+          <h3 className="font-normal font-['Inter'] text-black text-lg mb-2">{eventDetails.EventTitle}</h3>
           <p>日付: {eventDetails.EventDate}</p>
           <p>時刻: {eventDetails.EventTime}</p>
           <p>詳細: {eventDetails.EventDetail}</p>
         </div>
 
-        <div className="bg-gray-100 p-4 rounded-lg mb-4 text-black">
-          <h3 className="font-bold text-lg mb-2">参加者</h3>
+        <div className="bg-gray-100 p-4 rounded-lg mb-4 text-zinc-600">
+          <h3 className="font-normal font-['Inter'] text-black text-lg mb-2">参加者</h3>
           <p>{eventDetails.member.join('・')}</p>
         </div>
 
-        <div className="flex justify-between space-x-4 mb-4 text-black">
+        <div className="flex justify-between space-x-4 mb-4 text-zinc-600">
           <div className="bg-gray-100 p-4 rounded-lg flex-1">
-            <h3 className="font-bold text-lg mb-2">送り</h3>
-            <p>合計: {eventDetails.DropOffNumber}人</p>
-            <br></br>
+            <h3 className="font-normal font-['Inter'] text-black text-lg mb-2">送り</h3>
+            <p className="mb-3">合計: {eventDetails.DropOffNumber}人</p>
             <p>残り: {dropOffRemaining}人</p>
           </div>
           <div className="bg-gray-100 p-4 rounded-lg flex-1">
-            <h3 className="font-bold text-lg mb-2">迎え</h3>
-            <p>合計: {eventDetails.PickUpNumber}人</p>
-            <br></br>
-            <p>残り: {pickUpRemaining}人</p>
+            <h3 className="font-normal font-['Inter'] text-black text-lg mb-2">迎え</h3>
+            <p className="mb-3">合計: {eventDetails.PickUpNumber}人</p>
+            <p >残り: {pickUpRemaining}人</p>
           </div>
         </div>
 
-        <div className="bg-gray-100 p-4 rounded-lg mb-4 text-black">
-          <h3 className="font-bold text-lg mb-2">会場</h3>
+        <div className="bg-gray-100 p-4 rounded-lg mb-4 text-zinc-600">
+          <h3 className="font-normal font-['Inter'] text-black text-lg mb-2">会場</h3>
           <p>{eventDetails.departurePoint} → {eventDetails.destination}</p>
           <p>会場URL: {eventDetails.EventURL}</p>
         </div>
 
-        <div className="bg-gray-100 p-4 rounded-lg mb-4 text-black">
-          <h3 className="font-bold text-lg mb-2">配車登録済み</h3>
+        <div className="bg-gray-100 p-4 rounded-lg mb-4 text-zinc-600">
+          <h3 className="font-normal font-['Inter'] text-black text-lg mb-2">配車登録済み</h3>
           {registered.map((item, index) => (
             <p key={index}>{item}</p>
           ))}
         </div>
 
-        <div className="text-black">
-          <h3 className="font-bold text-lg mb-2">配車登録</h3>
+        <div className="text-zinc-600">
+          <h3 className="font-normal font-['Inter'] text-black text-lg mb-2">配車登録</h3>
           <div className="flex items-center mb-4">
             <p className="text-sm mr-2">乗車可能人数</p>
             <Input
@@ -120,14 +118,14 @@ const EventDetailModal: React.FC<ModalProps> = ({ eventDetails, onClose }) => {
           </div>
           <div className="flex space-x-4">
             <Button
-              className="bg-gray-700 hover:bg-gray-600 flex-1 text-white"
+              className="bg-gray-700 px-0 py-4 hover:bg-gray-600 flex-1 text-white"
               onClick={() => handleRegister('pickUp')}
               disabled={typeof passengers !== 'number' || passengers <= 0}
             >
               迎え登録
             </Button>
             <Button
-              className="bg-gray-700 hover:bg-gray-600 flex-1 text-white"
+              className="bg-gray-700 px-0 py-4 hover:bg-gray-600 flex-1 text-white"
               onClick={() => handleRegister('dropOff')}
               disabled={typeof passengers !== 'number' || passengers <= 0}
             >
