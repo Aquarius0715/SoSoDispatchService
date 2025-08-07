@@ -192,3 +192,78 @@ func TestEventParticipantRepository_FetchUserInfos_Empty(t *testing.T) {
 	assert.Empty(t, got)
 	assert.NoError(t, mock.ExpectationsWereMet())
 }
+
+/* ----------------------------------------------------------------
+   5. FetchMemberInfos
+   ---------------------------------------------------------------- */
+
+/*
+----------------------------------------------------------------
+ 5. FetchMemberInfos
+    ----------------------------------------------------------------
+*/
+const sqlFetchMemberInfos = `
+		SELECT u\.id, u\.username, cm\.soso_point
+		FROM event_participants AS ep
+		INNER JOIN events   AS e  ON e\.id = ep\.event_id
+		INNER JOIN calender_memberships AS cm
+		     ON cm\.calender_id = e\.calender_id
+		     AND cm\.user_id     = ep\.user_id
+		INNER JOIN users AS u ON u\.id = ep\.user_id
+		WHERE ep\.event_id = \? AND ep\.type = 'participants'`
+
+// ---------- 正常系 ----------
+func TestEventParticipantRepository_FetchMemberInfos_OK(t *testing.T) {
+	repo, mock, closeFn := newEventParticipantRepoMock(t)
+	defer closeFn()
+
+	rows := sqlmock.NewRows([]string{
+		"id", "username", "soso_point",
+	}).AddRow("u1", "alice", 11).
+		AddRow("u2", "bob", 7).
+		AddRow("u3", "carol", 5)
+
+	mock.ExpectQuery(sqlFetchMemberInfos).
+		WithArgs("ev1").
+		WillReturnRows(rows)
+
+	got, err := repo.FetchMemberInfos(context.Background(), "ev1")
+	assert.NoError(t, err)
+	assert.Len(t, got, 3)
+	assert.Equal(t, "u1", got[0].UserID)
+	assert.Equal(t, "bob", got[1].UserName)
+	assert.Equal(t, 5, got[2].SoSoPoint)
+	assert.NoError(t, mock.ExpectationsWereMet())
+}
+
+// ---------- 0 件 ----------
+func TestEventParticipantRepository_FetchMemberInfos_Empty(t *testing.T) {
+	repo, mock, closeFn := newEventParticipantRepoMock(t)
+	defer closeFn()
+
+	mock.ExpectQuery(sqlFetchMemberInfos).
+		WithArgs("evX").
+		WillReturnRows(sqlmock.NewRows([]string{
+			"id", "username", "soso_point",
+		}))
+
+	got, err := repo.FetchMemberInfos(context.Background(), "evX")
+	assert.NoError(t, err)
+	assert.Empty(t, got)
+	assert.NoError(t, mock.ExpectationsWereMet())
+}
+
+// ---------- DB エラー ----------
+func TestEventParticipantRepository_FetchMemberInfos_DBError(t *testing.T) {
+	repo, mock, closeFn := newEventParticipantRepoMock(t)
+	defer closeFn()
+
+	mock.ExpectQuery(sqlFetchMemberInfos).
+		WithArgs("evErr").
+		WillReturnError(assert.AnError)
+
+	got, err := repo.FetchMemberInfos(context.Background(), "evErr")
+	assert.Error(t, err)
+	assert.Nil(t, got)
+	assert.NoError(t, mock.ExpectationsWereMet())
+}
