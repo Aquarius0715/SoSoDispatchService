@@ -2,12 +2,15 @@ import React, { useState } from 'react';
 import clsx from 'clsx';
 import Button from '../Button/Button';
 import Textarea from '../TextFieald/Textfieald';
+import { on } from 'events';
 
 interface Props {
   onClose: () => void;
+  isOpen ?: boolean;
+  onSave: (newCalendar: { calendarName: string; reason?: string }) => void;
 }
 
-const TeamAddModal: React.FC<Props> = ({ onClose }) => {
+const TeamAddModal: React.FC<Props> = ({ onClose, onSave, isOpen }) => {
   const [newCalendarTitle, setNewCalendarTitle] = useState('');
   const [newCalendarReason, setNewCalendarReason] = useState('');
   const [sharedCalendarUrl, setSharedCalendarUrl] = useState('');
@@ -19,6 +22,10 @@ const TeamAddModal: React.FC<Props> = ({ onClose }) => {
   const handleCreateNewCalendar = () => {
     // ボタンをクリックしたらロード状態をtrueにする
     setIsCreating(true);
+    onSave({
+      calendarName: newCalendarTitle,
+      reason: newCalendarReason,
+    });
     console.log('新規カレンダーを作成:', newCalendarTitle, '作成理由:', newCalendarReason);
     
     // ここでAPI通信などの処理を行う
@@ -40,6 +47,10 @@ const TeamAddModal: React.FC<Props> = ({ onClose }) => {
       onClose();
     }, 2000); // 2秒後に処理が完了したと仮定
   };
+
+  if (!isOpen) {
+    return null;
+  }
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4">
@@ -74,6 +85,7 @@ const TeamAddModal: React.FC<Props> = ({ onClose }) => {
             disabled={isCreating || !newCalendarTitle}
             className={clsx('w-full !rounded-md bg-gray-700 text-white hover:bg-gray-800', isCreating && 'opacity-50 cursor-not-allowed')}
             onClick={handleCreateNewCalendar}
+            
           >
             {isCreating ? '作成中...' : '新規作成'}
           </Button>

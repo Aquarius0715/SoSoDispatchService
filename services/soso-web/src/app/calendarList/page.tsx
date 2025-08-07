@@ -9,6 +9,8 @@ import Button from '@/src/components/Button/Button';
 import clsx from 'clsx';
 import StatusEditModal from '@/src/components/Modal/StatusEditModal';
 import { useRouter } from 'next/navigation';
+import TeamAddModal from '@/src/components/Modal/TeamAddModal';
+
 
 export interface CalendarEntry {
   id: number | string;
@@ -23,10 +25,15 @@ interface UserStatus {
     capacity: number;
 }
 
+interface calendarAddProps {
+  calendarName: string;
+}
+
 export default function MyPage() {
   const router = useRouter();
 // モーダルの表示状態を管理するステート
   const [isStatusEditModalOpen, setIsStatusEditModalOpen] = useState(false);
+  const [isTeamAddModalOpen, setIsTeamAddModalOpen] = useState(false);
 
   // ユーザー情報のステートを追加
   const [userStatus, setUserStatus] = useState<UserStatus>({ // ★ UserStatus型を指定
@@ -95,6 +102,12 @@ export default function MyPage() {
   //   alert(`カレンダーID: ${id} がクリックされました`);
   // };
   
+
+
+  const handleAddCalendar = () => {
+    setIsTeamAddModalOpen(true);
+  };
+
   // onSaveに渡す関数
   // この関数が、モーダルからの編集内容を受け取る
   // ★ ここを修正
@@ -102,8 +115,15 @@ export default function MyPage() {
     setUserStatus(newStatus); // ユーザー情報を更新
     setIsStatusEditModalOpen(false); // モーダルを閉じる
   };
-  // ★ 不要なインターフェースを削除
-  // interface HandleSaveStatusArgs { ... }
+
+  const handleSaveAddCalendar = (newCalendar: calendarAddProps): void => {
+    const newEntry: CalendarEntry = {
+      id: calendars.length + 1,
+      name: newCalendar.calendarName,
+    };
+    setCalendars([...calendars, newEntry]);
+    setIsTeamAddModalOpen(false);
+  };
 
   return (
     <div className="flex flex-col h-screen bg-gray-100">
@@ -133,6 +153,15 @@ export default function MyPage() {
               </Button>
             ))}
           </div>
+          {!isTeamAddModalOpen && (
+                <Button
+                variant="circle"
+                onClick={handleAddCalendar}
+                className="fixed bottom-8 right-80 z-50"
+                >
+                <span className="text-2xl">+</span>
+                </Button>
+            )}
         </main>
         <MyPageRightSidebar drives={drives} />
       </div>
@@ -142,6 +171,12 @@ export default function MyPage() {
         onClose={() => setIsStatusEditModalOpen(false)}
         onSave={handleSaveStatus}
         initialStatus={userStatus}
+      />
+
+      <TeamAddModal
+        isOpen={isTeamAddModalOpen}
+        onClose={() => setIsTeamAddModalOpen(false)}
+        onSave={handleSaveAddCalendar}
       />
     </div>
   );
