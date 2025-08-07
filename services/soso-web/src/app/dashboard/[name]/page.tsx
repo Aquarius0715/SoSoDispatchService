@@ -4,7 +4,7 @@
 import React, { useState } from 'react';
 import { NextPage } from 'next';
 import { useRouter } from 'next/navigation';
-// import React, { use } from 'react'; 
+
 // 必要なコンポーネントをインポート
 import CalendarHeader from '@/src/components/Headers/CalendarHeader';
 import CalendarLeftSidebar from '@/src/components/Sidebar/CalendarSidebar';
@@ -15,16 +15,21 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import jaLocale from '@fullcalendar/core/locales/ja'; // 日本語化
+import SOSOEditModal from '@/src/components/Modal/SOSOEditModal';
 
 // サイドバーで必要となるデータの型をインポート
-// パスは実際のプロジェクトに合わせて調整してください
 import { Member } from '@/src/components/MemberList/MenberList';
 import { SOSOTransaction } from '@/src/components/SOSOList/SOSOList';
+
+// モーダルが返すデータの型
+interface EditedMemberData extends Member {
+  reason: string;
+}
 
 // ページのPropsの型定義
 interface DashboardPageProps {
   params: {
-    name: string; // URLから受け取るカレンダー名
+    name: string;
   };
 }
 
@@ -69,92 +74,88 @@ const handleAddEventClick = (e: React.MouseEvent, arg: any) => {
   setIsAddModalOpen(true);
 };
 
-  // --- ▼▼▼ ここからダミーデータとハンドラ関数 ▼▼▼ ---
-  // 本来はAPIなどから取得しますが、UI表示用に仮のデータを用意します。
+  // --- ▼▼▼ State管理 ▼▼▼ ---
 
-  // 左サイドバーに渡すメンバーリストのダミーデータ
-  const dummyMembers: Member[] = [
-    // 修正点: `name` `role` `soso` -> `memberName` `hasCar` `passengerNumber` `sosoPoint`
+  const [members, setMembers] = useState<Member[]>([
     { id: 1, memberName: '佐藤 健太', hasCar: true, passengerNumber: 4, sosoPoint: 150 },
     { id: 2, memberName: '鈴木 陽子', hasCar: false, sosoPoint: 50 },
     { id: 3, memberName: '高橋 一郎', hasCar: false, sosoPoint: 80 },
     { id: 4, memberName: '伊藤 花子', hasCar: true, passengerNumber: 6, sosoPoint: 200 },
-  ];
+  ]);
 
-  // 右サイドバーに渡すSOSOポイント履歴のダミーデータ
-  const dummyLogs: SOSOTransaction[] = [
-    // 修正点: 新しいSOSOTransaction型に合わせてプロパティを全面的に変更
-    {
-      id: 1,
-      eventName: '新歓コンパ',
-      date: '2024/07/15',
-      time: '19:00',
-      changer: '佐藤 健太',
-      changee: 'システム',
-      sosoPoints: 10,
-      reason: '新歓コンパでの運転協力',
-    },
-    {
-      id: 2,
-      eventName: 'ライブ打ち上げ',
-      date: '2024/07/12',
-      time: '21:30',
-      changer: 'システム',
-      changee: '伊藤 花子',
-      sosoPoints: -5,
-      reason: 'ガソリン代精算',
-    },
-    {
-      id: 3,
-    eventName: 'ゼミ歓迎会',
-      date: '2024/07/10',
-      time: '18:00',
-      changer: '高橋 一郎',
-      changee: '佐藤 健太',
-      sosoPoints: 5,
-      reason: '買い出し協力のお礼',
-    },
-  ];
+  const [logs, setLogs] = useState<SOSOTransaction[]>([]);
 
-  // ヘッダーに渡すためのハンドラ関数
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedMember, setSelectedMember] = useState<Member | null>(null);
+
+  // --- ▼▼▼ ハンドラ関数 ▼▼▼ ---
+
   const handleLogout = () => {
     router.push('/');
     alert('ログアウトしました');
   };
   const handleLogoClick = () => {
-    router.push('/mypage'); // ロゴクリックでマイページに移動するなど
+    router.push('/mypage');
   };
 
-  //左サイドバーに渡すためのハンドラ関数
   const handleEditMember = (member: Member) => {
-    alert(`${member.memberName}さんを編集します`);
-    // ここで実際に編集モーダルを開く処理を実装
+    setSelectedMember(member);
+    setIsModalOpen(true);
   };
 
-  // --- ▲▲▲ ここまでダミーデータとハンドラ関数 ▲▲▲ ---
+  const handleSaveSosoChange = (editedData: EditedMemberData) => {
+    // 1. メンバーリスト内のポイントを更新
+    setMembers(currentMembers =>
+      currentMembers.map(member =>
+        member.id === editedData.id
+          ? { ...member, sosoPoint: editedData.sosoPoint }
+          : member
+      )
+    );
+
+    // 2. ポイント変動履歴に新しいログを追加
+    if (selectedMember) { // ★★★ 修正点1: `editedData.reason`のチェックを削除
+      const pointChange = editedData.sosoPoint - selectedMember.sosoPoint;
+      
+      // ポイントに変動があった場合のみログを追加
+      if (pointChange !== 0) {
+        const newLog: SOSOTransaction = {
+          id: Date.now(),
+          eventName: '手動調整',
+          date: new Date().toLocaleDateString('ja-JP'),
+          time: new Date().toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' }),
+          changer: '管理者',
+          changee: editedData.memberName,
+          sosoPoints: pointChange,
+          // ★★★ 修正点2: 理由が空の場合、代替テキストを表示
+          reason: editedData.reason || '（理由の記載なし）',
+        };
+        setLogs(prevLogs => [newLog, ...prevLogs]);
+      }
+    }
+
+    setIsModalOpen(false);
+  };
 
   return (
-    // ページ全体のレイアウト
     <div className="flex flex-col h-screen bg-gray-100">
       
       {/* 1. ヘッダーの配置 */}
-      <div> 
-        <CalendarHeader
-          pageTitle={decodedTitle}
-          onLogout={handleLogout}
-          onClickLogo={handleLogoClick}
-          calendarUrl={`https://example.com/dashboard/share/${name}`} // 仮の共有URL
-        />
-      </div>
+      <CalendarHeader
+        pageTitle={decodedTitle}
+        onLogout={handleLogout}
+        onClickLogo={handleLogoClick}
+        calendarUrl={`https://example.com/dashboard/share/${name}`}
+      />
 
       {/* ヘッダー以外の全領域 */}
       <div className="flex flex-grow overflow-hidden">
 
         {/* 2. 左サイドバーの配置 */}
         <CalendarLeftSidebar
-          members={dummyMembers}
+          members={members}
           onEditMember={handleEditMember}
-          className="h-full" // 高さを親要素に合わせる
+          className="h-full"
         />
 
         {/* 3. メインコンテンツエリア */}
@@ -196,10 +197,20 @@ const handleAddEventClick = (e: React.MouseEvent, arg: any) => {
 
         {/* 4. 右サイドバーの配置 */}
         <CalendarRightSidebar
-          logs={dummyLogs}
-          className="h-full" // 高さを親要素に合わせる
+          logs={logs}
+          className="h-full"
         />
       </div>
+
+      {/* モーダルはselectedMemberが存在する場合のみレンダリング */}
+      {selectedMember && (
+        <SOSOEditModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onSave={handleSaveSosoChange}
+          initialData={selectedMember}
+        />
+      )}
     </div>
   );
 };

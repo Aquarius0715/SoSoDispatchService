@@ -8,24 +8,30 @@ interface Props {
   children?: React.ReactNode;
 }
 
-function CalendarRightSidebar(props: Props) {
+function CalendarRightSidebar({ logs, className, children }: Props) {
   return (
     <aside
       className={clsx(
         'w-72 h-screen bg-white p-4 flex flex-col overflow-y-auto', // ★ スタイルを調整
-        props.className
+        className
       )}
     >
       <div className='flex-grow'>
         <h2 className='text-xl font-bold text-gray-800 mb-4'>SOSOポイント変動履歴</h2>
-        
-        <SOSOList 
-          logs={props.logs}
-        />
+        {/* logs配列の長さをチェックして、表示を切り替える */}
+        {logs.length > 0 ? (
+          // 履歴が1件以上ある場合は、SOSOListを表示
+          <SOSOList logs={logs} />
+        ) : (
+          // 履歴がない場合は、メッセージを表示
+          <p className="text-sm text-gray-500 mt-4">
+            ポイントの変動履歴はありません。
+          </p>
+        )}
       </div>
 
       {/* children をサイドバー下部に表示したい場合などに使用できます */}
-      {props.children}
+      {children}
     </aside>
   );
 }
