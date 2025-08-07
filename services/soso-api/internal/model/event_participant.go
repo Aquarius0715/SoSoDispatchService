@@ -19,8 +19,8 @@ type Type string
 
 const (
 	Participants Type = "participants"
-	PickUp       Type = "pick_up"
-	DropOff      Type = "drop_off"
+	Go           Type = "go"
+	Return       Type = "return"
 )
 
 // -------------------------

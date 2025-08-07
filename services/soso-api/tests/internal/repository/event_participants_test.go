@@ -40,7 +40,7 @@ func TestEventParticipantRepository_BulkInsert_OK(t *testing.T) {
 			EventID:      "ev1",
 			UserID:       "u2",
 			Status:       model.Registered,
-			Type:         model.PickUp,
+			Type:         model.Go,
 			RegisteredAt: ts,
 		},
 	}
@@ -110,7 +110,7 @@ func TestEventParticipantRepository_FindByEventIDAndType_OK(t *testing.T) {
 
 	const (
 		eventID = "ev1"
-		pt      = model.PickUp
+		pt      = model.Go
 	)
 	now := time.Now()
 
@@ -127,7 +127,7 @@ func TestEventParticipantRepository_FindByEventIDAndType_OK(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Len(t, got, 2)
 	assert.Equal(t, "u1", got[0].UserID)
-	assert.Equal(t, model.PickUp, got[0].Type)
+	assert.Equal(t, model.Go, got[0].Type)
 	assert.NoError(t, mock.ExpectationsWereMet())
 }
 
@@ -139,12 +139,12 @@ func TestEventParticipantRepository_FindByEventIDAndType_Empty(t *testing.T) {
 	defer closeFn()
 
 	mock.ExpectQuery(`SELECT\s+event_id`).
-		WithArgs("ev2", string(model.DropOff)).
+		WithArgs("ev2", string(model.Go)).
 		WillReturnRows(sqlmock.NewRows([]string{
 			"event_id", "user_id", "status", "type", "registered_at",
 		})) // 空
 
-	got, err := repo.FindByEventIDAndType(context.Background(), "ev2", model.DropOff)
+	got, err := repo.FindByEventIDAndType(context.Background(), "ev2", model.Go)
 	assert.NoError(t, err)
 	assert.Empty(t, got)
 	assert.NoError(t, mock.ExpectationsWereMet())
