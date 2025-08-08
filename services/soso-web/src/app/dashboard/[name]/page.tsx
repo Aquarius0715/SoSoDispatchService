@@ -16,6 +16,7 @@ import interactionPlugin from '@fullcalendar/interaction';
 import EventAddModal from '@/src/components/Modal/EventAddModal';
 import jaLocale from '@fullcalendar/core/locales/ja';
 import SOSOManagementModal from '@/src/components/Modal/SOSOManagementModal';
+import SOSOEditModal from '@/src/components/Modal/SOSOEditModal';
 
 // サイドバーで必要となるデータの型をインポート
 import { Member } from '@/src/components/MemberList/MenberList';
@@ -78,6 +79,8 @@ const DashboardPage: NextPage<DashboardPageProps> = ({ params }) => {
   const [logs, setLogs] = useState<SOSOTransaction[]>([]);
   const [isSosoModalOpen, setIsSosoModalOpen] = useState(false);
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
+  const [isSOSOEditModalOpen, setIsSOSOEditModalOpen] = useState(false);
+  const [selectedMemberForEdit, setSelectedMemberForEdit] = useState<Member | null>(null);
 
   // --- ▼▼▼ useEffect ▼▼▼ ---
   // paramsを非同期で処理
@@ -203,20 +206,26 @@ const DashboardPage: NextPage<DashboardPageProps> = ({ params }) => {
 
   const handleEditMember = (member: Member) => {
     console.log("🔵 メンバー編集がクリックされました:", member);
-    setSelectedMember(member);
-    setIsSosoModalOpen(true);
+    setSelectedMemberForEdit(member);
+    setIsSOSOEditModalOpen(true);
   };
 
+  // handleSaveSosoChange関数も修正
   const handleSaveSosoChange = (editedData: EditedMemberData): void => {
     console.log("🔵 handleSaveSosoChangeが実行されました。");
+    
+    // メンバー情報を更新
     setMembers(currentMembers =>
       currentMembers.map(member =>
-        member.id === editedData.id ? { ...member, sosoPoint: editedData.sosoPoint } : member
+        member.id === editedData.id 
+          ? { ...member, sosoPoint: editedData.sosoPoint } 
+          : member
       )
     );
     
-    if (selectedMember) {
-      const pointChange = editedData.sosoPoint - selectedMember.sosoPoint;
+    // selectedMemberForEditから前の値を取得
+    if (selectedMemberForEdit) {
+      const pointChange = editedData.sosoPoint - selectedMemberForEdit.sosoPoint;
       if (pointChange !== 0) {
         const newLog: SOSOTransaction = {
           id: Date.now(),
@@ -231,7 +240,15 @@ const DashboardPage: NextPage<DashboardPageProps> = ({ params }) => {
       }
     }
     
-    setIsSosoModalOpen(false);
+    // モーダルを閉じて状態をリセット
+    setIsSOSOEditModalOpen(false);
+    setSelectedMemberForEdit(null);
+  };
+
+  // モーダルを閉じる関数
+  const handleCloseSOSOEditModal = () => {
+    setIsSOSOEditModalOpen(false);
+    setSelectedMemberForEdit(null);
   };
 
   console.log('🟢 DashboardPageがレンダリングされました。'); 
@@ -297,6 +314,16 @@ const DashboardPage: NextPage<DashboardPageProps> = ({ params }) => {
           initialData={selectedManagementEvent}
           onSave={handleSaveManagement}
           allMembers={members}
+        />
+      )}
+
+      {/* SOSO編集モーダル */}
+      {selectedMemberForEdit && (
+        <SOSOEditModal
+          isOpen={isSOSOEditModalOpen}
+          onClose={handleCloseSOSOEditModal}
+          onSave={handleSaveSosoChange}
+          initialData={selectedMemberForEdit}
         />
       )}
     </div>
