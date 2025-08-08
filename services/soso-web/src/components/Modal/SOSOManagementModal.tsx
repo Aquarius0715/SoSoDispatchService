@@ -27,9 +27,6 @@ interface Props {
 // SOSOManagementModal.tsx を修正
 function SOSOManagementModal({ initialData, className, isOpen, onClose, onSave, allMembers }: Props) {
   // useState部分は削除
-  // const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  // const [selectedMember, setSelectedMember] = useState<Member | null>(null);
-
   const participatingMembers = initialData.extendedProps?.participatingMembers || [];
 
   useEffect(() => {
@@ -85,8 +82,20 @@ function SOSOManagementModal({ initialData, className, isOpen, onClose, onSave, 
           </button>
         </div>
 
+        {/* イベント詳細情報 */}
+        <div className="p-4 bg-gray-50 border-b border-gray-200">
+          <div className="grid grid-cols-2 gap-4 text-sm">
+            <p><strong>開始時間:</strong> {new Date(initialData.start).toLocaleString('ja-JP')}</p>
+            <p><strong>終了時間:</strong> {new Date(initialData.end).toLocaleString('ja-JP')}</p>
+            <p><strong>送り時刻:</strong> {initialData.extendedProps?.dropOffTime || '未設定'}</p>
+            <p><strong>迎え時刻:</strong> {initialData.extendedProps?.pickUpTime || '未設定'}</p>
+            <p><strong>出発地:</strong> {initialData.extendedProps?.departurePoint || '未設定'}</p>
+            <p><strong>目的地:</strong> {initialData.extendedProps?.destinationPoint || '未設定'}</p>
+          </div>
+        </div>
+
         {/* メイン部分 */}
-        <div className="flex h-[calc(90vh-120px)] overflow-hidden">
+        <div className="flex h-[calc(90vh-200px)] overflow-hidden">
           {/* 左側: メンバー一覧 */}
           <div className="flex-1 p-6 border-r border-gray-200 overflow-y-auto">
             <h2 className="text-xl text-black font-bold mb-4">
@@ -112,13 +121,16 @@ function SOSOManagementModal({ initialData, className, isOpen, onClose, onSave, 
 
           {/* 右側: トランザクション履歴 */}
           <div className="flex-1 p-6 overflow-y-auto">
-            <h2 className="text-xl text-black font-bold mb-4">トランザクション履歴</h2>
-            <SOSOList logs={[]} />
+            <h2 className="text-xl text-black font-bold mb-4">
+              このイベントのトランザクション履歴
+            </h2>
+            <SOSOList 
+              logs={initialData.extendedProps?.eventLogs || []} 
+              eventName={initialData.title}
+            />
           </div>
         </div>
       </div>
-
-      {/* SOSOEditModalを削除 */}
     </div>
   );
 }
