@@ -24,12 +24,12 @@ interface Props {
   allMembers: Member[];
 }
 
+// SOSOManagementModal.tsx を修正
 function SOSOManagementModal({ initialData, className, isOpen, onClose, onSave, allMembers }: Props) {
-  // ★★★ useStateとuseEffectを最初に呼び出す ★★★
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [selectedMember, setSelectedMember] = useState<Member | null>(null);
+  // useState部分は削除
+  // const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  // const [selectedMember, setSelectedMember] = useState<Member | null>(null);
 
-  // 参加メンバーを取得
   const participatingMembers = initialData.extendedProps?.participatingMembers || [];
 
   useEffect(() => {
@@ -41,24 +41,25 @@ function SOSOManagementModal({ initialData, className, isOpen, onClose, onSave, 
     }
   }, [isOpen, initialData]);
 
-  // ★★★ 早期returnはhooksの後に配置 ★★★
   if (!isOpen) return null;
 
+  // メンバー編集を親コンポーネント（page.tsx）に委譲
   const handleEditMember = (member: Member) => {
     console.log("🔵 メンバー編集ボタンが押されました:", member);
-    setSelectedMember(member);
-    setIsEditModalOpen(true);
-  };
-
-  const handleCloseEditModal = () => {
-    console.log("🔵 メンバー編集モーダルを閉じます。");
-    setIsEditModalOpen(false);
-    setSelectedMember(null);
-  };
-
-  const handleSaveEditedMember = (editedData: Member & { reason: string }) => {
-    console.log('🔵 メンバー編集を保存:', editedData);
-    handleCloseEditModal();
+    
+    // 親コンポーネントのメンバー編集関数を呼び出すために
+    // onSaveを通じてデータを渡す
+    onSave({
+      ...initialData,
+      extendedProps: {
+        ...initialData.extendedProps,
+        editMember: member,
+        action: 'editMember'
+      }
+    });
+    
+    // 管理モーダルを閉じる
+    onClose();
   };
 
   return (
@@ -91,7 +92,6 @@ function SOSOManagementModal({ initialData, className, isOpen, onClose, onSave, 
             <h2 className="text-xl text-black font-bold mb-4">
               参加メンバー ({participatingMembers.length}人)
             </h2>
-            {/* 参加メンバーを表示 */}
             <div className="mb-6">
               <MemberList 
                 members={participatingMembers} 
@@ -99,7 +99,6 @@ function SOSOManagementModal({ initialData, className, isOpen, onClose, onSave, 
               />
             </div>
 
-            {/* 全メンバーリストも表示する場合 */}
             <h3 className="text-lg text-gray-600 font-semibold mb-2">
               全メンバー ({allMembers.length}人)
             </h3>
@@ -119,15 +118,7 @@ function SOSOManagementModal({ initialData, className, isOpen, onClose, onSave, 
         </div>
       </div>
 
-      {/* 編集モーダル */}
-      {selectedMember && (
-        <SOSOEditModal
-          isOpen={isEditModalOpen}
-          onClose={handleCloseEditModal}
-          onSave={handleSaveEditedMember}
-          initialData={selectedMember}
-        />
-      )}
+      {/* SOSOEditModalを削除 */}
     </div>
   );
 }

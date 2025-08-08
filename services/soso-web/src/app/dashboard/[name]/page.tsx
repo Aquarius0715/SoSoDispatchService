@@ -144,8 +144,26 @@ const DashboardPage: NextPage<DashboardPageProps> = ({ params }) => {
   const handleSaveManagement = (eventData: any) => {
     console.log("🔵 handleSaveManagementが実行されました。");
     console.log('🔵 Management data saved:', eventData);
-    setIsManagementModalOpen(false);
-  };
+    
+    // メンバー編集アクションの場合
+    if (eventData.extendedProps?.action === 'editMember') {
+      const memberToEdit = eventData.extendedProps.editMember;
+      console.log('🔵 メンバー編集要求:', memberToEdit);
+      
+      // 管理モーダルを閉じる
+      setIsManagementModalOpen(false);
+      setSelectedManagementEvent(null);
+      
+      // メンバー編集モーダルを開く
+      setSelectedMemberForEdit(memberToEdit);
+      setIsSOSOEditModalOpen(true);
+      
+      return;
+    }
+  
+  // 通常の保存処理
+  setIsManagementModalOpen(false);
+};
 
   const handleEventClick = (clickInfo: any) => {
     console.log('clickInfo:', clickInfo);
