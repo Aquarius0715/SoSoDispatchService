@@ -35,6 +35,7 @@ interface DashboardPageProps {
 
 // EventStatus型をインポート（または再定義）
 interface EventStatus {
+  date: string;
   title: string;
   details: string;
   dropOffTime: string;
@@ -75,6 +76,7 @@ const DashboardPage: NextPage<DashboardPageProps> = ({ params }) => {
 
   // ▼ 新規イベント追加時の初期ステータス
   const initialEventStatus: EventStatus = {
+    date: '',
     title: '',
     details: '',
     dropOffTime: '',
@@ -86,18 +88,45 @@ const DashboardPage: NextPage<DashboardPageProps> = ({ params }) => {
     members: []
   };
 
-  // ▼ 新規イベント保存時の処理
-  const handleSaveNewEvent = (eventData: any) => {
-    const newEvent: EventInput = {
-      id: Date.now().toString(),
-      title: eventData.title,
-      start: eventData.start,
-      end: eventData.end,
-      // 他の必要なプロパティがあれば追加
-    };
-    setEvents(prevEvents => [...prevEvents, newEvent]);
-    setIsAddModalOpen(false);
+  // page.tsx
+// ▼ 新規イベント保存時の処理
+const handleSaveNewEvent = (eventData: EventStatus) => {
+  // 開始時刻と終了時刻を作成（送り時刻を使用）
+  const startDateTime = eventData.dropOffTime 
+    ? `${eventData.date}T${eventData.dropOffTime}:00`
+    : `${eventData.date}T09:00:00`; // デフォルト時刻
+  
+  const endDateTime = eventData.pickUpTime 
+    ? `${eventData.date}T${eventData.pickUpTime}:00`
+    : `${eventData.date}T10:00:00`; // デフォルト時刻（1時間後）
+
+  // 新しいイベントを作成
+  const newEvent: EventInput = {
+    id: Date.now().toString(),
+    title: eventData.title,
+    start: startDateTime,
+    end: endDateTime,
+    // カスタムプロパティも追加可能
+    extendedProps: {
+      details: eventData.details,
+      dropOffTime: eventData.dropOffTime,
+      pickUpTime: eventData.pickUpTime,
+      dropOffCount: eventData.dropOffCount,
+      pickUpCount: eventData.pickUpCount,
+      departurePoint: eventData.departurePoint,
+      destinationPoint: eventData.destinationPoint,
+      members: eventData.members,
+    }
   };
+
+  // eventsステートに新しいイベントを追加
+  setEvents(prevEvents => [...prevEvents, newEvent]);
+  
+  // モーダルを閉じる
+  setIsAddModalOpen(false);
+  
+  console.log('新しいイベントが追加されました:', newEvent);
+};
 
 
   // ▼ イベントクリック時の処理
@@ -118,9 +147,19 @@ const handleAddEventClick = (e: React.MouseEvent, arg: any) => {
   // 親要素のdateClickイベントが発火するのを防ぐ
   e.stopPropagation();
 
-    // クリックされた日付をStateに保存
-    setSelectedDate(arg.dateStr);
-    
+    // arg.dateを直接変更せず、新しいDateオブジェクトを作成して操作する
+  const tempDate = new Date(arg.date); // 新しいDateオブジェクトを作成
+  tempDate.setDate(tempDate.getDate() + 1);
+  const clickedDate = tempDate.toISOString().split('T')[0];
+  console.log('clickedDate:', clickedDate); // これを追加
+
+    // 選択された日付をStateに保存
+
+  setSelectedDate(clickedDate);
+  // console.log('arg.dateオブジェクト:', arg.date); // これを追加
+  // console.log('arg.dateのtoString():', arg.date.toString()); // ローカルタイム表示
+  // console.log('arg.dateのtoISOString():', arg.date.toISOString()); // UTC表示
+
     // 新規追加モーダルを開く
     setIsAddModalOpen(true);
   };
@@ -204,20 +243,21 @@ const handleAddEventClick = (e: React.MouseEvent, arg: any) => {
                 right: 'dayGridMonth,dayGridWeek'
               }}
               events={events}
+              eventClick={handleEventClick}
               dayCellContent={(arg) => (
-                <div className="relative h-full w-full">
-                  <span className="absolute top-1 left-2 text-sm text-gray-800">
-                    {arg.dayNumberText.replace('日', '')}
-                  </span>
-                  <button
-                    onClick={(e) => handleAddEventClick(e, arg)}
-                    className="absolute top-[-6px] right-1 text-gray-400 hover:bg-gray-200 rounded-full p-2"
-                    aria-label="予定を追加"
-                  >
-                    +
-                  </button>
-                </div>
-              )}
+              <div className="relative h-full w-full">
+                <span className="absolute top-1 right-20 text-sm text-gray-800">
+                  {arg.dayNumberText.replace('日', '')}
+                </span>
+                <button
+                  onClick={(e) => handleAddEventClick(e, arg)}
+                  className="absolute top-[-6px] right-1 text-gray-400 hover:bg-gray-200 rounded-full p-2"
+                  aria-label="予定を追加"
+                >
+                  +
+                </button>
+              </div>
+            )}
             />
           </div>
         </main>
@@ -238,8 +278,7 @@ const handleAddEventClick = (e: React.MouseEvent, arg: any) => {
           isOpen={isAddModalOpen}
           onClose={() => setIsAddModalOpen(false)}
           onSave={handleSaveNewEvent}
-          initialStatus={initialEventStatus}
-          date={selectedDate}
+          initialStatus={{ ...initialEventStatus, date: selectedDate }}
         />
       )}
 
