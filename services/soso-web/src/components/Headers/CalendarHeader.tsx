@@ -3,6 +3,7 @@ import React,{useState} from "react";
 import clsx from "clsx";
 import Button from "../Button/Button";
 import Image from "next/image";
+import ShareCalendarModal from "../Modal/ShareCalenderModal";
 
 interface Props {
   className?: string;
@@ -14,6 +15,7 @@ interface Props {
 
 function CalendarHeader({ className, pageTitle, onLogout, onClickLogo, calendarUrl }: Props) {
     const [showPopup, setShowPopup] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
     if (!calendarUrl) {
     alert('共有できるカレンダーのURLが設定されていません。');
         return; // 関数をここで終了
@@ -23,6 +25,8 @@ function CalendarHeader({ className, pageTitle, onLogout, onClickLogo, calendarU
     // クリップボードにURLをコピー
     navigator.clipboard.writeText(calendarUrl)
       .then(() => {
+        // 👇 navigator.clipboard.writeText の .then() の中に追加
+        setIsModalOpen(true); // モーダルを表示
         // コピーが成功したら、ポップアップを表示
         setShowPopup(true);
         // 3秒後にポップアップを自動的に非表示にする
@@ -59,6 +63,11 @@ function CalendarHeader({ className, pageTitle, onLogout, onClickLogo, calendarU
         <span className="text-white">ログアウト</span>
       </Button>
     </div>
+    <ShareCalendarModal
+    isOpen={isModalOpen}
+    onClose={() => setIsModalOpen(false)}
+    shareUrl={calendarUrl}
+/>
     </header>
   );
 }
