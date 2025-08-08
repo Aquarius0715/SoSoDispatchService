@@ -50,6 +50,12 @@ const EventAddModal: React.FC<EventAddModalProps> = ({
   const [departurePoint, setDeparturePoint] = useState(initialStatus.departurePoint);
   const [destinationPoint, setDestinationPoint] = useState(initialStatus.destinationPoint);
   const [participants, setParticipants] = useState(initialParticipants);
+  const [dropOffCountInput, setDropOffCountInput] = useState(
+  initialStatus.dropOffCount === 0 ? '' : String(initialStatus.dropOffCount)
+);
+  const [pickUpCountInput, setPickUpCountInput] = useState(
+    initialStatus.pickUpCount === 0 ? '' : String(initialStatus.pickUpCount)
+  );
 
   // 日付のフォーマット処理を修正
   const formatDate = (dateString: string) => {
@@ -110,13 +116,23 @@ const EventAddModal: React.FC<EventAddModalProps> = ({
     };
   };
 
-  // 数値用のハンドラーを追加
-  const handleNumberInputChange = (setter: React.Dispatch<React.SetStateAction<number>>) => {
-    return (e: React.ChangeEvent<HTMLInputElement>) => {
-      const value = parseInt(e.target.value) || 0;
-      setter(value);
-    };
-  };
+  // 送り人数用のハンドラー
+const handleDropOffCountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const inputValue = e.target.value;
+  setDropOffCountInput(inputValue); // 入力フィールドは常に文字列で更新
+  
+  // 保存時に使う数値の状態を更新
+  setDropOffCount(parseInt(inputValue) || 0); 
+};
+
+// 迎え人数用のハンドラーを追加
+const handlePickUpCountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const inputValue = e.target.value;
+  setPickUpCountInput(inputValue); // 入力フィールドは常に文字列で更新
+  
+  // 保存時に使う数値の状態を更新
+  setPickUpCount(parseInt(inputValue) || 0); 
+};
 
   // 保存ボタンが押されたときの処理
   const handleSave = () => {
@@ -173,13 +189,14 @@ const EventAddModal: React.FC<EventAddModalProps> = ({
           <div className="flex space-x-4">
             <div className="w-1/2">
               <label className="block text-sm font-semibold mb-1 text-black">送り人数</label>
-              <Input value={String(dropOffCount)} onChange={handleNumberInputChange(setDropOffCount)} className="w-full text-black" />
+              <Input value={dropOffCountInput} onChange={handleDropOffCountChange} placeholder="送り人数" className="w-full text-black" />
             </div>
             <div className="w-1/2">
               <label className="block text-sm font-semibold mb-1 text-black">迎え人数</label>
               <Input
-                value={String(pickUpCount)}
-                onChange={handleNumberInputChange(setPickUpCount)}
+                value={pickUpCountInput}
+                onChange={handleDropOffCountChange}
+                placeholder="迎え人数"
                 className="w-full text-black"
               />
             </div>
