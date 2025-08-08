@@ -195,7 +195,7 @@ const handlePickUpCountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
               <label className="block text-sm font-semibold mb-1 text-black">迎え人数</label>
               <Input
                 value={pickUpCountInput}
-                onChange={handleDropOffCountChange}
+                onChange={handlePickUpCountChange}
                 placeholder="迎え人数"
                 className="w-full text-black"
               />
