@@ -180,21 +180,25 @@ const DashboardPage: NextPage<DashboardPageProps> = ({ params }) => {
               }} 
               events={events}
               eventClick={handleEventClick}
-              dayCellContent={(arg) => (
-                <div className="relative h-full w-full">
-                  <span className="absolute top-1 left-1 text-sm text-gray-800">
-                    {arg.dayNumberText.replace('日', '')}
-                  </span>
-                  
-                  <button 
-                    onClick={(e) => handleAddEventClick(e, arg)}
-                    className="absolute top-1 right-1 text-black text-xl font-bold hover:opacity-70"
-                    aria-label="予定を追加"
-                  >
-                    +
-                  </button>
-                </div>
-              )}
+dayCellContent={(arg) => (
+  <div className="relative w-full h-full">
+    {/* 左上に日付数字 */}
+    <div
+      className="absolute top-1 left-2 text-sm text-gray-800 pointer-events-none"
+    >
+      {arg.dayNumberText.replace('日', '')}
+    </div>
+
+    {/* 右上に「+」ボタン */}
+    <button
+      onClick={(e) => handleAddEventClick(e, arg)}
+      className="absolute top-1 right-2 text-black text-base font-bold hover:opacity-70 hover:scale-105 transition-transform"
+      aria-label="予定を追加"
+    >
+      +
+    </button>
+  </div>
+)}
             />
           </div>
         </main>
