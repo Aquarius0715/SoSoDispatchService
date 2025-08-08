@@ -73,7 +73,7 @@ CREATE TABLE `event_participants` (
   `event_id`             VARCHAR(36)                        NOT NULL,
   `user_id`              VARCHAR(36)                        NOT NULL,
   `status`               ENUM('registered','cancelled')     NOT NULL DEFAULT 'registered',
-  `type`                 ENUM('participants', 'pick_up', 'drop_off') NOT NULL,
+  `type`                 ENUM('participants', 'go', 'return') NOT NULL,
   `registered_at`        DATETIME(6)                        NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
   PRIMARY KEY (`event_id`,`user_id`),
   INDEX `idx_rp_user` (`user_id`),
