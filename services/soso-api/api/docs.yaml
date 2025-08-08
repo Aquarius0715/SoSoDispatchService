@@ -1,71 +1,99 @@
+# ================================================================
+# SoSo Dispatch Service API (OpenAPI 3.1.0)
+# ---------------------------------------------------------------
+#  - すべての状態変更系エンドポイントは
+#      * X-CSRF-Token ヘッダー
+#      * Authorization: Bearer <JWT>
+#    を要求します（/auth/csrf・/auth/login 等を除く）。
+#  - 日本語コメントを多数挿入し、読みやすさを重視しています。
+#  - コピペして swagger-ui / Redoc 等にそのまま貼り付け可能です。
+# ================================================================
+
 openapi: 3.1.0
 info:
   title: SoSo Dispatch Service API
   description: |
-    Ride-sharing support system “SoSo” – HTTP API  
-    All state-changing endpoints require a CSRF token (header **X-CSRF-Token**)  
-    and a valid JWT Bearer token (except `/auth/login` and `/auth/csrf`).  
-    Responses use camelCase; times are RFC 3339 `date-time`.
+    ライドシェア支援システム **SoSo** の HTTP API 定義  
+    * CSRF トークンは `/auth/csrf` で取得  
+    * JWT アクセストークンは `Authorization` ヘッダーで送信  
+    * タイムスタンプは **RFC 3339** (`date-time`)
   version: 1.0.0
+
 servers:
-  - url: http://localhost:8080
+  - url: http://localhost:8080   # 開発環境
+
+# ------------------------------------------------
+# セキュリティスキーム
+# ------------------------------------------------
 components:
   securitySchemes:
-    bearerAuth:
+    bearerAuth:          # JWT 認証
       type: http
       scheme: bearer
       bearerFormat: JWT
-    csrfToken:
+    csrfToken:           # CSRF トークン
       type: apiKey
       in: header
       name: X-CSRF-Token
+
+  # ------------------------------------------------
+  # 共通ヘッダー (components/parameters)
+  # ------------------------------------------------
+  parameters:
+    AuthorizationHeader:
+      name: Authorization
+      in: header
+      description: |
+        JWT アクセストークン  
+        例: `Bearer eyJhbGciOiJIUzI1NiIsInR…`
+      required: true
+      schema:
+        type: string
+    XCsrfTokenHeader:
+      name: X-CSRF-Token
+      in: header
+      description: |
+        CSRF 保護用トークン  
+        `/auth/csrf` で取得した値を送信
+      required: true
+      schema:
+        type: string
+
+  # ------------------------------------------------
+  # スキーマ定義
+  # ------------------------------------------------
   schemas:
+    # --- 汎用 ---
     Error:
       type: object
       properties:
-        message:
-          type: string
+        message: { type: string }
       required: [message]
+
+    # --- Auth ---
+    LoginRequest:
+      type: object
+      properties:
+        mailAddress: { type: string, format: email }
+        password:    { type: string, minLength: 8 }
+      required: [mailAddress, password]
 
     TokenResponse:
       type: object
       properties:
-        access_token:
-          type: string
-        access_expires_at:
-          type: string
-          format: date-time
+        access_token:      { type: string }
+        access_expires_at: { type: string, format: date-time }
       required: [access_token, access_expires_at]
 
-    LoginRequest:
-      type: object
-      properties:
-        mailAddress:
-          type: string
-          format: email
-        password:
-          type: string
-          minLength: 8
-      required: [mailAddress, password]
-
+    # --- Users ---
     RegisterRequest:
       type: object
       properties:
-        username:
-          type: string
-          minLength: 3
-          maxLength: 30
-        mailAddress:
-          type: string
-          format: email
-        password:
-          type: string
-          minLength: 8
-        hasCar:
-          type: boolean
-        capacity:
-          type: integer
-          minimum: 0
+        username:    { type: string, minLength: 3, maxLength: 30 }
+        mailAddress: { type: string, format: email }
+        password:    { type: string, minLength: 8 }
+        hasCar:      { type: boolean }
+        capacity:    { type: integer, minimum: 0 }
       required: [username, mailAddress, password]
 
     User:
@@ -75,19 +103,17 @@ components:
         username:    { type: string }
         mailAddress: { type: string, format: email }
         hasCar:      { type: boolean }
-        capacity:    { type: integer, minimum: 0 }
+        capacity:    { type: integer }
         createdAt:   { type: string, format: date-time }
         updatedAt:   { type: string, format: date-time }
       required: [id, username, mailAddress, hasCar, capacity]
 
+    # --- Calender ---
     CalenderCreateRequest:
       type: object
       properties:
-        name:
-          type: string
-          minLength: 1
-        description:
-          type: string
+        name:        { type: string, minLength: 1 }
+        description: { type: string }
       required: [name]
 
     Calender:
@@ -102,13 +128,14 @@ components:
     CalenderMember:
       type: object
       properties:
-        id:        { type: string, format: uuid, description: userId }
+        id:        { type: string, format: uuid, description: ユーザーID }
         username:  { type: string }
         hasCar:    { type: boolean }
         capacity:  { type: integer, minimum: 0 }
         sosoPoint: { type: integer, minimum: 0 }
       required: [id, username, hasCar, capacity, sosoPoint]
 
+    # --- Event ---
     EventCreateRequest:
       type: object
       properties:
@@ -123,8 +150,7 @@ components:
         participantUserIds:
           type: array
           items: { type: string, format: uuid }
-      required:
-        [title, startTime, endTime, participantUserIds]
+      required: [title, startTime, endTime, participantUserIds]
 
     Event:
       type: object
@@ -164,23 +190,30 @@ components:
       properties:
         userId:    { type: string, format: uuid }
         username:  { type: string }
-        sosoPoint: { type: integer, minimum: 0 }
+        sosoPoint: { type: integer }
       required: [userId, username, sosoPoint]
 
 tags:
-  - name: Auth
-  - name: Users
-  - name: Calenders
-  - name: Events
+  - name: Auth        # 認証
+  - name: Users       # ユーザー
+  - name: Calenders   # カレンダー
+  - name: Events      # イベント
 
+# ------------------------------------------------
+# パス定義
+# ------------------------------------------------
 paths:
+
+  # ----------------------------
+  # Auth
+  # ----------------------------
   /auth/csrf:
     get:
       tags: [Auth]
-      summary: Get a CSRF token
+      summary: CSRF トークン取得
       responses:
         "200":
-          description: Token issued
+          description: 取得成功
           content:
             application/json:
               schema:
@@ -188,13 +221,14 @@ paths:
                 properties:
                   csrf_token: { type: string }
                 required: [csrf_token]
-        default: { $ref: '#/components/schemas/Error' }
 
   /auth/login:
     post:
       tags: [Auth]
-      summary: Log-in and obtain JWT / refresh cookie
+      summary: ログイン
       security: [{ csrfToken: [] }]
+      parameters:
+        - $ref: '#/components/parameters/XCsrfTokenHeader'
       requestBody:
         required: true
         content:
@@ -202,40 +236,55 @@ paths:
             schema: { $ref: '#/components/schemas/LoginRequest' }
       responses:
         "200":
-          description: Success
+          description: 成功
+          headers:
+            Set-Cookie:
+              schema: { type: string }
+              description: リフレッシュトークン Cookie
           content:
             application/json:
               schema: { $ref: '#/components/schemas/TokenResponse' }
-        "401": { $ref: '#/components/schemas/Error' }
+        "401":
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
 
   /auth/refresh:
     post:
       tags: [Auth]
-      summary: Rotate refresh token & issue new JWT
+      summary: トークンリフレッシュ
       security: [{ csrfToken: [] }]
+      parameters:
+        - $ref: '#/components/parameters/XCsrfTokenHeader'
       responses:
         "200":
           content:
             application/json:
               schema: { $ref: '#/components/schemas/TokenResponse' }
-        "401": { $ref: '#/components/schemas/Error' }
 
   /auth/logout:
     post:
       tags: [Auth]
-      summary: Log-out and revoke refresh token
+      summary: ログアウト
       security:
         - csrfToken: []
         - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/XCsrfTokenHeader'
+        - $ref: '#/components/parameters/AuthorizationHeader'
       responses:
-        "200": { description: Logged out }
-        default: { $ref: '#/components/schemas/Error' }
+        "200": { description: ログアウト完了 }
 
+  # ----------------------------
+  # Users
+  # ----------------------------
   /users/register:
     post:
       tags: [Users]
-      summary: Register a new user
+      summary: ユーザー登録
       security: [{ csrfToken: [] }]
+      parameters:
+        - $ref: '#/components/parameters/XCsrfTokenHeader'
       requestBody:
         required: true
         content:
@@ -243,32 +292,44 @@ paths:
             schema: { $ref: '#/components/schemas/RegisterRequest' }
       responses:
         "201":
+          description: 登録成功
           content:
             application/json:
               schema: { $ref: '#/components/schemas/User' }
-        "409": { $ref: '#/components/schemas/Error' }
+        "409":
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
 
   /users/me:
     get:
       tags: [Users]
-      summary: Get currently authenticated user
+      summary: 自分のユーザー情報取得
       security:
         - csrfToken: []
         - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/XCsrfTokenHeader'
+        - $ref: '#/components/parameters/AuthorizationHeader'
       responses:
         "200":
           content:
             application/json:
               schema: { $ref: '#/components/schemas/User' }
-        default: { $ref: '#/components/schemas/Error' }
 
+  # ----------------------------
+  # Calenders
+  # ----------------------------
   /calenders/create:
     post:
       tags: [Calenders]
-      summary: Create a new calender
+      summary: カレンダー作成
       security:
         - csrfToken: []
         - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/XCsrfTokenHeader'
+        - $ref: '#/components/parameters/AuthorizationHeader'
       requestBody:
         required: true
         content:
@@ -276,21 +337,23 @@ paths:
             schema: { $ref: '#/components/schemas/CalenderCreateRequest' }
       responses:
         "201":
+          description: 作成成功
           content:
             application/json:
               schema: { $ref: '#/components/schemas/Calender' }
-        "409": { $ref: '#/components/schemas/Error' }
 
   /calenders/my:
     get:
       tags: [Calenders]
-      summary: List calenders the user belongs to
+      summary: 自分が所属するカレンダー一覧
       security:
         - csrfToken: []
         - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/XCsrfTokenHeader'
+        - $ref: '#/components/parameters/AuthorizationHeader'
       responses:
         "200":
-          description: List
           content:
             application/json:
               schema:
@@ -300,29 +363,36 @@ paths:
   /calenders/{calender_id}/join:
     post:
       tags: [Calenders]
-      summary: Join a calender
+      summary: カレンダーに参加
       security:
         - csrfToken: []
         - bearerAuth: []
       parameters:
-        - in: path
-          name: calender_id
+        - $ref: '#/components/parameters/XCsrfTokenHeader'
+        - $ref: '#/components/parameters/AuthorizationHeader'
+        - name: calender_id
+          in: path
           required: true
           schema: { type: string, format: uuid }
       responses:
-        "201": { description: Joined }
-        "409": { $ref: '#/components/schemas/Error' }
+        "201": { description: 参加完了 }
+        "409":
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
 
   /calenders/{calender_id}/members:
     get:
       tags: [Calenders]
-      summary: List members of a calender
+      summary: カレンダーメンバー一覧取得
       security:
         - csrfToken: []
         - bearerAuth: []
       parameters:
-        - in: path
-          name: calender_id
+        - $ref: '#/components/parameters/XCsrfTokenHeader'
+        - $ref: '#/components/parameters/AuthorizationHeader'
+        - name: calender_id
+          in: path
           required: true
           schema: { type: string, format: uuid }
       responses:
@@ -336,13 +406,15 @@ paths:
   /calenders/{calender_id}/events:
     post:
       tags: [Events]
-      summary: Create an event in a calender
+      summary: イベント作成
       security:
         - csrfToken: []
         - bearerAuth: []
       parameters:
-        - in: path
-          name: calender_id
+        - $ref: '#/components/parameters/XCsrfTokenHeader'
+        - $ref: '#/components/parameters/AuthorizationHeader'
+        - name: calender_id
+          in: path
           required: true
           schema: { type: string, format: uuid }
       requestBody:
@@ -352,18 +424,22 @@ paths:
             schema: { $ref: '#/components/schemas/EventCreateRequest' }
       responses:
         "201":
+          description: 作成成功
           content:
             application/json:
               schema: { $ref: '#/components/schemas/Event' }
+
     get:
       tags: [Events]
-      summary: List events in a calender
+      summary: カレンダー内イベント一覧
       security:
         - csrfToken: []
         - bearerAuth: []
       parameters:
-        - in: path
-          name: calender_id
+        - $ref: '#/components/parameters/XCsrfTokenHeader'
+        - $ref: '#/components/parameters/AuthorizationHeader'
+        - name: calender_id
+          in: path
           required: true
           schema: { type: string, format: uuid }
       responses:
@@ -374,16 +450,21 @@ paths:
                 type: array
                 items: { $ref: '#/components/schemas/Event' }
 
+  # ----------------------------
+  # Events
+  # ----------------------------
   /events/{event_id}:
     get:
       tags: [Events]
-      summary: Get an event (with participants)
+      summary: イベント取得（参加者ID付き）
       security:
         - csrfToken: []
         - bearerAuth: []
       parameters:
-        - in: path
-          name: event_id
+        - $ref: '#/components/parameters/XCsrfTokenHeader'
+        - $ref: '#/components/parameters/AuthorizationHeader'
+        - name: event_id
+          in: path
           required: true
           schema: { type: string, format: uuid }
       responses:
@@ -391,48 +472,57 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/Event' }
-        "404": { $ref: '#/components/schemas/Error' }
+        "404":
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
 
   /events/{event_id}/pickup:
     post:
       tags: [Events]
-      summary: Register as pick-up driver
+      summary: 迎えドライバー登録
       security:
         - csrfToken: []
         - bearerAuth: []
       parameters:
-        - in: path
-          name: event_id
+        - $ref: '#/components/parameters/XCsrfTokenHeader'
+        - $ref: '#/components/parameters/AuthorizationHeader'
+        - name: event_id
+          in: path
           required: true
           schema: { type: string, format: uuid }
       responses:
-        "201": { description: Registered }
+        "201": { description: 登録完了 }
 
   /events/{event_id}/return:
     post:
       tags: [Events]
-      summary: Register as return driver
+      summary: 送りドライバー登録
       security:
         - csrfToken: []
         - bearerAuth: []
       parameters:
-        - in: path
-          name: event_id
+        - $ref: '#/components/parameters/XCsrfTokenHeader'
+        - $ref: '#/components/parameters/AuthorizationHeader'
+        - name: event_id
+          in: path
           required: true
           schema: { type: string, format: uuid }
       responses:
-        "201": { description: Registered }
+        "201": { description: 登録完了 }
 
   /events/{event_id}/detail:
     get:
       tags: [Events]
-      summary: Detailed event information (remaining seats etc.)
+      summary: イベント詳細（残席数など）
       security:
         - csrfToken: []
         - bearerAuth: []
       parameters:
-        - in: path
-          name: event_id
+        - $ref: '#/components/parameters/XCsrfTokenHeader'
+        - $ref: '#/components/parameters/AuthorizationHeader'
+        - name: event_id
+          in: path
           required: true
           schema: { type: string, format: uuid }
       responses:
@@ -444,13 +534,15 @@ paths:
   /events/{event_id}/members:
     get:
       tags: [Events]
-      summary: List event members with SoSo points
+      summary: イベント参加メンバー一覧（SoSoポイント付き）
       security:
         - csrfToken: []
         - bearerAuth: []
       parameters:
-        - in: path
-          name: event_id
+        - $ref: '#/components/parameters/XCsrfTokenHeader'
+        - $ref: '#/components/parameters/AuthorizationHeader'
+        - name: event_id
+          in: path
           required: true
           schema: { type: string, format: uuid }
       responses:
