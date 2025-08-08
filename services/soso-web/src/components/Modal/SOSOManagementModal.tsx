@@ -5,14 +5,14 @@ import clsx from 'clsx';
 import { Member } from '../MemberList/MenberList';
 import { SOSOTransaction } from '../SOSOList/SOSOList';
 import SOSOEditModal from './SOSOEditModal';
-import { useState, useEffect } from 'react'; // useEffectを追加
+import { useState, useEffect } from 'react';
 
 interface EventProps {
   id: string;
   title: string;
   start: string;
   end: string;
-  extendedProps?: any; // 追加のプロパティを許可
+  extendedProps?: any;
 }
 
 interface Props {
@@ -21,10 +21,17 @@ interface Props {
   isOpen: boolean; 
   onClose: () => void;
   onSave: (data: EventProps) => void;
+  allMembers: Member[];
 }
 
-function SOSOManagementModal({ initialData, className, isOpen, onClose, onSave }: Props) {
-  
+function SOSOManagementModal({ initialData, className, isOpen, onClose, onSave, allMembers }: Props) {
+  // ★★★ useStateとuseEffectを最初に呼び出す ★★★
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedMember, setSelectedMember] = useState<Member | null>(null);
+
+  // 参加メンバーを取得
+  const participatingMembers = initialData.extendedProps?.participatingMembers || [];
+
   useEffect(() => {
     if (isOpen) {
       console.log("🟢 SOSOManagementModalがオープンされました。");
@@ -34,10 +41,8 @@ function SOSOManagementModal({ initialData, className, isOpen, onClose, onSave }
     }
   }, [isOpen, initialData]);
 
+  // ★★★ 早期returnはhooksの後に配置 ★★★
   if (!isOpen) return null;
-
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [selectedMember, setSelectedMember] = useState<Member | null>(null);
 
   const handleEditMember = (member: Member) => {
     console.log("🔵 メンバー編集ボタンが押されました:", member);
@@ -83,8 +88,27 @@ function SOSOManagementModal({ initialData, className, isOpen, onClose, onSave }
         <div className="flex h-[calc(90vh-120px)] overflow-hidden">
           {/* 左側: メンバー一覧 */}
           <div className="flex-1 p-6 border-r border-gray-200 overflow-y-auto">
-            <h2 className="text-xl text-black font-bold mb-4">メンバー一覧</h2>
-            <MemberList members={[]} onEditMember={handleEditMember} />
+            <h2 className="text-xl text-black font-bold mb-4">
+              参加メンバー ({participatingMembers.length}人)
+            </h2>
+            {/* 参加メンバーを表示 */}
+            <div className="mb-6">
+              <MemberList 
+                members={participatingMembers} 
+                onEditMember={handleEditMember} 
+              />
+            </div>
+
+            {/* 全メンバーリストも表示する場合 */}
+            <h3 className="text-lg text-gray-600 font-semibold mb-2">
+              全メンバー ({allMembers.length}人)
+            </h3>
+            <div>
+              <MemberList 
+                members={allMembers} 
+                onEditMember={handleEditMember} 
+              />
+            </div>
           </div>
 
           {/* 右側: トランザクション履歴 */}
