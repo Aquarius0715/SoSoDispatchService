@@ -39,6 +39,9 @@ function SOSOManagementModal({ initialData, className, isOpen, onClose, onSave, 
   }, [isOpen, initialData]);
 
   if (!isOpen) return null;
+  // ★★★ ログの確認 ★★★
+  const eventLogs = initialData.extendedProps?.eventLogs || [];
+  console.log("🟡 現在のイベントログ:", eventLogs);
 
   // メンバー編集を親コンポーネント（page.tsx）に委譲
   const handleEditMember = (member: Member) => {

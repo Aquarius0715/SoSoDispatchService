@@ -82,6 +82,7 @@ const DashboardPage: NextPage<DashboardPageProps> = ({ params }) => {
   const [isSOSOEditModalOpen, setIsSOSOEditModalOpen] = useState(false);
   const [selectedMemberForEdit, setSelectedMemberForEdit] = useState<Member | null>(null);
   const [eventLogs, setEventLogs] = useState<{[eventId: string]: SOSOTransaction[]}>({});
+  const [editSource, setEditSource] = useState<'sidebar' | 'management' | null>(null);
 
 
   // --- ▼▼▼ useEffect ▼▼▼ ---
@@ -153,10 +154,11 @@ const DashboardPage: NextPage<DashboardPageProps> = ({ params }) => {
       if (eventData.extendedProps?.action === 'editMember') {
         const memberToEdit = eventData.extendedProps.editMember;
         console.log('🔵 メンバー編集要求:', memberToEdit);
+        // 編集元を記録
+        setEditSource('management');
         
         // 管理モーダルを閉じる
         setIsManagementModalOpen(false);
-        setSelectedManagementEvent(null);
         
         // メンバー編集モーダルを開く
         setSelectedMemberForEdit(memberToEdit);
@@ -167,70 +169,88 @@ const DashboardPage: NextPage<DashboardPageProps> = ({ params }) => {
 
       // 通常の保存処理
       setIsManagementModalOpen(false);
+      setSelectedManagementEvent(null); // ここでのみnullにする
     };
 
-    // ★★★ 統合された handleSaveSosoChange 関数 ★★★
-    const handleSaveSosoChange = (editedData: EditedMemberData): void => {
-      console.log("🔵 handleSaveSosoChangeが実行されました。");
-      
-      // メンバー情報を更新
-      setMembers(currentMembers =>
-        currentMembers.map(member =>
-          member.id === editedData.id 
-            ? { ...member, sosoPoint: editedData.sosoPoint } 
-            : member
-        )
-      );
-      
-      // selectedMemberForEditから前の値を取得
-      if (selectedMemberForEdit) {
-        const pointChange = editedData.sosoPoint - selectedMemberForEdit.sosoPoint;
-        if (pointChange !== 0) {
-          const newLog: SOSOTransaction = {
-            id: Date.now(),
-            eventName: selectedManagementEvent?.title || '手動調整',
-            dateTime: new Date().toISOString(),
-            changer: '管理者',
-            changee: editedData.username,
-            sosoPoints: pointChange,
-            reason: editedData.reason || '（理由の記載なし）',
-          };
+    // page.tsx のhandleSaveSosoChange関数を修正
+const handleSaveSosoChange = (editedData: EditedMemberData): void => {
+  console.log("🔵 handleSaveSosoChangeが実行されました。");
+  
+  // メンバー情報を更新
+  setMembers(currentMembers =>
+    currentMembers.map(member =>
+      member.id === editedData.id 
+        ? { ...member, sosoPoint: editedData.sosoPoint } 
+        : member
+    )
+  );
+  
+  // selectedMemberForEditから前の値を取得
+  if (selectedMemberForEdit && selectedManagementEvent) {
+    const pointChange = editedData.sosoPoint - selectedMemberForEdit.sosoPoint;
+    if (pointChange !== 0) {
+      const newLog: SOSOTransaction = {
+        id: Date.now(),
+        eventName: selectedManagementEvent.title,
+        dateTime: new Date().toISOString(),
+        changer: '管理者',
+        changee: editedData.username,
+        sosoPoints: pointChange,
+        reason: editedData.reason || '（理由の記載なし）',
+      };
       
       // 全体のログに追加
       setLogs(prevLogs => [newLog, ...prevLogs]);
       
+      // ★★★ 新しいeventLogsを即座に計算 ★★★
+      const updatedEventLogs = [
+        newLog,
+        ...(eventLogs[selectedManagementEvent.id] || [])
+      ];
+      
       // イベント固有のログに追加
-      if (selectedManagementEvent) {
-        setEventLogs(prevEventLogs => ({
-          ...prevEventLogs,
-          [selectedManagementEvent.id]: [
-            newLog,
-            ...(prevEventLogs[selectedManagementEvent.id] || [])
-          ]
-        }));
-      }
-          
-          console.log('🔵 新しいトランザクションが追加されました:', newLog);
-        }
-      }
+      setEventLogs(prevEventLogs => ({
+        ...prevEventLogs,
+        [selectedManagementEvent.id]: updatedEventLogs
+      }));
       
-      // モーダルを閉じて状態をリセット
-      setIsSOSOEditModalOpen(false);
-      setSelectedMemberForEdit(null);
-      
-      // 管理モーダルを再度開く（SOSOManagementModalから呼ばれた場合）
-      if (selectedManagementEvent) {
-          const updatedEvent = {
-            ...selectedManagementEvent,
-            extendedProps: {
-              ...selectedManagementEvent.extendedProps,
-              eventLogs: eventLogs[selectedManagementEvent.id] || []
-            }
-          };
-          setSelectedManagementEvent(updatedEvent);
-          setIsManagementModalOpen(true);
+      // ★★★ 管理モーダルを即座に更新された履歴で再表示 ★★★
+      const updatedEvent = {
+        ...selectedManagementEvent,
+        extendedProps: {
+          ...selectedManagementEvent.extendedProps,
+          eventLogs: updatedEventLogs // 新しく計算したログを使用
         }
-    };
+      };
+      
+      console.log('🔵 更新されたイベントログ:', updatedEventLogs);
+      console.log('🔵 更新されたイベント:', updatedEvent);
+      
+      // selectedManagementEventを更新
+      setSelectedManagementEvent(updatedEvent);
+      
+      console.log('🔵 新しいトランザクションが追加されました:', newLog);
+    }
+  }
+  
+  // モーダルを閉じて状態をリセット
+  setIsSOSOEditModalOpen(false);
+  setSelectedMemberForEdit(null);
+  
+    // 編集元に応じて処理を分岐
+  if (editSource === 'management') {
+    console.log('🔵 SOSOManagementModalに戻ります');
+    console.log('🔵 selectedManagementEvent:', selectedManagementEvent);
+    
+    // SOSOManagementModalに戻る
+    setTimeout(() => {
+      setIsManagementModalOpen(true);
+    }, 100);
+  }
+  // editSource === 'sidebar' の場合は何もしない（メインページに戻る）
+  
+  setEditSource(null);
+};
 
     // handleEventClick関数も修正してイベントログを含める
     const handleEventClick = (clickInfo: any) => {
@@ -293,6 +313,7 @@ const DashboardPage: NextPage<DashboardPageProps> = ({ params }) => {
 
     const handleEditMember = (member: Member) => {
       console.log("🔵 メンバー編集がクリックされました:", member);
+      setEditSource('sidebar');
       setSelectedMemberForEdit(member);
       setIsSOSOEditModalOpen(true);
     };
@@ -303,13 +324,6 @@ const DashboardPage: NextPage<DashboardPageProps> = ({ params }) => {
       setSelectedMemberForEdit(null);
     };
 
-    // ★★★ 2番目の handleSaveSosoChange 関数を削除 ★★★
-    // この部分を完全に削除してください
-    /*
-    const handleSaveSosoChange = (editedData: EditedMemberData): void => {
-      // この関数は削除
-    };
-    */
       console.log('🟢 DashboardPageがレンダリングされました。'); 
       console.log('🟢 isManagementModalOpen:', isManagementModalOpen);
       console.log('🟢 selectedManagementEvent:', selectedManagementEvent);
@@ -369,7 +383,11 @@ const DashboardPage: NextPage<DashboardPageProps> = ({ params }) => {
       {selectedManagementEvent && (
         <SOSOManagementModal
           isOpen={isManagementModalOpen}
-          onClose={() => setIsManagementModalOpen(false)}
+          onClose={() => {
+            console.log('🔴 SOSOManagementModalを閉じます');
+            setIsManagementModalOpen(false);
+            setSelectedManagementEvent(null); // ここでのみnullにする
+          }}
           initialData={selectedManagementEvent}
           onSave={handleSaveManagement}
           allMembers={members}
