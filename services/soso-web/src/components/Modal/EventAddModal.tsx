@@ -134,6 +134,7 @@ const EventAddModal: React.FC<EventAddModalProps> = ({
       members: selectedMembers,
     };
     onSave(eventStatus);
+    onClose();
   };
 
   if (!isOpen) return null;

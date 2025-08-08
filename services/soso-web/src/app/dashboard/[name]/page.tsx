@@ -35,6 +35,7 @@ interface DashboardPageProps {
 
 // EventStatus型をインポート（または再定義）
 interface EventStatus {
+  date: string;
   title: string;
   details: string;
   dropOffTime: string;
@@ -75,6 +76,7 @@ const DashboardPage: NextPage<DashboardPageProps> = ({ params }) => {
 
   // ▼ 新規イベント追加時の初期ステータス
   const initialEventStatus: EventStatus = {
+    date: '',
     title: '',
     details: '',
     dropOffTime: '',
@@ -86,18 +88,45 @@ const DashboardPage: NextPage<DashboardPageProps> = ({ params }) => {
     members: []
   };
 
-  // ▼ 新規イベント保存時の処理
-  const handleSaveNewEvent = (eventData: any) => {
-    const newEvent: EventInput = {
-      id: Date.now().toString(),
-      title: eventData.title,
-      start: eventData.start,
-      end: eventData.end,
-      // 他の必要なプロパティがあれば追加
-    };
-    setEvents(prevEvents => [...prevEvents, newEvent]);
-    setIsAddModalOpen(false);
+  // page.tsx
+// ▼ 新規イベント保存時の処理
+const handleSaveNewEvent = (eventData: EventStatus) => {
+  // 開始時刻と終了時刻を作成（送り時刻を使用）
+  const startDateTime = eventData.dropOffTime 
+    ? `${eventData.date}T${eventData.dropOffTime}:00`
+    : `${eventData.date}T09:00:00`; // デフォルト時刻
+  
+  const endDateTime = eventData.pickUpTime 
+    ? `${eventData.date}T${eventData.pickUpTime}:00`
+    : `${eventData.date}T10:00:00`; // デフォルト時刻（1時間後）
+
+  // 新しいイベントを作成
+  const newEvent: EventInput = {
+    id: Date.now().toString(),
+    title: eventData.title,
+    start: startDateTime,
+    end: endDateTime,
+    // カスタムプロパティも追加可能
+    extendedProps: {
+      details: eventData.details,
+      dropOffTime: eventData.dropOffTime,
+      pickUpTime: eventData.pickUpTime,
+      dropOffCount: eventData.dropOffCount,
+      pickUpCount: eventData.pickUpCount,
+      departurePoint: eventData.departurePoint,
+      destinationPoint: eventData.destinationPoint,
+      members: eventData.members,
+    }
   };
+
+  // eventsステートに新しいイベントを追加
+  setEvents(prevEvents => [...prevEvents, newEvent]);
+  
+  // モーダルを閉じる
+  setIsAddModalOpen(false);
+  
+  console.log('新しいイベントが追加されました:', newEvent);
+};
 
 
   // ▼ イベントクリック時の処理
@@ -214,6 +243,7 @@ const handleAddEventClick = (e: React.MouseEvent, arg: any) => {
                 right: 'dayGridMonth,dayGridWeek'
               }}
               events={events}
+              eventClick={handleEventClick}
               dayCellContent={(arg) => (
               <div className="relative h-full w-full">
                 <span className="absolute top-1 right-20 text-sm text-gray-800">
