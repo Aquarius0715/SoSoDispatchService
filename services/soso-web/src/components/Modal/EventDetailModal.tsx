@@ -46,82 +46,91 @@ const EventDetailModal: React.FC<ModalProps> = ({ eventDetails, onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center">
-      <div className="bg-white p-6 rounded-lg w-full max-w-md shadow-lg">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl text-black font-bold">イベント詳細</h2>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-700 text-2xl">
-            &times;
-          </button>
+    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center p-4">
+      <div className="bg-white p-6 rounded-lg w-full max-w-md shadow-lg border border-gray-300 max-h-screen overflow-y-auto">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-xl text-zinc-600 font-bold">イベント詳細</h2>
+          <div className="flex items-center space-x-2">
+            <Button className="bg-gray-700 text-white px-4 py-2 rounded text-sm">編集</Button>
+            <button onClick={onClose} className="text-zinc-600 hover:text-gray-700 text-2xl font-light">
+              &times;
+            </button>
+          </div>
         </div>
-        <div className="flex justify-between   text-black  items-center mb-6">
-          <Button>イベント共有</Button>
-          <Button>編集</Button>
+        <div className="flex justify-between items-center mb-6">
+          <Button className="bg-gray-700 text-white px-4 py-2 rounded w-full">イベント共有</Button>
         </div>
 
-        <div className="text-black mb-6">
-          <h3 className="font-bold text-lg mb-2">{eventDetails.EventTitle}</h3>
+        <div className="bg-gray-100 p-4 rounded-lg mb-4 text-zinc-600">
+          <h3 className="font-normal font-['Inter'] text-black text-lg mb-2">{eventDetails.EventTitle}</h3>
           <p>日付: {eventDetails.EventDate}</p>
           <p>時刻: {eventDetails.EventTime}</p>
           <p>詳細: {eventDetails.EventDetail}</p>
         </div>
 
-        <div className="text-black mb-6">
-          <h3 className="font-bold text-lg mb-2">参加者</h3>
-          <p>{eventDetails.member.join(', ')}</p>
+        <div className="bg-gray-100 p-4 rounded-lg mb-4 text-zinc-600">
+          <h3 className="font-normal font-['Inter'] text-black text-lg mb-2">参加者</h3>
+          <p>{eventDetails.member.join('・')}</p>
         </div>
 
-        <div className="text-black mb-6">
-          <h3 className="font-bold text-lg mb-2">送迎</h3>
-          <div className="flex justify-between space-x-4 mb-2">
-            <div className="bg-gray-100 p-4 rounded-lg flex-1">
-              <p className="font-bold">送り</p>
-              <p>残り: {dropOffRemaining}人</p>
-            </div>
-            <div className="bg-gray-100 p-4 rounded-lg flex-1">
-              <p className="font-bold">迎え</p>
-              <p>残り: {pickUpRemaining}人</p>
-            </div>
+        <div className="flex justify-between space-x-4 mb-4 text-zinc-600">
+          <div className="bg-gray-100 p-4 rounded-lg flex-1">
+            <h3 className="font-normal font-['Inter'] text-black text-lg mb-2">送り</h3>
+            <p className="mb-3">合計: {eventDetails.DropOffNumber}人</p>
+            <p>残り: {dropOffRemaining}人</p>
           </div>
-          <p>{eventDetails.departurePoint} =&gt; {eventDetails.destination}</p>
+          <div className="bg-gray-100 p-4 rounded-lg flex-1">
+            <h3 className="font-normal font-['Inter'] text-black text-lg mb-2">迎え</h3>
+            <p className="mb-3">合計: {eventDetails.PickUpNumber}人</p>
+            <p >残り: {pickUpRemaining}人</p>
+          </div>
         </div>
 
-        <div className="text-black mb-6">
-          <h3 className="font-bold text-lg mb-2">配車登録済み</h3>
+        <div className="bg-gray-100 p-4 rounded-lg mb-4 text-zinc-600">
+          <h3 className="font-normal font-['Inter'] text-black text-lg mb-2">会場</h3>
+          <p>{eventDetails.departurePoint} → {eventDetails.destination}</p>
+          <p>会場URL: {eventDetails.EventURL}</p>
+        </div>
+
+        <div className="bg-gray-100 p-4 rounded-lg mb-4 text-zinc-600">
+          <h3 className="font-normal font-['Inter'] text-black text-lg mb-2">配車登録済み</h3>
           {registered.map((item, index) => (
             <p key={index}>{item}</p>
           ))}
         </div>
 
-        <div>
-          <h3 className="text-black font-bold text-lg mb-2">配車登録</h3>
-          <p className="text-sm text-black mb-2">乗車可能人数</p>
-          <Input
-            className="w-full mb-4 text-black "
-            type="number"
-            value={seatsRequired}
-            onChange={(e) => {
-            const value = e.target.value;
-            // ここでバリデーション
-            if (value === '' || !isNaN(Number(value))) {
-                setSeatsRequired(value === '' ? '' : Number(value));
-            }
-            }}
-          />
+        <div className="text-zinc-600">
+          <h3 className="font-normal font-['Inter'] text-black text-lg mb-2">配車登録</h3>
+          <div className="flex items-center mb-4">
+            <p className="text-sm mr-2">乗車可能人数</p>
+            <Input
+              className="w-1/4 mr-2"
+              type="number"
+              value={seatsRequired}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (value === '' || (!isNaN(Number(value)) && Number(value) >= 0)) {
+                  setSeatsRequired(value === '' ? '' : Number(value));
+                }
+              }}
+            />
+            <span className="text-sm">人</span>
+          </div>
           <div className="flex space-x-4">
             <Button
-              className="bg-blue-500 hover:bg-blue-600 flex-1"
-              onClick={() => handleRegister('dropOff')}
-              disabled={typeof seatsRequired !== 'number' || seatsRequired <= 0}
-            >
-              送り登録
-            </Button>
-            <Button
-              className="bg-green-500 hover:bg-green-600 flex-1"
+              className="bg-gray-700 px-0 py-4 hover:bg-gray-600 flex-1 text-white"
               onClick={() => handleRegister('pickUp')}
               disabled={typeof seatsRequired !== 'number' || seatsRequired <= 0}
             >
               迎え登録
+            </Button>
+            <Button
+              className="bg-gray-700 px-0 py-4 hover:bg-gray-600 flex-1 text-white"
+              onClick={() => handleRegister('dropOff')}
+              disabled={typeof seatsRequired !== 'number' || seatsRequired <= 0}
+
+            >
+              送り登録
             </Button>
           </div>
         </div>
@@ -131,17 +140,3 @@ const EventDetailModal: React.FC<ModalProps> = ({ eventDetails, onClose }) => {
 };
 
 export default EventDetailModal;
-
-//親コンポーネントで呼び出すデータの例
-// const eventData = {
-//     EventTitle: '新歓コンパ',
-//     EventDate: '2024年4月15日',
-//     EventTime: '18:00',
-//     EventDetail: '新入生歓迎コンパを開催します',
-//     member: ['田中太郎', '佐藤花子', '山田次郎', '鈴木三郎'],
-//     DropOffNumber: 2,
-//     PickUpNumber: 3,
-//     departurePoint: '大学',
-//     destination: '居酒屋〇〇',
-//     dispatchRegistered: ['山田次郎 (送り: 2人)'],
-//   };
