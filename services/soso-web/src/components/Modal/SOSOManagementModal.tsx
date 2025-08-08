@@ -25,7 +25,6 @@ interface Props {
 
 function SOSOManagementModal({ initialData, className, isOpen, onClose, onSave }: Props) {
   
-  // モーダルが開かれた/閉じられたことを追跡
   useEffect(() => {
     if (isOpen) {
       console.log("🟢 SOSOManagementModalがオープンされました。");
@@ -35,20 +34,10 @@ function SOSOManagementModal({ initialData, className, isOpen, onClose, onSave }
     }
   }, [isOpen, initialData]);
 
-  if (! isOpen) return null; // モーダルが開いていない場合は何も表示しない
+  if (!isOpen) return null;
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
-
-  // isEditModalOpenの状態変化を追跡
-  useEffect(() => {
-    console.log(`🟡 SOSOEditModalの状態が変更されました: ${isEditModalOpen}`);
-  }, [isEditModalOpen]);
-  
-  // selectedMemberの状態変化を追跡
-  useEffect(() => {
-    console.log(`🟡 選択されたメンバーが変更されました:`, selectedMember);
-  }, [selectedMember]);
 
   const handleEditMember = (member: Member) => {
     console.log("🔵 メンバー編集ボタンが押されました:", member);
@@ -64,23 +53,49 @@ function SOSOManagementModal({ initialData, className, isOpen, onClose, onSave }
 
   const handleSaveEditedMember = (editedData: Member & { reason: string }) => {
     console.log('🔵 メンバー編集を保存:', editedData);
-    // ここにメンバーリストを更新するロジックを実装
-    console.log('保存:', editedData);
     handleCloseEditModal();
   };
 
   return (
-    <div className={clsx('fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center', className)}>
-      <div className={clsx('bg-white p-6 rounded-lg shadow-xl w-96 flex')}>
-        <div className='flex-1 pr-4'>
-          <h2 className='text-xl text-black font-bold mb-4'>メンバー一覧</h2>
-            <MemberList members={[]} onEditMember={handleEditMember} />
+    <div 
+      className={clsx('fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center z-50', className)}
+      onClick={onClose}
+    >
+      <div 
+        className="bg-white rounded-lg shadow-xl w-11/12 max-w-6xl max-h-[90vh] overflow-hidden relative"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* ヘッダー部分 */}
+        <div className="flex justify-between items-center p-6 border-b border-gray-200">
+          <h1 className="text-2xl font-bold text-black">
+            イベント管理: {initialData.title}
+          </h1>
+          <button 
+            onClick={onClose}
+            className="text-gray-500 hover:text-gray-800 text-3xl font-bold leading-none p-2"
+            aria-label="閉じる"
+          >
+            ×
+          </button>
         </div>
-        <div className='flex-1 pl-4'>
-          <h2 className='text-xl text-black font-bold mb-4'>トランザクション履歴</h2>
-          <SOSOList  logs={[]} /> 
+
+        {/* メイン部分 */}
+        <div className="flex h-[calc(90vh-120px)] overflow-hidden">
+          {/* 左側: メンバー一覧 */}
+          <div className="flex-1 p-6 border-r border-gray-200 overflow-y-auto">
+            <h2 className="text-xl text-black font-bold mb-4">メンバー一覧</h2>
+            <MemberList members={[]} onEditMember={handleEditMember} />
+          </div>
+
+          {/* 右側: トランザクション履歴 */}
+          <div className="flex-1 p-6 overflow-y-auto">
+            <h2 className="text-xl text-black font-bold mb-4">トランザクション履歴</h2>
+            <SOSOList logs={[]} />
+          </div>
         </div>
       </div>
+
+      {/* 編集モーダル */}
       {selectedMember && (
         <SOSOEditModal
           isOpen={isEditModalOpen}
