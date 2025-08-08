@@ -14,8 +14,9 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import EventAddModal from '@/src/components/Modal/EventAddModal';
-import SOSOEditModal from '@/src/components/Modal/SOSOEditModal';
 import jaLocale from '@fullcalendar/core/locales/ja';
+import SOSOManagementModal from '@/src/components/Modal/SOSOManagementModal';
+import SOSOEditModal from '@/src/components/Modal/SOSOEditModal';
 
 // サイドバーで必要となるデータの型をインポート
 import { Member } from '@/src/components/MemberList/MenberList';
@@ -47,14 +48,47 @@ interface EventStatus {
   members: string[];
 }
 
+interface EventProps {
+  id: string;
+  title: string;
+  start: string;
+  end: string;
+  extendedProps?: any;
+}
+
 // ページ本体のコンポーネント
 const DashboardPage: NextPage<DashboardPageProps> = ({ params }) => {
   const router = useRouter();
+  
+  // --- ▼▼▼ すべてのState管理をここにまとめる ▼▼▼ ---
   const [name, setName] = useState<string>('');
   const [decodedTitle, setDecodedTitle] = useState<string>('');
+  const [isManagementModalOpen, setIsManagementModalOpen] = useState(false);
+  const [selectedManagementEvent, setSelectedManagementEvent] = useState<EventProps | null>(null);
+  const [events, setEvents] = useState<EventInput[]>([
+    { id: '1', title: 'チームミーティング', start: '2025-08-11T10:30:00', end: '2025-08-11T12:00:00' },
+  ]);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<string>('');
+  const [members, setMembers] = useState<Member[]>([
+    { id: 1, username: '佐藤 健太', hasCar: true, seatsRequired: 4, sosoPoint: 150 },
+    { id: 2, username: '鈴木 陽子', hasCar: false, sosoPoint: 50 },
+    { id: 3, username: '高橋 一郎', hasCar: false, sosoPoint: 80 },
+    { id: 4, username: '伊藤 花子', hasCar: true, seatsRequired: 6, sosoPoint: 200 },
+  ]);
+  const [logs, setLogs] = useState<SOSOTransaction[]>([]);
+  const [isSosoModalOpen, setIsSosoModalOpen] = useState(false);
+  const [selectedMember, setSelectedMember] = useState<Member | null>(null);
+  const [isSOSOEditModalOpen, setIsSOSOEditModalOpen] = useState(false);
+  const [selectedMemberForEdit, setSelectedMemberForEdit] = useState<Member | null>(null);
+  const [eventLogs, setEventLogs] = useState<{[eventId: string]: SOSOTransaction[]}>({});
+  const [editSource, setEditSource] = useState<'sidebar' | 'management' | null>(null);
 
+
+  // --- ▼▼▼ useEffect ▼▼▼ ---
   // paramsを非同期で処理
   useEffect(() => {
+    console.log("🟡 useEffect: paramsが変更されました。");
     const resolveParams = async () => {
       const resolvedParams = await params;
       setName(resolvedParams.name);
@@ -63,18 +97,7 @@ const DashboardPage: NextPage<DashboardPageProps> = ({ params }) => {
     resolveParams();
   }, [params]);
 
-  const [events, setEvents] = useState<EventInput[]>([
-    { id: '1', title: 'チームミーティング', start: '2025-08-11T10:30:00', end: '2025-08-11T12:00:00' },
-  ]);
-
-  // ▼ モーダル管理用のState（例）
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [selectedEvent, setSelectedEvent] = useState<EventInput | null>(null);
-  const [selectedDate, setSelectedDate] = useState<string>('');
-
-  // ▼ 新規イベント追加時の初期ステータス
+  // --- ▼▼▼ 定数定義 ▼▼▼ ---
   const initialEventStatus: EventStatus = {
     date: '',
     title: '',
@@ -88,138 +111,222 @@ const DashboardPage: NextPage<DashboardPageProps> = ({ params }) => {
     members: []
   };
 
-  // page.tsx
-// ▼ 新規イベント保存時の処理
-const handleSaveNewEvent = (eventData: EventStatus) => {
-  // 開始時刻と終了時刻を作成（送り時刻を使用）
-  const startDateTime = eventData.dropOffTime 
-    ? `${eventData.date}T${eventData.dropOffTime}:00`
-    : `${eventData.date}T09:00:00`; // デフォルト時刻
-  
-  const endDateTime = eventData.pickUpTime 
-    ? `${eventData.date}T${eventData.pickUpTime}:00`
-    : `${eventData.date}T10:00:00`; // デフォルト時刻（1時間後）
+  // page.tsx - 重複している handleSaveSosoChange 関数を1つにまとめる
 
-  // 新しいイベントを作成
-  const newEvent: EventInput = {
-    id: Date.now().toString(),
-    title: eventData.title,
-    start: startDateTime,
-    end: endDateTime,
-    // カスタムプロパティも追加可能
-    extendedProps: {
-      details: eventData.details,
-      dropOffTime: eventData.dropOffTime,
-      pickUpTime: eventData.pickUpTime,
-      dropOffCount: eventData.dropOffCount,
-      pickUpCount: eventData.pickUpCount,
-      departurePoint: eventData.departurePoint,
-      destinationPoint: eventData.destinationPoint,
-      members: eventData.members,
+    // --- ▼▼▼ ハンドラ関数 ▼▼▼ ---
+    const handleSaveNewEvent = (eventData: EventStatus) => {
+      console.log("🔵 handleSaveNewEventが実行されました。");
+      const startDateTime = eventData.dropOffTime 
+        ? `${eventData.date}T${eventData.dropOffTime}:00`
+        : `${eventData.date}T09:00:00`;
+      
+      const endDateTime = eventData.pickUpTime 
+        ? `${eventData.date}T${eventData.pickUpTime}:00`
+        : `${eventData.date}T10:00:00`;
+
+      const newEvent: EventInput = {
+        id: Date.now().toString(),
+        title: eventData.title,
+        start: startDateTime,
+        end: endDateTime,
+        extendedProps: {
+          details: eventData.details,
+          dropOffTime: eventData.dropOffTime,
+          pickUpTime: eventData.pickUpTime,
+          dropOffCount: eventData.dropOffCount,
+          pickUpCount: eventData.pickUpCount,
+          departurePoint: eventData.departurePoint,
+          destinationPoint: eventData.destinationPoint,
+          members: eventData.members,
+        }
+      };
+
+      setEvents(prevEvents => [...prevEvents, newEvent]);
+      setIsAddModalOpen(false);
+      console.log('🔵 新しいイベントが追加されました:', newEvent);
+    };
+
+    const handleSaveManagement = (eventData: any) => {
+      console.log("🔵 handleSaveManagementが実行されました。");
+      console.log('🔵 Management data saved:', eventData);
+      
+      // メンバー編集アクションの場合
+      if (eventData.extendedProps?.action === 'editMember') {
+        const memberToEdit = eventData.extendedProps.editMember;
+        console.log('🔵 メンバー編集要求:', memberToEdit);
+        // 編集元を記録
+        setEditSource('management');
+        
+        // 管理モーダルを閉じる
+        setIsManagementModalOpen(false);
+        
+        // メンバー編集モーダルを開く
+        setSelectedMemberForEdit(memberToEdit);
+        setIsSOSOEditModalOpen(true);
+        
+        return;
+      }
+
+      // 通常の保存処理
+      setIsManagementModalOpen(false);
+      setSelectedManagementEvent(null); // ここでのみnullにする
+    };
+
+    // page.tsx のhandleSaveSosoChange関数を修正
+const handleSaveSosoChange = (editedData: EditedMemberData): void => {
+  console.log("🔵 handleSaveSosoChangeが実行されました。");
+  
+  // メンバー情報を更新
+  setMembers(currentMembers =>
+    currentMembers.map(member =>
+      member.id === editedData.id 
+        ? { ...member, sosoPoint: editedData.sosoPoint } 
+        : member
+    )
+  );
+  
+  // selectedMemberForEditから前の値を取得
+  if (selectedMemberForEdit && selectedManagementEvent) {
+    const pointChange = editedData.sosoPoint - selectedMemberForEdit.sosoPoint;
+    if (pointChange !== 0) {
+      const newLog: SOSOTransaction = {
+        id: Date.now(),
+        eventName: selectedManagementEvent.title,
+        dateTime: new Date().toISOString(),
+        changer: '管理者',
+        changee: editedData.username,
+        sosoPoints: pointChange,
+        reason: editedData.reason || '（理由の記載なし）',
+      };
+      
+      // 全体のログに追加
+      setLogs(prevLogs => [newLog, ...prevLogs]);
+      
+      // ★★★ 新しいeventLogsを即座に計算 ★★★
+      const updatedEventLogs = [
+        newLog,
+        ...(eventLogs[selectedManagementEvent.id] || [])
+      ];
+      
+      // イベント固有のログに追加
+      setEventLogs(prevEventLogs => ({
+        ...prevEventLogs,
+        [selectedManagementEvent.id]: updatedEventLogs
+      }));
+      
+      // ★★★ 管理モーダルを即座に更新された履歴で再表示 ★★★
+      const updatedEvent = {
+        ...selectedManagementEvent,
+        extendedProps: {
+          ...selectedManagementEvent.extendedProps,
+          eventLogs: updatedEventLogs // 新しく計算したログを使用
+        }
+      };
+      
+      console.log('🔵 更新されたイベントログ:', updatedEventLogs);
+      console.log('🔵 更新されたイベント:', updatedEvent);
+      
+      // selectedManagementEventを更新
+      setSelectedManagementEvent(updatedEvent);
+      
+      console.log('🔵 新しいトランザクションが追加されました:', newLog);
     }
-  };
-
-  // eventsステートに新しいイベントを追加
-  setEvents(prevEvents => [...prevEvents, newEvent]);
+  }
   
-  // モーダルを閉じる
-  setIsAddModalOpen(false);
+  // モーダルを閉じて状態をリセット
+  setIsSOSOEditModalOpen(false);
+  setSelectedMemberForEdit(null);
   
-  console.log('新しいイベントが追加されました:', newEvent);
+    // 編集元に応じて処理を分岐
+  if (editSource === 'management') {
+    console.log('🔵 SOSOManagementModalに戻ります');
+    console.log('🔵 selectedManagementEvent:', selectedManagementEvent);
+    
+    // SOSOManagementModalに戻る
+    setTimeout(() => {
+      setIsManagementModalOpen(true);
+    }, 100);
+  }
+  // editSource === 'sidebar' の場合は何もしない（メインページに戻る）
+  
+  setEditSource(null);
 };
 
-
-  // ▼ イベントクリック時の処理
-  const handleEventClick = (clickInfo: any) => {
-    // クリックされたイベントの情報をStateに保存
-    setSelectedEvent({
-      id: clickInfo.event.id,
-      title: clickInfo.event.title,
-      start: clickInfo.event.startStr,
-      end: clickInfo.event.endStr,
-    });
-    // 編集モーダルを開く
-    setIsEditModalOpen(true);
-  };
-
-// ▼ プラスボタンクリック時の処理
-const handleAddEventClick = (e: React.MouseEvent, arg: any) => {
-  // 親要素のdateClickイベントが発火するのを防ぐ
-  e.stopPropagation();
-
-    // arg.dateを直接変更せず、新しいDateオブジェクトを作成して操作する
-  const tempDate = new Date(arg.date); // 新しいDateオブジェクトを作成
-  tempDate.setDate(tempDate.getDate() + 1);
-  const clickedDate = tempDate.toISOString().split('T')[0];
-  console.log('clickedDate:', clickedDate); // これを追加
-
-    // 選択された日付をStateに保存
-
-  setSelectedDate(clickedDate);
-  // console.log('arg.dateオブジェクト:', arg.date); // これを追加
-  // console.log('arg.dateのtoString():', arg.date.toString()); // ローカルタイム表示
-  // console.log('arg.dateのtoISOString():', arg.date.toISOString()); // UTC表示
-
-    // 新規追加モーダルを開く
-    setIsAddModalOpen(true);
-  };
-
-  // --- ▼▼▼ State管理 ▼▼▼ ---
-
-  const [members, setMembers] = useState<Member[]>([
-    { id: 1, username: '佐藤 健太', hasCar: true, seatsRequired: 4, sosoPoint: 150 },
-    { id: 2, username: '鈴木 陽子', hasCar: false, sosoPoint: 50 },
-    { id: 3, username: '高橋 一郎', hasCar: false, sosoPoint: 80 },
-    { id: 4, username: '伊藤 花子', hasCar: true, seatsRequired: 6, sosoPoint: 200 },
-  ]);
-  const [logs, setLogs] = useState<SOSOTransaction[]>([]);
-  const [isSosoModalOpen, setIsSosoModalOpen] = useState(false);
-  const [selectedMember, setSelectedMember] = useState<Member | null>(null);
-
-  // --- ▼▼▼ ハンドラ関数 ▼▼▼ ---
-
-  const handleLogout = () => {
-    router.push('/');
-    alert('ログアウトしました');
-  };
-
-  const handleLogoClick = () => {
-    router.push('/mypage');
-  };
-
-  const handleEditMember = (member: Member) => {
-    setSelectedMember(member);
-    setIsSosoModalOpen(true);
-  };
-
-  const handleSaveSosoChange = (editedData: EditedMemberData): void => {
-    // 1. メンバーのSOSOポイントを更新
-    setMembers(currentMembers =>
-      currentMembers.map(member =>
-        member.id === editedData.id ? { ...member, sosoPoint: editedData.sosoPoint } : member
-      )
-    );
-    
-    // 2. ポイント変動履歴に新しいログを追加
-    if (selectedMember) {
-      const pointChange = editedData.sosoPoint - selectedMember.sosoPoint;
-      if (pointChange !== 0) {
-        const newLog: SOSOTransaction = {
-          id: Date.now(),
-          eventName: '手動調整',
-          dateTime: new Date().toISOString(),
-          changer: '管理者',
-          changee: editedData.username,
-          sosoPoints: pointChange,
-          reason: editedData.reason || '（理由の記載なし）',
+    // handleEventClick関数も修正してイベントログを含める
+    const handleEventClick = (clickInfo: any) => {
+      console.log('clickInfo:', clickInfo);
+      console.log('🔴 イベントがクリックされました!');
+      
+      const eventId = clickInfo.event.id;
+      if (eventId) {
+        console.log('🟢 eventIdが存在します:', eventId);
+        
+        const eventMembers = clickInfo.event.extendedProps?.members || [];
+        const participatingMembers = members.filter(member => 
+          eventMembers.includes(member.username)
+        );
+        
+        console.log('🟢 参加メンバー:', participatingMembers);
+        
+        const eventProps: EventProps = {
+          id: eventId,
+          title: clickInfo.event.title || '',
+          start: clickInfo.event.startStr || '',
+          end: clickInfo.event.endStr || '',
+          extendedProps: {
+            ...clickInfo.event.extendedProps,
+            participatingMembers: participatingMembers,
+            eventLogs: eventLogs[eventId] || [] // イベント固有のログを追加
+          }
         };
-        setLogs(prevLogs => [newLog, ...prevLogs]);
+        
+        setSelectedManagementEvent(eventProps);
+        setIsManagementModalOpen(true);
+      } else {
+        console.error("🔴 Clicked event has no ID.");
       }
-    }
-    
-    // 3. モーダルを閉じる
-    setIsSosoModalOpen(false);
-  };
+    };
+
+    const handleAddEventClick = (e: React.MouseEvent, arg: any) => {
+      console.log("🔵 handleAddEventClickが実行されました。");
+      e.stopPropagation();
+
+      const tempDate = new Date(arg.date);
+      tempDate.setDate(tempDate.getDate() + 1);
+      const clickedDate = tempDate.toISOString().split('T')[0];
+      console.log('🔵 clickedDate:クリックしたぜい', clickedDate);
+
+      setSelectedDate(clickedDate);
+      setIsAddModalOpen(true);
+    };
+
+    const handleLogout = () => {
+      console.log("🔵 ログアウトが実行されました。");
+      router.push('/');
+      alert('ログアウトしました');
+    };
+
+    const handleLogoClick = () => {
+      console.log("🔵 ロゴがクリックされました。");
+      router.push('/mypage');
+    };
+
+    const handleEditMember = (member: Member) => {
+      console.log("🔵 メンバー編集がクリックされました:", member);
+      setEditSource('sidebar');
+      setSelectedMemberForEdit(member);
+      setIsSOSOEditModalOpen(true);
+    };
+
+    // モーダルを閉じる関数
+    const handleCloseSOSOEditModal = () => {
+      setIsSOSOEditModalOpen(false);
+      setSelectedMemberForEdit(null);
+    };
+
+      console.log('🟢 DashboardPageがレンダリングされました。'); 
+      console.log('🟢 isManagementModalOpen:', isManagementModalOpen);
+      console.log('🟢 selectedManagementEvent:', selectedManagementEvent);
 
   return (
     <div className="flex flex-col h-screen bg-gray-100">
@@ -245,19 +352,19 @@ const handleAddEventClick = (e: React.MouseEvent, arg: any) => {
               events={events}
               eventClick={handleEventClick}
               dayCellContent={(arg) => (
-              <div className="relative h-full w-full">
-                <span className="absolute top-1 right-20 text-sm text-gray-800">
-                  {arg.dayNumberText.replace('日', '')}
-                </span>
-                <button
-                  onClick={(e) => handleAddEventClick(e, arg)}
-                  className="absolute top-[-6px] right-1 text-gray-400 hover:bg-gray-200 rounded-full p-2"
-                  aria-label="予定を追加"
-                >
-                  +
-                </button>
-              </div>
-            )}
+                <div className="relative h-full w-full pointer-events-none">
+                  <span className="absolute top-1 right-20 text-sm text-gray-800">
+                    {arg.dayNumberText.replace('日', '')}
+                  </span>
+                  <button
+                    onClick={(e) => handleAddEventClick(e, arg)}
+                    className="absolute top-[-6px] right-1 text-gray-400 hover:bg-gray-200 rounded-full p-2 pointer-events-auto"
+                    aria-label="予定を追加"
+                  >
+                    +
+                  </button>
+                </div>
+              )}
             />
           </div>
         </main>
@@ -265,14 +372,6 @@ const handleAddEventClick = (e: React.MouseEvent, arg: any) => {
       </div>
 
       {/* --- ▼▼▼ モーダル領域 ▼▼▼ --- */}
-      {selectedMember && (
-        <SOSOEditModal
-          isOpen={isSosoModalOpen}
-          onClose={() => setIsSosoModalOpen(false)}
-          onSave={handleSaveSosoChange}
-          initialData={selectedMember}
-        />
-      )}
       {isAddModalOpen && (
         <EventAddModal
           isOpen={isAddModalOpen}
@@ -281,8 +380,29 @@ const handleAddEventClick = (e: React.MouseEvent, arg: any) => {
           initialStatus={{ ...initialEventStatus, date: selectedDate }}
         />
       )}
+      {selectedManagementEvent && (
+        <SOSOManagementModal
+          isOpen={isManagementModalOpen}
+          onClose={() => {
+            console.log('🔴 SOSOManagementModalを閉じます');
+            setIsManagementModalOpen(false);
+            setSelectedManagementEvent(null); // ここでのみnullにする
+          }}
+          initialData={selectedManagementEvent}
+          onSave={handleSaveManagement}
+          allMembers={members}
+        />
+      )}
 
-
+      {/* SOSO編集モーダル */}
+      {selectedMemberForEdit && (
+        <SOSOEditModal
+          isOpen={isSOSOEditModalOpen}
+          onClose={handleCloseSOSOEditModal}
+          onSave={handleSaveSosoChange}
+          initialData={selectedMemberForEdit}
+        />
+      )}
     </div>
   );
 };

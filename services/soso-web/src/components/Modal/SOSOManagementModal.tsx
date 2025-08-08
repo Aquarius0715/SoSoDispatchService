@@ -5,129 +5,136 @@ import clsx from 'clsx';
 import { Member } from '../MemberList/MenberList';
 import { SOSOTransaction } from '../SOSOList/SOSOList';
 import SOSOEditModal from './SOSOEditModal';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+
+interface EventProps {
+  id: string;
+  title: string;
+  start: string;
+  end: string;
+  extendedProps?: any;
+}
 
 interface Props {
   className?: string;
-  eventName : string;
+  initialData: EventProps; 
+  isOpen: boolean; 
+  onClose: () => void;
+  onSave: (data: EventProps) => void;
+  allMembers: Member[];
 }
 
-function SOSOManagementModal({ eventName, className }: Props) {
-    // ★ モーダルの状態を管理するuseState
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [selectedMember, setSelectedMember] = useState<Member | null>(null);
+// SOSOManagementModal.tsx を修正
+function SOSOManagementModal({ initialData, className, isOpen, onClose, onSave, allMembers }: Props) {
+  // useState部分は削除
+  const participatingMembers = initialData.extendedProps?.participatingMembers || [];
 
-  // ★ 編集ボタンが押されたときのハンドラー
+  useEffect(() => {
+    if (isOpen) {
+      console.log("🟢 SOSOManagementModalがオープンされました。");
+      console.log("🟢 initialData:", initialData);
+    } else {
+      console.log("🔴 SOSOManagementModalがクローズされました。");
+    }
+  }, [isOpen, initialData]);
+
+  if (!isOpen) return null;
+  // ★★★ ログの確認 ★★★
+  const eventLogs = initialData.extendedProps?.eventLogs || [];
+  console.log("🟡 現在のイベントログ:", eventLogs);
+
+  // メンバー編集を親コンポーネント（page.tsx）に委譲
   const handleEditMember = (member: Member) => {
-    setSelectedMember(member); // 編集対象のメンバーをセット
-    setIsEditModalOpen(true);   // 編集モーダルを開く
-  };
-
-  // ★ 編集モーダルを閉じる関数
-  const handleCloseEditModal = () => {
-    setIsEditModalOpen(false);
-    setSelectedMember(null);
-  };
-
-  // ★ 編集内容を保存する関数
-  const handleSaveEditedMember = (editedData: Member & { reason: string }) => {
-    // ここにメンバーリストを更新するロジックを実装
-    console.log('保存:', editedData);
-    handleCloseEditModal();
+    console.log("🔵 メンバー編集ボタンが押されました:", member);
+    
+    // 親コンポーネントのメンバー編集関数を呼び出すために
+    // onSaveを通じてデータを渡す
+    onSave({
+      ...initialData,
+      extendedProps: {
+        ...initialData.extendedProps,
+        editMember: member,
+        action: 'editMember'
+      }
+    });
+    
+    // 管理モーダルを閉じる
   };
 
   return (
-    <div className={clsx('fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center', className)}>
-      <div className={clsx('bg-white p-6 rounded-lg shadow-xl w-96 flex')}>
-        <div className='flex-1 pr-4'>
-          <h2 className='text-xl text-black font-bold mb-4'>メンバー一覧</h2>
-          {/* <MemberList members={DUMMY_MEMBERS} onEditMember={handleEditMember} /> */}
-            <MemberList members={[]} onEditMember={handleEditMember} />
+    <div 
+      className={clsx('fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center z-50', className)}
+      onClick={onClose}
+    >
+      <div 
+        className="bg-white rounded-lg shadow-xl w-11/12 max-w-6xl max-h-[90vh] overflow-hidden relative"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* ヘッダー部分 */}
+        <div className="flex justify-between items-center p-6 border-b border-gray-200">
+          <h1 className="text-2xl font-bold text-black">
+            イベント管理: {initialData.title}
+          </h1>
+          <button 
+            onClick={onClose}
+            className="text-gray-500 hover:text-gray-800 text-3xl font-bold leading-none p-2"
+            aria-label="閉じる"
+          >
+            ×
+          </button>
         </div>
-        <div className='flex-1 pl-4'>
-          <h2 className='text-xl text-black font-bold mb-4'>トランザクション履歴</h2>
-          {/* <SOSOList logs={DUMMY_TRANSACTIONS} /> */}
-          <SOSOList  logs={[]} /> 
+
+        {/* イベント詳細情報 */}
+        <div className="p-4 bg-gray-50 border-b border-gray-200">
+          <div className="grid grid-cols-2 gap-4 text-sm">
+            <p><strong>開始時間:</strong> {new Date(initialData.start).toLocaleString('ja-JP')}</p>
+            <p><strong>終了時間:</strong> {new Date(initialData.end).toLocaleString('ja-JP')}</p>
+            <p><strong>送り時刻:</strong> {initialData.extendedProps?.dropOffTime || '未設定'}</p>
+            <p><strong>迎え時刻:</strong> {initialData.extendedProps?.pickUpTime || '未設定'}</p>
+            <p><strong>出発地:</strong> {initialData.extendedProps?.departurePoint || '未設定'}</p>
+            <p><strong>目的地:</strong> {initialData.extendedProps?.destinationPoint || '未設定'}</p>
+          </div>
+        </div>
+
+        {/* メイン部分 */}
+        <div className="flex h-[calc(90vh-200px)] overflow-hidden">
+          {/* 左側: メンバー一覧 */}
+          <div className="flex-1 p-6 border-r border-gray-200 overflow-y-auto">
+            <h2 className="text-xl text-black font-bold mb-4">
+              参加メンバー ({participatingMembers.length}人)
+            </h2>
+            <div className="mb-6">
+              <MemberList 
+                members={participatingMembers} 
+                onEditMember={handleEditMember} 
+              />
+            </div>
+
+            <h3 className="text-lg text-gray-600 font-semibold mb-2">
+              全メンバー ({allMembers.length}人)
+            </h3>
+            <div>
+              <MemberList 
+                members={allMembers} 
+                onEditMember={handleEditMember} 
+              />
+            </div>
+          </div>
+
+          {/* 右側: トランザクション履歴 */}
+          <div className="flex-1 p-6 overflow-y-auto">
+            <h2 className="text-xl text-black font-bold mb-4">
+              このイベントのトランザクション履歴
+            </h2>
+            <SOSOList 
+              logs={initialData.extendedProps?.eventLogs || []} 
+              eventName={initialData.title}
+            />
+          </div>
         </div>
       </div>
-      {/* ★ 編集対象が選択された場合のみSOSOEditModalを表示 */}
-      {selectedMember && (
-        <SOSOEditModal
-          isOpen={isEditModalOpen}
-          onClose={handleCloseEditModal}
-          onSave={handleSaveEditedMember}
-          initialData={selectedMember}
-        />
-      )}
     </div>
   );
 }
 
 export default SOSOManagementModal;
-
-// テスト用ダミーデータ
-// export const DUMMY_MEMBERS: Member[] = [
-//   {
-//     id: 1,
-//     memberName: '山田 太郎',
-//     hasCar: true,
-//     passengerNumber: 3,
-//     sosoPoint: 100,
-//   },
-//   {
-//     id: 2,
-//     memberName: '田中 花子',
-//     hasCar: false,
-//     sosoPoint: 50,
-//   },
-//   {
-//     id: 3,
-//     memberName: '鈴木 次郎',
-//     hasCar: true,
-//     passengerNumber: 1,
-//     sosoPoint: 75,
-//   },
-// ];
-
-// export const DUMMY_TRANSACTIONS: SOSOTransaction[] = [
-//   {
-//     id: 1,
-//     eventName: 'キックオフMTG',
-//     date: '2025-08-01',
-//     time: '10:00',
-//     changer: '田中 花子',
-//     changee: '山田 太郎',
-//     sosoPoints: 10,
-//     reason: 'チーム貢献度が高かったため',
-//   },
-//   {
-//     id: 2,
-//     eventName: 'チームランチ',
-//     date: '2025-08-01',
-//     time: '12:30',
-//     changer: '鈴木 次郎',
-//     changee: '田中 花子',
-//     sosoPoints: 5,
-//     reason: 'ランチ手配をしてくれた',
-//   },
-//   {
-//     id: 3,
-//     eventName: '新規プロジェクト発表',
-//     date: '2025-08-02',
-//     time: '14:00',
-//     changer: '山田 太郎',
-//     changee: '鈴木 次郎',
-//     sosoPoints: 20,
-//     reason: '素晴らしいアイデアを出してくれた',
-//   },
-//   {
-//     id: 4,
-//     eventName: 'キックオフMTG',
-//     date: '2025-08-01',
-//     time: '10:00',
-//     changer: '田中 花子',
-//     changee: '鈴木 次郎',
-//     sosoPoints: -5,
-//     reason: '遅刻したため',
-//   },
-// ];

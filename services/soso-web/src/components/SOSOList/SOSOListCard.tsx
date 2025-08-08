@@ -13,7 +13,7 @@ interface Props {
 }
 
 
-function SOSOcard({ className, dateTime, changer, changee, sosoPoints, reason }: Props) {
+function SOSOCard({ className, dateTime, changer, changee, sosoPoints, reason }: Props) {
   const pointTextColor = sosoPoints >= 0 ? 'text-green-600' : 'text-red-600';
   const pointText = sosoPoints > 0 ? `+${sosoPoints}pt` : `${sosoPoints}pt`;
 
@@ -30,4 +30,4 @@ function SOSOcard({ className, dateTime, changer, changee, sosoPoints, reason }:
 }
 
 
-export default SOSOcard;
+export default SOSOCard;

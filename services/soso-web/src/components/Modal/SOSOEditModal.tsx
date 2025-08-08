@@ -44,7 +44,6 @@ const SOSOEditModal: React.FC<Props> = ({ isOpen, onClose, onSave, initialData }
 
   const handleSave = () => {
     onSave(editedData);
-    onClose();
   };
 
   return (
