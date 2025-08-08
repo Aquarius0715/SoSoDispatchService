@@ -14,7 +14,6 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import EventAddModal from '@/src/components/Modal/EventAddModal';
-import SOSOEditModal from '@/src/components/Modal/SOSOEditModal';
 import jaLocale from '@fullcalendar/core/locales/ja';
 import SOSOManagementModal from '@/src/components/Modal/SOSOManagementModal';
 
@@ -82,9 +81,6 @@ const DashboardPage: NextPage<DashboardPageProps> = ({ params }) => {
 
   // ▼ モーダル管理用のState（例）
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [selectedEvent, setSelectedEvent] = useState<EventInput | null>(null);
   const [selectedDate, setSelectedDate] = useState<string>('');
 
   // ▼ 新規イベント追加時の初期ステータス
@@ -194,7 +190,7 @@ const handleAddEventClick = (e: React.MouseEvent, arg: any) => {
   const tempDate = new Date(arg.date); // 新しいDateオブジェクトを作成
   tempDate.setDate(tempDate.getDate() + 1);
   const clickedDate = tempDate.toISOString().split('T')[0];
-  console.log('🔵 clickedDate:', clickedDate); // これを追加
+  console.log('🔵 clickedDate:クリックしたぜい', clickedDate); // これを追加
 
     // 選択された日付をStateに保存
 
@@ -316,14 +312,6 @@ const handleAddEventClick = (e: React.MouseEvent, arg: any) => {
       </div>
 
       {/* --- ▼▼▼ モーダル領域 ▼▼▼ --- */}
-      {selectedMember && (
-        <SOSOEditModal
-          isOpen={isSosoModalOpen}
-          onClose={() => setIsSosoModalOpen(false)}
-          onSave={handleSaveSosoChange}
-          initialData={selectedMember}
-        />
-      )}
       {isAddModalOpen && (
         <EventAddModal
           isOpen={isAddModalOpen}
