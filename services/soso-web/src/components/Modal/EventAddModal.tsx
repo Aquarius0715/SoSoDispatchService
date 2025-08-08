@@ -173,14 +173,13 @@ const EventAddModal: React.FC<EventAddModalProps> = ({
           <div className="flex space-x-4">
             <div className="w-1/2">
               <label className="block text-sm font-semibold mb-1 text-black">送り人数</label>
-              <Input value={String(dropOffCount)} onChange={handleNumberInputChange(setDropOffCount)} placeholder="送り人数" className="w-full text-black" />
+              <Input value={String(dropOffCount)} onChange={handleNumberInputChange(setDropOffCount)} className="w-full text-black" />
             </div>
             <div className="w-1/2">
               <label className="block text-sm font-semibold mb-1 text-black">迎え人数</label>
               <Input
                 value={String(pickUpCount)}
                 onChange={handleNumberInputChange(setPickUpCount)}
-                placeholder="迎え人数"
                 className="w-full text-black"
               />
             </div>
