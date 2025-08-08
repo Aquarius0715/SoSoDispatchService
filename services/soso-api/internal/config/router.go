@@ -122,15 +122,15 @@ func SetupRouter(cfg *Config) *echo.Echo {
 	calG.POST("/:calender_id/join", calenderMembershipH.Create)
 	calG.GET("/my", calenderH.FindMyCalenders)
 	calG.GET("/:calender_id/members", calenderMembershipH.List)
-	calG.POST(":calender_id/events", eventH.Create)
-	calG.GET(":calender_id/events", eventH.ListByCalender)
+	calG.POST("/:calender_id/events", eventH.Create)
+	calG.GET("/:calender_id/events", eventH.ListByCalender)
 
 	eveG := e.Group("/events", csrfMW, echojwt.WithConfig(jwtCfg))
-	eveG.GET(":event_id", eventH.FindById)
-	eveG.POST(":event_id/pickup", eventH.RegisterPickUp)
-	eveG.POST(":event_id/return", eventH.RegisterReturn)
-	eveG.GET(":event_id/detail", eventH.Detail)
-	eveG.GET(":event_id/members", eventH.Members)
+	eveG.GET("/:event_id", eventH.FindById)
+	eveG.POST("/:event_id/pickup", eventH.RegisterPickUp)
+	eveG.POST("/:event_id/return", eventH.RegisterReturn)
+	eveG.GET("/:event_id/detail", eventH.Detail)
+	eveG.GET("/:event_id/members", eventH.Members)
 
 	// シャットダウン時クローズ
 	e.Server.RegisterOnShutdown(func() { _ = db.Close() })

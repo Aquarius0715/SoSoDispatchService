@@ -35,6 +35,18 @@ services:
     ports:
       - "9419:8080"
     environment:
+      SWAGGER_JSON: /docs.yaml
+    volumes:
+      - ./services/soso-api/api/docs.yaml:/docs.yaml:ro
+    depends_on:
+      - soso-api
+
+  soso-api-document-deploy:
+    image: swaggerapi/swagger-ui:latest
+    container_name: soso-api-document-deploy
+    ports:
+      - "9418:8080"
+    environment:
       SWAGGER_JSON: /swagger.yaml
     volumes:
       - ./services/soso-api/api/swagger.yaml:/swagger.yaml:ro
