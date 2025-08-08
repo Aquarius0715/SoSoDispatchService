@@ -1,29 +1,32 @@
-//SOSOList.tsx
 import React from 'react';
-import SOSOcard from './SOSOListCard'; // SOSOcardコンポーネントをインポート
-
-// SOSOポイント変動履歴のデータの型を定義
+import SOSOcard from './SOSOListCard';
+// SOSOList.tsx のSOSOTransactionインターフェースを修正
 export interface SOSOTransaction {
   id: number | string;
-  eventName: string; // 画像のようにイベント名も表示
-  dateTime: string; // 日時を一つのフィールドにまとめることも可能
+  eventName: string;
+  dateTime: string;
   changer: string;
   changee: string;
-  sosoPoints: number;
-  reason: string;
+  sosoPoints: number; // ★★★ この行を確認
+  reason: string; // ★★★ この行を確認
 }
 
 // SOSOListが受け取るpropsの型
 interface SOSOListProps {
-  logs: SOSOTransaction[]; // SOSOTransactionの配列
-  eventName?: string; // イベント名をオプションで受け取る
+  logs: SOSOTransaction[];
+  eventName?: string;
 }
 
 function SOSOList({ logs, eventName }: SOSOListProps) {
+  console.log("🟡 SOSOList受信ログ:", logs);
+  console.log("🟡 SOSOList eventName:", eventName);
+  
   // eventNameが指定されている場合は、そのイベントに関連するログのみをフィルタリング
   const filteredLogs = eventName 
     ? logs.filter(log => log.eventName === eventName)
     : logs;
+
+  console.log("🟡 フィルタリング後のログ:", filteredLogs);
 
   if (filteredLogs.length === 0) {
     return (
@@ -44,10 +47,10 @@ function SOSOList({ logs, eventName }: SOSOListProps) {
         </div>
       )}
       
-      {/* filteredLogs配列をループして、SOSOcardを生成 */}
+      {/* filteredLogs配列をループして、SOSOCardを生成 */}
       {filteredLogs.map((log) => (
         <SOSOcard
-          key={log.id} // 各要素にユニークなkeyを指定
+          key={log.id}
           dateTime={log.dateTime}
           changer={log.changer}
           changee={log.changee}

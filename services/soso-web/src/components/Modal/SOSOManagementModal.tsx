@@ -59,7 +59,6 @@ function SOSOManagementModal({ initialData, className, isOpen, onClose, onSave, 
     });
     
     // 管理モーダルを閉じる
-    onClose();
   };
 
   return (
