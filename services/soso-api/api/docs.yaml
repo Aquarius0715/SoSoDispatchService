@@ -1,25 +1,24 @@
 openapi: 3.1.0
 info:
-  title: SOSO Dispatch Service API
-  version: 1.0.2
+  title: SoSo Dispatch Service API
   description: |
-    OpenAPI specification for SOSO Dispatch Service backend implemented with Echo.
+    Ride-sharing support system “SoSo” – HTTP API  
+    All state-changing endpoints require a CSRF token (header **X-CSRF-Token**)  
+    and a valid JWT Bearer token (except `/auth/login` and `/auth/csrf`).  
+    Responses use camelCase; times are RFC 3339 `date-time`.
+  version: 1.0.0
 servers:
   - url: http://localhost:8080
 components:
   securitySchemes:
-    BearerAuth:
+    bearerAuth:
       type: http
       scheme: bearer
       bearerFormat: JWT
-  parameters:
-    CsrfTokenHeader:
-      name: X-CSRF-Token
+    csrfToken:
+      type: apiKey
       in: header
-      required: true
-      schema:
-        type: string
-      description: CSRF token issued by **GET /auth/csrf**
+      name: X-CSRF-Token
   schemas:
     Error:
       type: object
@@ -27,15 +26,7 @@ components:
         message:
           type: string
       required: [message]
-    LoginRequest:
-      type: object
-      properties:
-        mailAddress:
-          type: string
-          format: email
-        password:
-          type: string
-      required: [mailAddress, password]
+
     TokenResponse:
       type: object
       properties:
@@ -45,444 +36,427 @@ components:
           type: string
           format: date-time
       required: [access_token, access_expires_at]
-    RegisterRequest:
+
+    LoginRequest:
       type: object
       properties:
-        username:
-          type: string
         mailAddress:
           type: string
           format: email
         password:
           type: string
+          minLength: 8
+      required: [mailAddress, password]
+
+    RegisterRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          minLength: 3
+          maxLength: 30
+        mailAddress:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 8
         hasCar:
           type: boolean
         capacity:
           type: integer
           minimum: 0
       required: [username, mailAddress, password]
+
     User:
       type: object
       properties:
-        id:
-          type: string
-          format: uuid
-        username:
-          type: string
-        mailAddress:
-          type: string
-          format: email
-        hasCar:
-          type: boolean
-        capacity:
-          type: integer
-        createdAt:
-          type: string
-          format: date-time
-        updatedAt:
-          type: string
-          format: date-time
+        id:          { type: string, format: uuid }
+        username:    { type: string }
+        mailAddress: { type: string, format: email }
+        hasCar:      { type: boolean }
+        capacity:    { type: integer, minimum: 0 }
+        createdAt:   { type: string, format: date-time }
+        updatedAt:   { type: string, format: date-time }
+      required: [id, username, mailAddress, hasCar, capacity]
+
     CalenderCreateRequest:
       type: object
       properties:
         name:
           type: string
+          minLength: 1
         description:
           type: string
       required: [name]
+
     Calender:
       type: object
       properties:
-        id:
-          type: string
-          format: uuid
-        name:
-          type: string
-        description:
-          type: string
-        ownerId:
-          type: string
+        id:          { type: string, format: uuid }
+        name:        { type: string }
+        description: { type: string }
+        ownerId:     { type: string, format: uuid }
+      required: [id, name, ownerId]
+
     CalenderMember:
       type: object
       properties:
-        id:
-          type: string
-        username:
-          type: string
-        hasCar:
-          type: boolean
-        capacity:
-          type: integer
-        sosoPoint:
-          type: integer
+        id:        { type: string, format: uuid, description: userId }
+        username:  { type: string }
+        hasCar:    { type: boolean }
+        capacity:  { type: integer, minimum: 0 }
+        sosoPoint: { type: integer, minimum: 0 }
+      required: [id, username, hasCar, capacity, sosoPoint]
+
     EventCreateRequest:
       type: object
       properties:
-        title:
-          type: string
-          maxLength: 128
-        description:
-          type: string
-        startTime:
-          type: string
-          format: date-time
-        endTime:
-          type: string
-          format: date-time
-        originLocation:
-          type: string
-          maxLength: 255
-        destinationLocation:
-          type: string
-          maxLength: 255
-        seatsRequiredGo:
-          type: integer
-          minimum: 0
-        seatsRequiredReturn:
-          type: integer
-          minimum: 0
-        participants:
+        title:               { type: string, maxLength: 128 }
+        description:         { type: string }
+        startTime:           { type: string, format: date-time }
+        endTime:             { type: string, format: date-time }
+        originLocation:      { type: string, maxLength: 255 }
+        destinationLocation: { type: string, maxLength: 255 }
+        seatsRequiredGo:     { type: integer, minimum: 0 }
+        seatsRequiredReturn: { type: integer, minimum: 0 }
+        participantUserIds:
           type: array
-          description: ユーザーIDの配列（通常の参加者）
-          uniqueItems: true
-          items:
-            type: string
-            description: userId
-        pickUp:
-          type: array
-          description: ユーザーIDの配列（迎えに行く対象）
-          uniqueItems: true
-          items:
-            type: string
-            description: userId
-        dropOff:
-          type: array
-          description: ユーザーIDの配列（送り先対象）
-          uniqueItems: true
-          items:
-            type: string
-            description: userId
+          items: { type: string, format: uuid }
       required:
-        - title
-        - startTime
-        - endTime
-      example:
-        title: 合同練習の送迎
-        description: 部室→体育館→部室
-        startTime: 2025-08-10T10:00:00Z
-        endTime: 2025-08-10T14:00:00Z
-        originLocation: 部室
-        destinationLocation: 体育館
-        seatsRequiredGo: 3
-        seatsRequiredReturn: 2
-        participants: ["u001", "u002"]
-        pickUp: ["u003"]
-        dropOff: []
+        [title, startTime, endTime, participantUserIds]
+
     Event:
       type: object
       properties:
-        id:
-          type: string
-        calenderId:
-          type: string
-        creatorId:
-          type: string
-        title:
-          type: string
-        description:
-          type: string
-        startTime:
-          type: string
-          format: date-time
-        endTime:
-          type: string
-          format: date-time
-        originLocation:
-          type: string
-        destinationLocation:
-          type: string
-        seatsRequiredGo:
-          type: integer
-        seatsRequiredReturn:
-          type: integer
-        participants:
+        id:                  { type: string, format: uuid }
+        calenderId:          { type: string, format: uuid }
+        creatorId:           { type: string, format: uuid }
+        title:               { type: string }
+        description:         { type: string }
+        startTime:           { type: string, format: date-time }
+        endTime:             { type: string, format: date-time }
+        originLocation:      { type: string }
+        destinationLocation: { type: string }
+        seatsRequiredGo:     { type: integer }
+        seatsRequiredReturn: { type: integer }
+        participantUserIds:
           type: array
-          description: ユーザーIDの配列（通常の参加者）
-          uniqueItems: true
-          items:
-            type: string
-            description: userId
-        pickUp:
-          type: array
-          description: ユーザーIDの配列（迎えに行く対象）
-          uniqueItems: true
-          items:
-            type: string
-            description: userId
-        dropOff:
-          type: array
-          description: ユーザーIDの配列（送り先対象）
-          uniqueItems: true
-          items:
-            type: string
-            description: userId
-      example:
-        id: ev_123
-        calenderId: cal_001
-        creatorId: u_admin
-        title: 合同練習の送迎
-        description: 部室→体育館→部室
-        startTime: 2025-08-10T10:00:00Z
-        endTime: 2025-08-10T14:00:00Z
-        originLocation: 部室
-        destinationLocation: 体育館
-        seatsRequiredGo: 3
-        seatsRequiredReturn: 2
-        participants: ["u001", "u002"]
-        pickUp: ["u003"]
-        dropOff: []
+          items: { type: string, format: uuid }
+      required:
+        [id, calenderId, creatorId, title, startTime, endTime,
+         seatsRequiredGo, seatsRequiredReturn]
+
+    EventDetail:
+      allOf:
+        - $ref: '#/components/schemas/Event'
+        - type: object
+          properties:
+            remainingGoSeats:     { type: integer, minimum: 0 }
+            remainingReturnSeats: { type: integer, minimum: 0 }
+            participants:
+              type: array
+              items: { type: string }
+          required: [remainingGoSeats, remainingReturnSeats, participants]
+
+    EventMember:
+      type: object
+      properties:
+        userId:    { type: string, format: uuid }
+        username:  { type: string }
+        sosoPoint: { type: integer, minimum: 0 }
+      required: [userId, username, sosoPoint]
+
+tags:
+  - name: Auth
+  - name: Users
+  - name: Calenders
+  - name: Events
+
 paths:
   /auth/csrf:
     get:
       tags: [Auth]
-      summary: Issue CSRF token
-      responses:
-        "200":
-          description: CSRF token issued
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  csrf_token:
-                    type: string
-        "204":
-          description: CSRF disabled
-  /auth/login:
-    post:
-      tags: [Auth]
-      summary: Login and get tokens
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/LoginRequest'
+      summary: Get a CSRF token
       responses:
         "200":
           description: Token issued
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TokenResponse'
-        "401":
-          description: Invalid credentials
+                type: object
+                properties:
+                  csrf_token: { type: string }
+                required: [csrf_token]
+        default: { $ref: '#/components/schemas/Error' }
+
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: Log-in and obtain JWT / refresh cookie
+      security: [{ csrfToken: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/LoginRequest' }
+      responses:
+        "200":
+          description: Success
           content:
             application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+              schema: { $ref: '#/components/schemas/TokenResponse' }
+        "401": { $ref: '#/components/schemas/Error' }
+
   /auth/refresh:
     post:
       tags: [Auth]
-      summary: Refresh access token
+      summary: Rotate refresh token & issue new JWT
+      security: [{ csrfToken: [] }]
       responses:
         "200":
-          description: Token rotated
           content:
             application/json:
-              schema:
-                $ref: '#/components/schemas/TokenResponse'
-        "401":
-          description: Invalid refresh token
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+              schema: { $ref: '#/components/schemas/TokenResponse' }
+        "401": { $ref: '#/components/schemas/Error' }
+
   /auth/logout:
     post:
       tags: [Auth]
-      summary: Logout
+      summary: Log-out and revoke refresh token
       security:
-        - BearerAuth: []
+        - csrfToken: []
+        - bearerAuth: []
       responses:
-        "200":
-          description: Logged out
+        "200": { description: Logged out }
+        default: { $ref: '#/components/schemas/Error' }
+
   /users/register:
     post:
       tags: [Users]
-      summary: Register user
+      summary: Register a new user
+      security: [{ csrfToken: [] }]
       requestBody:
         required: true
         content:
           application/json:
-            schema:
-              $ref: '#/components/schemas/RegisterRequest'
+            schema: { $ref: '#/components/schemas/RegisterRequest' }
       responses:
         "201":
-          description: Created
           content:
             application/json:
-              schema:
-                $ref: '#/components/schemas/User'
-        "409":
-          description: Duplicate user
+              schema: { $ref: '#/components/schemas/User' }
+        "409": { $ref: '#/components/schemas/Error' }
+
   /users/me:
     get:
       tags: [Users]
-      summary: Get my profile
+      summary: Get currently authenticated user
       security:
-        - BearerAuth: []
+        - csrfToken: []
+        - bearerAuth: []
       responses:
         "200":
-          description: OK
           content:
             application/json:
-              schema:
-                $ref: '#/components/schemas/User'
+              schema: { $ref: '#/components/schemas/User' }
+        default: { $ref: '#/components/schemas/Error' }
+
   /calenders/create:
     post:
       tags: [Calenders]
-      summary: Create calender
+      summary: Create a new calender
       security:
-        - BearerAuth: []
-      parameters:
-        - $ref: '#/components/parameters/CsrfTokenHeader'
+        - csrfToken: []
+        - bearerAuth: []
       requestBody:
         required: true
         content:
           application/json:
-            schema:
-              $ref: '#/components/schemas/CalenderCreateRequest'
+            schema: { $ref: '#/components/schemas/CalenderCreateRequest' }
       responses:
         "201":
-          description: Created
           content:
             application/json:
-              schema:
-                $ref: '#/components/schemas/Calender'
-  /calenders/{calender_id}/join:
-    post:
-      tags: [Calenders]
-      summary: Join calender
-      security:
-        - BearerAuth: []
-      parameters:
-        - name: calender_id
-          in: path
-          required: true
-          schema:
-            type: string
-        - $ref: '#/components/parameters/CsrfTokenHeader'
-      responses:
-        "201":
-          description: Joined
+              schema: { $ref: '#/components/schemas/Calender' }
+        "409": { $ref: '#/components/schemas/Error' }
+
   /calenders/my:
     get:
       tags: [Calenders]
-      summary: List my calenders
+      summary: List calenders the user belongs to
       security:
-        - BearerAuth: []
+        - csrfToken: []
+        - bearerAuth: []
       responses:
         "200":
-          description: OK
+          description: List
           content:
             application/json:
               schema:
                 type: array
-                items:
-                  $ref: '#/components/schemas/Calender'
+                items: { $ref: '#/components/schemas/Calender' }
+
+  /calenders/{calender_id}/join:
+    post:
+      tags: [Calenders]
+      summary: Join a calender
+      security:
+        - csrfToken: []
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: calender_id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "201": { description: Joined }
+        "409": { $ref: '#/components/schemas/Error' }
+
   /calenders/{calender_id}/members:
     get:
-      tags: [CalenderMembership]
-      summary: List calender members
+      tags: [Calenders]
+      summary: List members of a calender
       security:
-        - BearerAuth: []
+        - csrfToken: []
+        - bearerAuth: []
       parameters:
-        - name: calender_id
-          in: path
+        - in: path
+          name: calender_id
           required: true
-          schema:
-            type: string
+          schema: { type: string, format: uuid }
       responses:
         "200":
-          description: OK
           content:
             application/json:
               schema:
                 type: array
-                items:
-                  $ref: '#/components/schemas/CalenderMember'
+                items: { $ref: '#/components/schemas/CalenderMember' }
+
   /calenders/{calender_id}/events:
     post:
       tags: [Events]
-      summary: Create event in calender
+      summary: Create an event in a calender
       security:
-        - BearerAuth: []
+        - csrfToken: []
+        - bearerAuth: []
       parameters:
-        - name: calender_id
-          in: path
+        - in: path
+          name: calender_id
           required: true
-          schema:
-            type: string
-        - $ref: '#/components/parameters/CsrfTokenHeader'
+          schema: { type: string, format: uuid }
       requestBody:
         required: true
         content:
           application/json:
-            schema:
-              $ref: '#/components/schemas/EventCreateRequest'
+            schema: { $ref: '#/components/schemas/EventCreateRequest' }
       responses:
         "201":
-          description: Created
           content:
             application/json:
-              schema:
-                $ref: '#/components/schemas/Event'
+              schema: { $ref: '#/components/schemas/Event' }
     get:
       tags: [Events]
-      summary: List events by calender
+      summary: List events in a calender
       security:
-        - BearerAuth: []
+        - csrfToken: []
+        - bearerAuth: []
       parameters:
-        - name: calender_id
-          in: path
+        - in: path
+          name: calender_id
           required: true
-          schema:
-            type: string
+          schema: { type: string, format: uuid }
       responses:
         "200":
-          description: OK
           content:
             application/json:
               schema:
                 type: array
-                items:
-                  $ref: '#/components/schemas/Event'
-  /events/{eventId}:
+                items: { $ref: '#/components/schemas/Event' }
+
+  /events/{event_id}:
     get:
       tags: [Events]
-      summary: Get event by id
+      summary: Get an event (with participants)
       security:
-        - BearerAuth: []
+        - csrfToken: []
+        - bearerAuth: []
       parameters:
-        - name: eventId
-          in: path
+        - in: path
+          name: event_id
           required: true
-          schema:
-            type: string
+          schema: { type: string, format: uuid }
       responses:
         "200":
-          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Event' }
+        "404": { $ref: '#/components/schemas/Error' }
+
+  /events/{event_id}/pickup:
+    post:
+      tags: [Events]
+      summary: Register as pick-up driver
+      security:
+        - csrfToken: []
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: event_id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "201": { description: Registered }
+
+  /events/{event_id}/return:
+    post:
+      tags: [Events]
+      summary: Register as return driver
+      security:
+        - csrfToken: []
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: event_id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "201": { description: Registered }
+
+  /events/{event_id}/detail:
+    get:
+      tags: [Events]
+      summary: Detailed event information (remaining seats etc.)
+      security:
+        - csrfToken: []
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: event_id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "200":
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/EventDetail' }
+
+  /events/{event_id}/members:
+    get:
+      tags: [Events]
+      summary: List event members with SoSo points
+      security:
+        - csrfToken: []
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: event_id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Event'
-        "404":
-          description: Not found
-
-tags:
-  - name: Auth
-  - name: Users
-  - name: Calenders
-  - name: CalenderMembership
-  - name: Events
+                type: array
+                items: { $ref: '#/components/schemas/EventMember' }
