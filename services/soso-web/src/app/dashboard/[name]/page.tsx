@@ -118,9 +118,19 @@ const handleAddEventClick = (e: React.MouseEvent, arg: any) => {
   // 親要素のdateClickイベントが発火するのを防ぐ
   e.stopPropagation();
 
-    // クリックされた日付をStateに保存
-    setSelectedDate(arg.dateStr);
-    
+    // arg.dateを直接変更せず、新しいDateオブジェクトを作成して操作する
+  const tempDate = new Date(arg.date); // 新しいDateオブジェクトを作成
+  tempDate.setDate(tempDate.getDate() + 1);
+  const clickedDate = tempDate.toISOString().split('T')[0];
+  console.log('clickedDate:', clickedDate); // これを追加
+
+    // 選択された日付をStateに保存
+
+  setSelectedDate(clickedDate);
+  // console.log('arg.dateオブジェクト:', arg.date); // これを追加
+  // console.log('arg.dateのtoString():', arg.date.toString()); // ローカルタイム表示
+  // console.log('arg.dateのtoISOString():', arg.date.toISOString()); // UTC表示
+
     // 新規追加モーダルを開く
     setIsAddModalOpen(true);
   };
@@ -205,19 +215,19 @@ const handleAddEventClick = (e: React.MouseEvent, arg: any) => {
               }}
               events={events}
               dayCellContent={(arg) => (
-                <div className="relative h-full w-full">
-                  <span className="absolute top-1 left-2 text-sm text-gray-800">
-                    {arg.dayNumberText.replace('日', '')}
-                  </span>
-                  <button
-                    onClick={(e) => handleAddEventClick(e, arg)}
-                    className="absolute top-[-6px] right-1 text-gray-400 hover:bg-gray-200 rounded-full p-2"
-                    aria-label="予定を追加"
-                  >
-                    +
-                  </button>
-                </div>
-              )}
+              <div className="relative h-full w-full">
+                <span className="absolute top-1 right-20 text-sm text-gray-800">
+                  {arg.dayNumberText.replace('日', '')}
+                </span>
+                <button
+                  onClick={(e) => handleAddEventClick(e, arg)}
+                  className="absolute top-[-6px] right-1 text-gray-400 hover:bg-gray-200 rounded-full p-2"
+                  aria-label="予定を追加"
+                >
+                  +
+                </button>
+              </div>
+            )}
             />
           </div>
         </main>
@@ -238,8 +248,7 @@ const handleAddEventClick = (e: React.MouseEvent, arg: any) => {
           isOpen={isAddModalOpen}
           onClose={() => setIsAddModalOpen(false)}
           onSave={handleSaveNewEvent}
-          initialStatus={initialEventStatus}
-          date={selectedDate}
+          initialStatus={{ ...initialEventStatus, date: selectedDate }}
         />
       )}
 

@@ -7,12 +7,13 @@ import Input from '../TextFieald/Input';
 
 // モーダルの入力内容の型
 interface EventStatus {
+  date: string; // 日付
   title: string;
   details: string;
   dropOffTime: string; // 送り時刻
-  pickUpTime: string;  // 迎え時刻
+  pickUpTime: string; // 迎え時刻
   dropOffCount: number; // 送り人数
-  pickUpCount: number;  // 迎え人数
+  pickUpCount: number; // 迎え人数
   departurePoint: string;
   destinationPoint: string;
   members: string[];
@@ -24,7 +25,6 @@ interface EventAddModalProps {
   onClose: () => void;
   onSave: (status: EventStatus) => void;
   initialStatus: EventStatus;
-  date: string;
 }
 
 // 参加者データの仮配列
@@ -39,8 +39,8 @@ const EventAddModal: React.FC<EventAddModalProps> = ({
   onClose,
   onSave,
   initialStatus,
-  date
 }) => {
+  const [date, setDate] = useState(initialStatus.date);
   const [title, setTitle] = useState(initialStatus.title);
   const [details, setDetails] = useState(initialStatus.details);
   const [dropOffTime, setDropOffTime] = useState(initialStatus.dropOffTime);
@@ -51,12 +51,28 @@ const EventAddModal: React.FC<EventAddModalProps> = ({
   const [destinationPoint, setDestinationPoint] = useState(initialStatus.destinationPoint);
   const [participants, setParticipants] = useState(initialParticipants);
 
-  const formattedDate = new Date(date).toLocaleDateString('ja-JP', {
-    year: 'numeric', month: 'long', day: 'numeric'
-  });
+  // 日付のフォーマット処理を修正
+  const formatDate = (dateString: string) => {
+    try {
+      const dateObj = new Date(dateString);
+      // 無効な日付の場合のフォールバック
+      if (isNaN(dateObj.getTime())) {
+        return dateString;
+      }
+      return dateObj.toLocaleDateString('ja-JP', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        weekday: 'short'
+      });
+    } catch (error) {
+      return dateString;
+    }
+  };
 
   useEffect(() => {
     if (isOpen) {
+      setDate(initialStatus.date);
       setTitle(initialStatus.title);
       setDetails(initialStatus.details);
       setDropOffTime(initialStatus.dropOffTime);
@@ -106,6 +122,7 @@ const EventAddModal: React.FC<EventAddModalProps> = ({
   const handleSave = () => {
     const selectedMembers = participants.filter(p => p.isChecked).map(p => p.name);
     const eventStatus: EventStatus = {
+      date,
       title,
       details,
       dropOffTime,
@@ -120,6 +137,7 @@ const EventAddModal: React.FC<EventAddModalProps> = ({
   };
 
   if (!isOpen) return null;
+  
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-600 bg-opacity-50">
@@ -131,7 +149,10 @@ const EventAddModal: React.FC<EventAddModalProps> = ({
           </button>
         </div>
         <div className="p-4 space-y-4">
-          <div className="text-center font-bold text-lg text-black">{formattedDate}</div>
+          {/* 日付表示を修正 */}
+          <div className="text-center font-bold text-lg text-black bg-blue-50 p-2 rounded">
+            {date}
+          </div>
           <div>
             <label className="block text-sm font-semibold mb-1 text-black">タイトル</label>
             <Input value={title} onChange={handleInputChange(setTitle)} placeholder="タイトル" className="w-full text-black" />
@@ -152,7 +173,6 @@ const EventAddModal: React.FC<EventAddModalProps> = ({
             <div className="w-1/2">
               <label className="block text-sm font-semibold mb-1 text-black">送り人数</label>
               <Input value={dropOffCount} onChange={handleNumberInputChange(setDropOffCount)} placeholder="送り人数" className="w-full text-black" />
-
             </div>
             <div className="w-1/2">
               <label className="block text-sm font-semibold mb-1 text-black">迎え人数</label>
