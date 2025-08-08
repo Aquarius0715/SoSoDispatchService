@@ -154,6 +154,7 @@ const handleSaveManagement = (eventData: any) => {
 
 // page.tsx のhandleEventClick関数を修正
 const handleEventClick = (clickInfo: any) => {
+  console.log('clickInfo:', clickInfo);
   console.log('🔴 イベントがクリックされました!');
   console.log('🔴 clickInfo.event:', clickInfo.event);
   console.log('🔴 clickInfo.event.id:', clickInfo.event.id);
@@ -294,7 +295,20 @@ const handleAddEventClick = (e: React.MouseEvent, arg: any) => {
               }}
               events={events}
               eventClick={handleEventClick}
-              
+              dayCellContent={(arg) => (
+              <div className="relative h-full w-full pointer-events-none">
+                <span className="absolute top-1 right-20 text-sm text-gray-800">
+                  {arg.dayNumberText.replace('日', '')}
+                </span>
+                <button
+                  onClick={(e) => handleAddEventClick(e, arg)}
+                  className="absolute top-[-6px] right-1 text-gray-400 hover:bg-gray-200 rounded-full p-2 pointer-events-auto"
+                  aria-label="予定を追加"
+                >
+                  +
+                </button>
+              </div>
+            )}
             />
           </div>
         </main>
