@@ -36,6 +36,7 @@ func SetupRouter(cfg *Config) *echo.Echo {
 	calMRepo := &repository.CalenderMembershipRepository{DB: db}
 	eveRepo := &repository.EventRepository{DB: db}
 	evePRepo := &repository.EventParticipantRepository{DB: db}
+	sosoPRepo := &repository.SosoPointRepository{DB: db}
 
 	cookieCfg := handlers.CookieConf{
 		Name:     cfg.CookieNameRT,
@@ -49,6 +50,7 @@ func SetupRouter(cfg *Config) *echo.Echo {
 	calenderH := handlers.NewCalenderHandler(calRepo)
 	calenderMembershipH := handlers.NewCalenderMembershipHandler(calMRepo)
 	eventH := handlers.NewEventHandler(eveRepo, evePRepo)
+	sosoPH := handlers.NewSosoPointHandler(sosoPRepo)
 
 	// Echo標準ミドルウェア
 	e.Use(echoMW.Logger())
@@ -122,6 +124,7 @@ func SetupRouter(cfg *Config) *echo.Echo {
 	calG.POST("/:calender_id/join", calenderMembershipH.Create)
 	calG.GET("/my", calenderH.FindMyCalenders)
 	calG.GET("/:calender_id/members", calenderMembershipH.List)
+	calG.PUT("/:calender_id/members/:user_id", sosoPH.Update)
 	calG.POST("/:calender_id/events", eventH.Create)
 	calG.GET("/:calender_id/events", eventH.ListByCalender)
 
