@@ -18,6 +18,15 @@ export default function Home() {
 
   const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || '';
 
+  // 【追加】ページ読み込み時にlocalStorageからトークンを復元するuseEffect
+  useEffect(() => {
+    const storedToken = localStorage.getItem('access_token');
+    if (storedToken) {
+      setToken(storedToken);
+      console.log('localStorageからトークンを復元しました:', storedToken);
+    }
+  }, []); // 空の配列[]を指定することで、最初の1回だけ実行される
+
   useEffect(() => {
     const fetchCsrfToken = async () => {
       console.log('CSRFトークン取得開始...');
@@ -28,7 +37,7 @@ export default function Home() {
         if (!res.ok) {
           throw new Error(`HTTPエラー: ${res.status}`);
         }
-        const csrfToken = Cookies.get(`csrf_token`)?.toString ?? ""
+        const csrfToken = Cookies.get(`csrf_token`)?.toString() ?? ""
         setCsrfToken(csrfToken);
     };
 
@@ -59,6 +68,9 @@ export default function Home() {
 
       const data = await res.json();
       setToken(data.access_token);
+      // 【変更点】取得したトークンをlocalStorageに保存
+      localStorage.setItem('access_token', data.access_token); 
+
       console.log('✅ ログイン成功');
       console.log('取得したトークン:', data.access_token);
       alert('ログイン成功');
@@ -76,6 +88,7 @@ export default function Home() {
       const res = await fetch(`${API_BASE}/users/me`, {
         method: 'GET',
         headers: {
+          // 'token'はuseStateから取得するため、localStorageから復元されていれば値が入っている
           Authorization: `Bearer ${token}`,
         },
         credentials: 'include',
