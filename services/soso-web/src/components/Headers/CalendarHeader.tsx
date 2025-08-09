@@ -3,7 +3,8 @@ import React,{useState} from "react";
 import clsx from "clsx";
 import Button from "../Button/Button";
 import Image from "next/image";
-import ShareCalendarModal from "../Modal/ShareCalenderModal";
+import ShareCalenderModal from '../Modal/ShareCalenderModal'; 
+ develop
 
 interface Props {
   className?: string;
@@ -14,14 +15,17 @@ interface Props {
 }
 
 function CalendarHeader({ className, pageTitle, onLogout, onClickLogo, calendarUrl }: Props) {
-    const [showPopup, setShowPopup] = useState(false);
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    //const [showPopup, setShowPopup] = useState(false);
+    const [showModal, setShowModal] = useState(false);
+
+    const handleShareClick = () => {
     if (!calendarUrl) {
-    alert('共有できるカレンダーのURLが設定されていません。');
-        return; // 関数をここで終了
+      alert('共有できるカレンダーのURLが設定されていません。');
+      return;
     }
+
   // 2. 「カレンダー共有」ボタンがクリックされたときの処理をまとめた関数
-  const handleShareClick = () => {
+  /*const handleShareClick = () => {
     // クリップボードにURLをコピー
     navigator.clipboard.writeText(calendarUrl)
       .then(() => {
@@ -39,8 +43,20 @@ function CalendarHeader({ className, pageTitle, onLogout, onClickLogo, calendarU
         console.error('クリップボードへのコピーに失敗しました。', err);
         alert('URLのコピーに失敗しました。');
       });
+  };*/
+      navigator.clipboard.writeText(calendarUrl)
+      .then(() => {
+        setShowModal(true); // モーダル表示
+      })
+      .catch(err => {
+        console.error('クリップボードへのコピーに失敗しました。', err);
+        alert('URLのコピーに失敗しました。');
+      });
   };
+
+
   return (
+    <>
     <header className={clsx("bg-gray-500 shadow-md p-4 flex justify-between items-center", className)}>
       <div className="flex items-center gap-3"> {/* gap-3で間隔を調整 */}
         {/* アイコン部分 */}
@@ -69,6 +85,10 @@ function CalendarHeader({ className, pageTitle, onLogout, onClickLogo, calendarU
     shareUrl={calendarUrl}
 />
     </header>
+      {showModal && calendarUrl && (
+        <ShareCalenderModal url={calendarUrl} onClose={() => setShowModal(false)} />
+      )}
+    </>
   );
 }
 

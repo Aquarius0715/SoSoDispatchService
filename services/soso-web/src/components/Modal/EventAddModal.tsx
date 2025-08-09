@@ -5,7 +5,7 @@ import TimePicker from '../Button/TimePickerButton';
 import Textarea from '../TextFieald/Textfieald';
 import Input from '../TextFieald/Input';
 
-// モーダルの入力内容の型
+// EventStatusの型定義をモーダルの入力内容に合わせる
 interface EventStatus {
   date: string; // 日付
   title: string;
@@ -157,7 +157,7 @@ const handlePickUpCountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
   
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-600 bg-opacity-50">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 bg-opacity-50">
       <div className="bg-white rounded-lg shadow-lg w-1/3 overflow-y-auto max-h-screen">
         <div className="p-4 border-b flex justify-between items-center">
           <h3 className="text-xl font-bold text-black">予定追加</h3>
@@ -224,7 +224,7 @@ const handlePickUpCountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
           </div>
         </div>
         <div className="p-4 border-t flex justify-center">
-          <Button onClick={handleSave} className="bg-blue-600 hover:bg-blue-700 w-full">
+          <Button onClick={handleSave} className="text-white bg-gray-600 hover:bg-gray-700 w-full">
             入力完了
           </Button>
         </div>

@@ -57,7 +57,7 @@ const StatusEditModal: FC<StatusEditModalProps> = ({
 
   return (
     // モーダルの背景
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4">
+    <div className="fixed inset-0 bg-black^50 bg-opacity-50 flex justify-center items-center p-4">
       {/* モーダルの本体 */}
       <div className="bg-white p-8 rounded-lg shadow-xl w-full max-w-sm">
         

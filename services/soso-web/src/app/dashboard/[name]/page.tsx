@@ -17,6 +17,7 @@ import EventAddModal from '@/src/components/Modal/EventAddModal';
 import jaLocale from '@fullcalendar/core/locales/ja';
 import SOSOManagementModal from '@/src/components/Modal/SOSOManagementModal';
 import SOSOEditModal from '@/src/components/Modal/SOSOEditModal';
+import EventAddModal from '@/src/components/Modal/EventAddModal';
 
 // サイドバーで必要となるデータの型をインポート
 import { Member } from '@/src/components/MemberList/MenberList';
@@ -352,19 +353,43 @@ const handleSaveSosoChange = (editedData: EditedMemberData): void => {
               events={events}
               eventClick={handleEventClick}
               dayCellContent={(arg) => (
-                <div className="relative h-full w-full pointer-events-none">
-                  <span className="absolute top-1 right-20 text-sm text-gray-800">
+ fix/natsu/Calender-design
+                <div className="relative w-full h-full">
+                  <div className="absolute top-0 right-15 text-sm text-gray-800 pointer-events-none z-10">
                     {arg.dayNumberText.replace('日', '')}
-                  </span>
+                  </div>
                   <button
                     onClick={(e) => handleAddEventClick(e, arg)}
-                    className="absolute top-[-6px] right-1 text-gray-400 hover:bg-gray-200 rounded-full p-2 pointer-events-auto"
+                    className="absolute top-0 right-2 text-black text-base font-bold hover:opacity-70 hover:scale-105 transition-transform"
+
                     aria-label="予定を追加"
                   >
                     +
                   </button>
                 </div>
               )}
+                eventContent={(arg) => {
+                const startTime = arg.event.start
+                  ? new Date(arg.event.start).toLocaleTimeString('ja-JP', {
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })
+                  : '';
+
+                return (
+                  <div className="mt-2 flex items-center space-x-2 text-xs text-gray-800 truncate">
+                    {/* 青い丸 */}
+                    <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0" />
+
+                    {/* 時刻とタイトル */}
+                    <div>
+                      <span className="font-medium">{startTime}</span>{' '}
+                      <span>{arg.event.title}</span>
+                    </div>
+                  </div>
+                );
+              }}
+
             />
           </div>
         </main>
@@ -403,6 +428,34 @@ const handleSaveSosoChange = (editedData: EditedMemberData): void => {
           initialData={selectedMemberForEdit}
         />
       )}
+
+      {isAddModalOpen && (
+  <EventAddModal
+    isOpen={isAddModalOpen}
+    onClose={() => setIsAddModalOpen(false)}
+    onSave={(status) => {
+      const newEvent: EventInput = {
+        id: Date.now().toString(),
+        title: status.title,
+        start: selectedDate + 'T' + status.pickUpTime,
+        end: selectedDate + 'T' + status.dropOffTime,
+      };
+      setEvents(prev => [...prev, newEvent]);
+      setIsAddModalOpen(false);
+    }}
+    initialStatus={{
+      title: '',
+      details: '',
+      dropOffTime: '10:00',
+      pickUpTime: '09:00',
+      dropOffCount: 0,
+      pickUpCount: 0,
+      departurePoint: '',
+      destinationPoint: '',
+      members: [],
+    }}
+  />
+)}
     </div>
   );
 };
