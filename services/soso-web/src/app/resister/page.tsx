@@ -7,6 +7,7 @@ import Button from '../../components/Button/Button';
 import { useRouter } from 'next/navigation';
 import Radio from '@/src/components/Button/RadioButton';
 import Dropdown from '@/src/components/DropdownMenu/DropdownMenu';
+import Cookies from 'js-cookie';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -49,7 +50,6 @@ export default function RegisterPage() {
 
   useEffect(() => {
     const fetchCsrfToken = async () => {
-      try {
         const response = await fetch(`${API_BASE}/auth/csrf`, {
           method: 'GET',
           credentials: 'include',
@@ -58,14 +58,10 @@ export default function RegisterPage() {
         if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
       throw new Error(errorData.message || `HTTP ${response.status}: Registration failed`);
-    }
+        }
         
-        const data = await response.json();
-        setCsrfToken(data.csrf_token);
-        console.log('CSRFトークン取得成功:', data.csrf_token);
-      } catch (err: any) {
-        console.error('CSRFトークン取得失敗', err);
-      }
+        const csrfToken = Cookies.get(`csrf_token`)?.toString ?? ""
+        setCsrfToken(csrfToken);
     };
     
     fetchCsrfToken();
@@ -74,10 +70,6 @@ export default function RegisterPage() {
   const register = async () => {
     if (!validateForm()) return;
   
-  if (!csrfToken) {
-    alert('CSRF トークンが取得できていません。ページを再読み込みしてください。');
-    return;
-  }
 
     setLoading(true);
     try {
