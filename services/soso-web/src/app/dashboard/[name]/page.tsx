@@ -353,7 +353,7 @@ const handleSaveSosoChange = (editedData: EditedMemberData): void => {
               eventClick={handleEventClick}
               dayCellContent={(arg) => (
                 <div className="relative w-full h-full">
-                  <div className="absolute top-0 right-15 text-sm text-gray-800 pointer-events-none z-10">
+                  <div className="absolute top-0 right-[63px] text-sm text-gray-800 pointer-events-none z-10">
                     {arg.dayNumberText.replace('日', '')}
                   </div>
                   <button
@@ -375,7 +375,7 @@ const handleSaveSosoChange = (editedData: EditedMemberData): void => {
                   : '';
 
                 return (
-                  <div className="mt-2 flex items-center space-x-2 text-xs text-gray-800 truncate">
+                  <div className="flex items-center space-x-2 text-xs text-gray-800 truncate">
                     {/* 青い丸 */}
                     <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0" />
 

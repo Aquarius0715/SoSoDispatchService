@@ -46,11 +46,11 @@ const CalendarHeader: React.FC<Props> = ({ className, pageTitle, onLogout, onCli
           </button>
           <h1 className="text-2xl font-bold text-white">{pageTitle}</h1>
         </div>
-        <div className="flex items-center gap-2">
-          <Button className="bg-gray-400 text-white hover:bg-gray-800" onClick={handleShareClick}>
+        <div className="flex items-center gap-4">
+          <Button className="bg-gray-400 text-white hover:bg-gray-800 px-6 py-3">
             <span className="text-white">カレンダー共有</span>
           </Button>
-          <Button className="bg-gray-700 text-white hover:bg-gray-800" onClick={onLogout}>
+          <Button className="bg-gray-700 text-white hover:bg-gray-800 px-6 py-3">
             <span className="text-white">ログアウト</span>
           </Button>
         </div>
