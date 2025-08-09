@@ -10,6 +10,8 @@ func New() *CustomValidator {
 
 	RegisterUser(v)
 	ResisterCalender(v)
+	RegisterEvent(v)
+	ResisterCalenderMembership(v)
 
 	return &CustomValidator{v: v}
 }

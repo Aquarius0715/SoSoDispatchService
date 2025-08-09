@@ -34,6 +34,9 @@ func SetupRouter(cfg *Config) *echo.Echo {
 	rtRepo := &repository.RefreshTokenRepository{DB: db}
 	calRepo := &repository.CalenderRepository{DB: db}
 	calMRepo := &repository.CalenderMembershipRepository{DB: db}
+	eveRepo := &repository.EventRepository{DB: db}
+	evePRepo := &repository.EventParticipantRepository{DB: db}
+	sosoPRepo := &repository.SosoPointRepository{DB: db}
 
 	cookieCfg := handlers.CookieConf{
 		Name:     cfg.CookieNameRT,
@@ -46,6 +49,8 @@ func SetupRouter(cfg *Config) *echo.Echo {
 	userH := handlers.NewUserHandler(userRepo)
 	calenderH := handlers.NewCalenderHandler(calRepo)
 	calenderMembershipH := handlers.NewCalenderMembershipHandler(calMRepo)
+	eventH := handlers.NewEventHandler(eveRepo, evePRepo)
+	sosoPH := handlers.NewSosoPointHandler(sosoPRepo)
 
 	// Echo標準ミドルウェア
 	e.Use(echoMW.Logger())
@@ -119,6 +124,16 @@ func SetupRouter(cfg *Config) *echo.Echo {
 	calG.POST("/:calender_id/join", calenderMembershipH.Create)
 	calG.GET("/my", calenderH.FindMyCalenders)
 	calG.GET("/:calender_id/members", calenderMembershipH.List)
+	calG.PUT("/:calender_id/members/:user_id/point", sosoPH.Update)
+	calG.POST("/:calender_id/events", eventH.Create)
+	calG.GET("/:calender_id/events", eventH.ListByCalender)
+
+	eveG := e.Group("/events", csrfMW, echojwt.WithConfig(jwtCfg))
+	eveG.GET("/:event_id", eventH.FindById)
+	eveG.POST("/:event_id/pickup", eventH.RegisterPickUp)
+	eveG.POST("/:event_id/return", eventH.RegisterReturn)
+	eveG.GET("/:event_id/detail", eventH.Detail)
+	eveG.GET("/:event_id/members", eventH.Members)
 
 	// シャットダウン時クローズ
 	e.Server.RegisterOnShutdown(func() { _ = db.Close() })

@@ -5,30 +5,29 @@ import TimePicker from '../Button/TimePickerButton';
 import Textarea from '../TextFieald/Textfieald';
 import Input from '../TextFieald/Input';
 
-
 // EventStatusの型定義をモーダルの入力内容に合わせる
 interface EventStatus {
+  date: string; // 日付
   title: string;
   details: string;
   dropOffTime: string; // 送り時刻
-  pickUpTime: string;  // 迎え時刻
+  pickUpTime: string; // 迎え時刻
   dropOffCount: number; // 送り人数
-  pickUpCount: number;  // 迎え人数
+  pickUpCount: number; // 迎え人数
   departurePoint: string;
   destinationPoint: string;
-  members: string[]; // 参加者
+  members: string[];
 }
 
-// EventAddModalのProps型定義
+// EventAddModalが受け取るPropsの型
 interface EventAddModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (status: EventStatus) => void;
-  // 初期値のデータ構造をEventStatusに合わせる
   initialStatus: EventStatus;
 }
 
-// 参加者データの配列を定義
+// 参加者データの仮配列
 const initialParticipants = [
   { id: 1, name: '田中太郎', isChecked: false },
   { id: 2, name: '佐藤花子', isChecked: false },
@@ -39,9 +38,9 @@ const EventAddModal: React.FC<EventAddModalProps> = ({
   isOpen,
   onClose,
   onSave,
-  initialStatus
+  initialStatus,
 }) => {
-  // initialStatusの値を各stateの初期値として設定
+  const [date, setDate] = useState(initialStatus.date);
   const [title, setTitle] = useState(initialStatus.title);
   const [details, setDetails] = useState(initialStatus.details);
   const [dropOffTime, setDropOffTime] = useState(initialStatus.dropOffTime);
@@ -50,11 +49,48 @@ const EventAddModal: React.FC<EventAddModalProps> = ({
   const [pickUpCount, setPickUpCount] = useState(initialStatus.pickUpCount);
   const [departurePoint, setDeparturePoint] = useState(initialStatus.departurePoint);
   const [destinationPoint, setDestinationPoint] = useState(initialStatus.destinationPoint);
-  
-  // 参加者リストはローカルで管理
   const [participants, setParticipants] = useState(initialParticipants);
+  const [dropOffCountInput, setDropOffCountInput] = useState(
+  initialStatus.dropOffCount === 0 ? '' : String(initialStatus.dropOffCount)
+);
+  const [pickUpCountInput, setPickUpCountInput] = useState(
+    initialStatus.pickUpCount === 0 ? '' : String(initialStatus.pickUpCount)
+  );
 
-  // モーダル表示中のスクロールロック処理
+  // 日付のフォーマット処理を修正
+  const formatDate = (dateString: string) => {
+    try {
+      const dateObj = new Date(dateString);
+      // 無効な日付の場合のフォールバック
+      if (isNaN(dateObj.getTime())) {
+        return dateString;
+      }
+      return dateObj.toLocaleDateString('ja-JP', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        weekday: 'short'
+      });
+    } catch (error) {
+      return dateString;
+    }
+  };
+
+  useEffect(() => {
+    if (isOpen) {
+      setDate(initialStatus.date);
+      setTitle(initialStatus.title);
+      setDetails(initialStatus.details);
+      setDropOffTime(initialStatus.dropOffTime);
+      setPickUpTime(initialStatus.pickUpTime);
+      setDropOffCount(initialStatus.dropOffCount);
+      setPickUpCount(initialStatus.pickUpCount);
+      setDeparturePoint(initialStatus.departurePoint);
+      setDestinationPoint(initialStatus.destinationPoint);
+      setParticipants(initialParticipants.map(p => ({ ...p, isChecked: false })));
+    }
+  }, [isOpen, initialStatus]);
+
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
@@ -66,35 +102,43 @@ const EventAddModal: React.FC<EventAddModalProps> = ({
     };
   }, [isOpen]);
 
-  // チェックボックスの状態変更ハンドラ
   const handleCheckboxChange = (id: number) => {
     setParticipants(
-      participants.map(participant =>
-        participant.id === id ? { ...participant, isChecked: !participant.isChecked } : participant,
-      ),
+      participants.map(p =>
+        p.id === id ? { ...p, isChecked: !p.isChecked } : p
+      )
     );
   };
 
-  // 入力フィールドの変更ハンドラ
   const handleInputChange = (setter: React.Dispatch<React.SetStateAction<string>>) => {
     return (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       setter(e.target.value);
     };
   };
 
-  // 数値用のハンドラーを追加
-  const handleNumberInputChange = (setter: React.Dispatch<React.SetStateAction<number>>) => {
-    return (e: React.ChangeEvent<HTMLInputElement>) => {
-      const value = parseInt(e.target.value) || 0;
-      setter(value);
-    };
-  };
+  // 送り人数用のハンドラー
+const handleDropOffCountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const inputValue = e.target.value;
+  setDropOffCountInput(inputValue); // 入力フィールドは常に文字列で更新
+  
+  // 保存時に使う数値の状態を更新
+  setDropOffCount(parseInt(inputValue) || 0); 
+};
+
+// 迎え人数用のハンドラーを追加
+const handlePickUpCountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const inputValue = e.target.value;
+  setPickUpCountInput(inputValue); // 入力フィールドは常に文字列で更新
+  
+  // 保存時に使う数値の状態を更新
+  setPickUpCount(parseInt(inputValue) || 0); 
+};
 
   // 保存ボタンが押されたときの処理
   const handleSave = () => {
     const selectedMembers = participants.filter(p => p.isChecked).map(p => p.name);
-
     const eventStatus: EventStatus = {
+      date,
       title,
       details,
       dropOffTime,
@@ -105,78 +149,53 @@ const EventAddModal: React.FC<EventAddModalProps> = ({
       destinationPoint,
       members: selectedMembers,
     };
-    
     onSave(eventStatus);
-    
-    console.log('保存ボタンがクリックされました', eventStatus);
+    onClose();
   };
 
   if (!isOpen) return null;
+  
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 bg-opacity-50">
       <div className="bg-white rounded-lg shadow-lg w-1/3 overflow-y-auto max-h-screen">
         <div className="p-4 border-b flex justify-between items-center">
-          {/* ヘッダーのタイトルを黒文字に修正 */}
           <h3 className="text-xl font-bold text-black">予定追加</h3>
-          <button 
-            onClick={onClose}
-            className="text-gray-500 hover:text-gray-800"
-          >
+          <button onClick={onClose} className="text-gray-500 hover:text-gray-800">
             <span className="text-2xl">&times;</span>
           </button>
         </div>
-
         <div className="p-4 space-y-4">
-          {/* 日付表示部分のテキストを黒文字に修正 */}
-          <div className="text-center font-bold text-lg text-black">2024年4月5日</div>
+          {/* 日付表示を修正 */}
+          <div className="text-center font-bold text-lg text-black bg-blue-50 p-2 rounded">
+            {date}
+          </div>
           <div>
-            {/* ラベルのテキストを黒文字に修正 */}
             <label className="block text-sm font-semibold mb-1 text-black">タイトル</label>
-            <Input
-              value={title}
-              onChange={handleInputChange(setTitle)}
-              placeholder="タイトル"
-              className="w-full text-black"
-            />
+            <Input value={title} onChange={handleInputChange(setTitle)} placeholder="タイトル" className="w-full text-black" />
           </div>
           <div>
-            {/* ラベルのテキストを黒文字に修正 */}
             <label className="block text-sm font-semibold mb-1 text-black">詳細</label>
-            <Textarea
-              value={details}
-              onChange={handleInputChange(setDetails)}
-              placeholder="詳細"
-              className="w-full text-black"
-            />
+            <Textarea value={details} onChange={handleInputChange(setDetails)} placeholder="詳細" className="w-full text-black" />
           </div>
           <div>
-            {/* ラベルのテキストを黒文字に修正 */}
             <label className="block text-sm font-semibold mb-1 text-black">送り時刻</label>
             <TimePicker value={dropOffTime} onChange={setDropOffTime} />
           </div>
           <div>
-            {/* ラベルのテキストを黒文字に修正 */}
             <label className="block text-sm font-semibold mb-1 text-black">迎え時刻</label>
             <TimePicker value={pickUpTime} onChange={setPickUpTime} />
           </div>
           <div className="flex space-x-4">
             <div className="w-1/2">
-              {/* ラベルのテキストを黒文字に修正 */}
               <label className="block text-sm font-semibold mb-1 text-black">送り人数</label>
-              <Input
-                value={dropOffCount}
-                onChange={handleNumberInputChange(setDropOffCount)}
-                placeholder="送り人数"
-                className="w-full text-black"
-              />
+              <Input value={dropOffCountInput} onChange={handleDropOffCountChange} placeholder="送り人数" className="w-full text-black" />
             </div>
             <div className="w-1/2">
-              {/* ラベルのテキストを黒文字に修正 */}
               <label className="block text-sm font-semibold mb-1 text-black">迎え人数</label>
               <Input
-                value={pickUpCount}
-                onChange={handleNumberInputChange(setPickUpCount)}
+                value={pickUpCountInput}
+                onChange={handlePickUpCountChange}
                 placeholder="迎え人数"
                 className="w-full text-black"
               />
@@ -184,38 +203,21 @@ const EventAddModal: React.FC<EventAddModalProps> = ({
           </div>
           <div className="flex space-x-4">
             <div className="w-1/2">
-              {/* ラベルのテキストを黒文字に修正 */}
               <label className="block text-sm font-semibold mb-1 text-black">出発地</label>
-              <Input
-                value={departurePoint}
-                onChange={handleInputChange(setDeparturePoint)}
-                placeholder="出発地"
-                className="w-full text-black"
-              />
+              <Input value={departurePoint} onChange={handleInputChange(setDeparturePoint)} placeholder="出発地" className="w-full text-black" />
             </div>
             <div className="w-1/2">
-              {/* ラベルのテキストを黒文字に修正 */}
               <label className="block text-sm font-semibold mb-1 text-black">目的地</label>
-              <Input
-                value={destinationPoint}
-                onChange={handleInputChange(setDestinationPoint)}
-                placeholder="目的地"
-                className="w-full text-black"
-              />
+              <Input value={destinationPoint} onChange={handleInputChange(setDestinationPoint)} placeholder="目的地" className="w-full text-black" />
             </div>
           </div>
           <div>
-            {/* 参加者セクションのタイトルを黒文字に修正 */}
             <h3 className="text-sm font-semibold mb-2 text-black">参加者</h3>
             <div className="border rounded-lg p-3 space-y-2">
-              {participants.map(participant => (
-                <label key={participant.id} className="flex items-center space-x-2 cursor-pointer">
-                  <Checkbox
-                    checked={participant.isChecked}
-                    onChange={() => handleCheckboxChange(participant.id)}
-                  />
-                  {/* 参加者名のテキストを黒文字に修正 */}
-                  <span className="text-black">{participant.name}</span>
+              {participants.map(p => (
+                <label key={p.id} className="flex items-center space-x-2 cursor-pointer">
+                  <Checkbox checked={p.isChecked} onChange={() => handleCheckboxChange(p.id)} />
+                  <span className="text-black">{p.name}</span>
                 </label>
               ))}
             </div>
