@@ -17,6 +17,8 @@ import EventAddModal from '@/src/components/Modal/EventAddModal';
 import jaLocale from '@fullcalendar/core/locales/ja';
 import SOSOManagementModal from '@/src/components/Modal/SOSOManagementModal';
 import SOSOEditModal from '@/src/components/Modal/SOSOEditModal';
+import EventDetailModal from '@/src/components/Modal/EventDetailModal';
+import { EventDetails } from '@/src/components/Modal/EventDetailModal';
 
 // サイドバーで必要となるデータの型をインポート
 import { Member } from '@/src/components/MemberList/MenberList';
@@ -48,6 +50,7 @@ interface EventStatus {
   members: string[];
 }
 
+
 interface EventProps {
   id: string;
   title: string;
@@ -77,12 +80,13 @@ const DashboardPage: NextPage<DashboardPageProps> = ({ params }) => {
     { id: 4, username: '伊藤 花子', hasCar: true, seatsRequired: 6, sosoPoint: 200 },
   ]);
   const [logs, setLogs] = useState<SOSOTransaction[]>([]);
-  const [isSosoModalOpen, setIsSosoModalOpen] = useState(false);
-  const [selectedMember, setSelectedMember] = useState<Member | null>(null);
+
   const [isSOSOEditModalOpen, setIsSOSOEditModalOpen] = useState(false);
   const [selectedMemberForEdit, setSelectedMemberForEdit] = useState<Member | null>(null);
   const [eventLogs, setEventLogs] = useState<{[eventId: string]: SOSOTransaction[]}>({});
   const [editSource, setEditSource] = useState<'sidebar' | 'management' | null>(null);
+  const [isEventDetailModalOpen, setIsEventDetailModalOpen] = useState(false);
+  const [eventDetailData, setEventDetailData] = useState<EventDetails | null>(null);
 
 
   // --- ▼▼▼ useEffect ▼▼▼ ---
@@ -280,8 +284,22 @@ const handleSaveSosoChange = (editedData: EditedMemberData): void => {
           }
         };
         
-        setSelectedManagementEvent(eventProps);
-        setIsManagementModalOpen(true);
+        // setSelectedManagementEvent(eventProps);
+        // setIsManagementModalOpen(true);
+        setIsEventDetailModalOpen(true);
+        setEventDetailData({
+          id: eventId,
+          date : clickInfo.event.startStr.split('T')[0] || '',
+          title: clickInfo.event.title || '',
+          details: clickInfo.event.extendedProps?.details || '',
+          dropOffTime: clickInfo.event.startStr || '',
+          pickUpTime: clickInfo.event.endStr || '',
+          dropOffCount: clickInfo.event.extendedProps?.dropOffCount || 0,
+          pickUpCount: clickInfo.event.extendedProps?.pickUpCount || 0,
+          departurePoint: clickInfo.event.extendedProps?.departurePoint || '',
+          destinationPoint: clickInfo.event.extendedProps?.destinationPoint || '',
+          members: clickInfo.event.extendedProps?.members || [],
+        });
       } else {
         console.error("🔴 Clicked event has no ID.");
       }
@@ -427,34 +445,15 @@ const handleSaveSosoChange = (editedData: EditedMemberData): void => {
         />
       )}
 
-      {isAddModalOpen && (
-  <EventAddModal
-    isOpen={isAddModalOpen}
-    onClose={() => setIsAddModalOpen(false)}
-    onSave={(status) => {
-      const newEvent: EventInput = {
-        id: Date.now().toString(),
-        title: status.title,
-        start: selectedDate + 'T' + status.pickUpTime,
-        end: selectedDate + 'T' + status.dropOffTime,
-      };
-      setEvents(prev => [...prev, newEvent]);
-      setIsAddModalOpen(false);
-    }}
-    initialStatus={{
-      title: '',
-      details: '',
-      dropOffTime: '10:00',
-      pickUpTime: '09:00',
-      dropOffCount: 0,
-      pickUpCount: 0,
-      departurePoint: '',
-      destinationPoint: '',
-      members: [],
-    }}
-  />
-)}
+      
 
+      {isEventDetailModalOpen && eventDetailData && (
+        <EventDetailModal
+          isOpen={isEventDetailModalOpen}
+          onClose={() => setIsEventDetailModalOpen(false)}
+          eventData={eventDetailData}
+        />
+      )}
       
     </div>
   );
