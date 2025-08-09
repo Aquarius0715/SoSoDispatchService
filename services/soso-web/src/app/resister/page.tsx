@@ -140,6 +140,7 @@ export default function RegisterPage() {
               パスワード
             </label>
             <Input
+              type='password'
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="!h-11 !rounded-md bg-white w-full max-w-md"

@@ -17,7 +17,7 @@ const Input: React.FC<Props> = (props) => {
 
   return (
     <input
-      type="text"
+      type={props.type ?? 'text'}
       className={clsx(className)}
       placeholder={props.placeholder}
       id={props.id}
