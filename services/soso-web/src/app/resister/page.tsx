@@ -202,9 +202,19 @@ export default function RegisterPage() {
         </div>
         <Button
           onClick={register}
-          className="bg-gray-600 hover:bg-gray-700 text-white w-full max-w-md flex justify-center"
+          className={`bg-gray-600 hover:bg-gray-700 text-white w-full max-w-md flex justify-center ${
+            loading ? 'opacity-50 cursor-not-allowed' : ''
+          }`}
+          disabled={loading}
         >
-        登録
+          {loading ? (
+            <div className="flex items-center">
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+              登録中...
+            </div>
+          ) : (
+            '登録'
+          )}
         </Button>
         </div>
       </div>
