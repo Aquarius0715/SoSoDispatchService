@@ -47,9 +47,11 @@ const SOSOEditModal: React.FC<Props> = ({ isOpen, onClose, onSave, initialData }
   };
 
   return (
-    <div className='fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center z-50'>
-      <div className={clsx('bg-white p-6 rounded-lg shadow-xl w-96')}>
+
+    <div className='fixed inset-0 bg-black/30 bg-opacity-50 overflow-y-auto z-50 h-full w-full flex items-center justify-center'>
+      <div className={clsx('bg-white p-6 rounded-lg shadow-xl w-96 z-60')}>
         <div className="p-4 border-b flex justify-between items-center">
+          {/* ヘッダーのタイトルを黒文字に修正 */}
           <h3 className="text-xl font-bold text-black">SOSO編集</h3>
           <button 
             onClick={onClose}
