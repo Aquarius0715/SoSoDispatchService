@@ -17,7 +17,6 @@ import EventAddModal from '@/src/components/Modal/EventAddModal';
 import jaLocale from '@fullcalendar/core/locales/ja';
 import SOSOManagementModal from '@/src/components/Modal/SOSOManagementModal';
 import SOSOEditModal from '@/src/components/Modal/SOSOEditModal';
-import EventAddModal from '@/src/components/Modal/EventAddModal';
 
 // サイドバーで必要となるデータの型をインポート
 import { Member } from '@/src/components/MemberList/MenberList';
@@ -353,7 +352,6 @@ const handleSaveSosoChange = (editedData: EditedMemberData): void => {
               events={events}
               eventClick={handleEventClick}
               dayCellContent={(arg) => (
- fix/natsu/Calender-design
                 <div className="relative w-full h-full">
                   <div className="absolute top-0 right-15 text-sm text-gray-800 pointer-events-none z-10">
                     {arg.dayNumberText.replace('日', '')}
@@ -456,6 +454,8 @@ const handleSaveSosoChange = (editedData: EditedMemberData): void => {
     }}
   />
 )}
+
+      
     </div>
   );
 };
