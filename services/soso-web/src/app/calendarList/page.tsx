@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import MyPageHeader from '@/src/components/Headers/MyPageHeader';
 import MyPageLeftSidebar from '@/src/components/Sidebar/MyPageLeftSidebar';
 import MyPageRightSidebar from '@/src/components/Sidebar/MyPageRightSidebar';
@@ -43,12 +43,44 @@ export default function MyPage() {
     capacity: 3,
   });
 
-  const [calendars, setCalendars] = useState<CalendarEntry[]>([
-    { id: 1, name: 'テニスサークル' },
-    { id: 2, name: '軽音学部' },
-    { id: 3, name: 'ゼミ' },
-    { id: 4, name: 'バイト仲間' },
-  ]);
+  const [calendars, setCalendars] = useState<CalendarEntry[]>([]);
+
+const fetchCalendars = async () => { 
+    try {
+      // 1. localStorageからアクセストークンを取得
+      const accessToken = localStorage.getItem('accessToken');
+
+      // トークンがない場合は処理を中断
+      if (!accessToken) {
+        console.error('アクセストークンがありません。ログインしてください。');
+        // 必要に応じてログインページへのリダイレクト処理などを追加
+        return;
+      }
+
+      const response = await fetch('/calenders/my', {
+        // 2. headersを追加
+        headers: {
+          // 'Authorization'ヘッダーに、"Bearer "という文字列を付けてトークンをセット
+          'Authorization': `Bearer ${accessToken}`,
+          // もしCSRFトークンも必要であれば、同様に追加します。
+          // 'X-CSRF-Token': '取得したCSRFトークン'
+        }
+      });
+
+      if (!response.ok) {
+        // エラー発生時にステータスコードも表示するとデバッグしやすくなります
+        throw new Error(`カレンダーの取得に失敗しました (Status: ${response.status})`);
+      }
+      const data: CalendarEntry[] = await response.json();
+      setCalendars(data);
+    } catch (error) {
+      console.error('カレンダーの取得に失敗:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchCalendars();
+  }, []);
 
   const drives: Drive[] = [
     {
@@ -116,14 +148,36 @@ export default function MyPage() {
     setIsStatusEditModalOpen(false); // モーダルを閉じる
   };
 
-  const handleSaveAddCalendar = (newCalendar: calendarAddProps): void => {
-    const newEntry: CalendarEntry = {
-      id: calendars.length + 1,
-      name: newCalendar.calendarName,
-    };
-    setCalendars([...calendars, newEntry]);
-    setIsTeamAddModalOpen(false);
+  const handleSaveAddCalendar = async (newCalendar: calendarAddProps): Promise<void> => {
+    try {
+      const response = await fetch('/calenders/create', {
+        method: 'POST',
+        // handleSaveAddCalendar内のheaders
+        headers: {
+          'Content-Type': 'application/json',
+          // 'acssToken' は 'Authorization' の間違いである可能性があります
+          acssToken: localStorage.getItem('accessToken') || '',
+        },
+        body: JSON.stringify({ name: newCalendar.calendarName }),
+    });
+      if (!response.ok) {
+        throw new Error('カレンダーの追加に失敗しました');
+      }
+      await fetchCalendars();
+      setIsTeamAddModalOpen(false);
+    } catch (error) {
+      console.error('カレンダーの追加に失敗:', error);
+    }
   };
+
+  // const handleSaveAddCalendar = (newCalendar: calendarAddProps): void => {
+  //   const newEntry: CalendarEntry = {
+  //     id: calendars.length + 1,
+  //     name: newCalendar.calendarName,
+  //   };
+  //   setCalendars([...calendars, newEntry]);
+  //   setIsTeamAddModalOpen(false);
+  // };
 
   return (
     <div className="flex flex-col h-screen bg-gray-100">
