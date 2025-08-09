@@ -18,7 +18,7 @@ export interface CalendarEntry {
 
 // ユーザー情報の型定義
 interface UserStatus {
-  userName: string;
+  username: string;
   mailAddress: string;
   hasCar: boolean;
   capacity: number;
@@ -35,7 +35,7 @@ export default function MyPage() {
 
   // ユーザー情報のステート。初期値は空に設定
   const [userStatus, setUserStatus] = useState<UserStatus>({
-    userName: '読み込み中...',
+    username: '読み込み中...',
     mailAddress: '',
     hasCar: false,
     capacity: 0,
@@ -189,7 +189,7 @@ export default function MyPage() {
       />
       <div className="flex flex-grow overflow-hidden">
         <MyPageLeftSidebar
-          userName={userStatus.userName}
+          username={userStatus.username}
           hasCar={userStatus.hasCar}
           seatsRequired={userStatus.capacity}
           onEditClick={handleEditStatus}

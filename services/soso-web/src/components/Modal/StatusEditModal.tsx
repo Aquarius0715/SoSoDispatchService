@@ -7,7 +7,7 @@ import Radio from '../Button/RadioButton';
 
 // 1. モーダルで扱うデータの型定義に`mailAddress`を追加
 interface UserStatus {
-  userName: string;
+  username: string;
   mailAddress: string; // ★追加
   hasCar: boolean;
   capacity: number;
@@ -28,14 +28,14 @@ const StatusEditModal: FC<StatusEditModalProps> = ({
   initialStatus,
 }) => {
   // 2. 各フォームフィールドの状態を管理（mailAddressを追加）
-  const [userName, setUserName] = useState(initialStatus.userName);
+  const [username, setUserName] = useState(initialStatus.username);
   const [mailAddress, setMailAddress] = useState(initialStatus.mailAddress); // ★追加
   const [hasCar, setHasCar] = useState(initialStatus.hasCar);
   const [capacity, setCapacity] = useState(initialStatus.capacity);
 
   // 保存ボタンが押されたときの処理（onSaveにmailAddressを渡す）
   const handleSave = () => {
-    onSave({ userName, mailAddress, hasCar, capacity }); // ★mailAddressを追加
+    onSave({ username, mailAddress, hasCar, capacity }); // ★mailAddressを追加
   };
   
   // モーダルが開いていなければ何も表示しない
@@ -74,7 +74,7 @@ const StatusEditModal: FC<StatusEditModalProps> = ({
               ユーザー名
             </label>
             <Textarea
-              value={userName}
+              value={username}
               onChange={(e) => setUserName(e.target.value)}
               className="!h-11 !rounded-md text-black " 
             />
