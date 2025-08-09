@@ -27,6 +27,11 @@ rebuild:
 	$(DC) build --no-cache
 	$(DC) up -d
 
+dev:
+	$(DC) down
+	$(DC) build soso-api soso-web --no-cache
+	$(DC) up -d
+
 ## イメージの pull（依存イメージの更新）
 pull:
 	$(DC) pull
