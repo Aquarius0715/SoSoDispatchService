@@ -309,7 +309,7 @@ const handleSaveSosoChange = (editedData: EditedMemberData): void => {
 
     const handleLogoClick = () => {
       console.log("🔵 ロゴがクリックされました。");
-      router.push('/mypage');
+      router.push('../');
     };
 
     const handleEditMember = (member: Member) => {
