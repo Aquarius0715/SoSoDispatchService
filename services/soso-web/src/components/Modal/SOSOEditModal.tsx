@@ -48,11 +48,11 @@ function SOSOEditModal({ isOpen, onClose, onSave, initialData }: Props) {
   };
 
   return (
-    <div className='fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center'>
-      <div className={clsx('bg-white p-6 rounded-lg shadow-xl w-96')}>
+    <div className='fixed inset-0 bg-black/50 bg-opacity-50 z-50 overflow-y-auto h-full w-full flex items-center justify-center'>
+      <div className={clsx('bg-white p-6 rounded-lg shadow-xl w-96 z-60')}>
         <div className="p-4 border-b flex justify-between items-center">
           {/* ヘッダーのタイトルを黒文字に修正 */}
-          <h3 className="text-xl font-bold text-black">予定追加</h3>
+          <h3 className="text-xl font-bold text-black">メンバー編集</h3>
           <button 
             onClick={onClose}
             className="text-gray-500 hover:text-gray-800"
