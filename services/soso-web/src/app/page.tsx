@@ -1,92 +1,134 @@
 "use client";
 
-import { useState, useEffect } from 'react'
-import axios from 'axios'
-import Image from 'next/image'
+import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import Input from '../components/TextFieald/Input';
 import Button from '../components/Button/Button';
 import { useRouter } from 'next/navigation';
 
-
 export default function Home() {
-  const router = useRouter(); // ★ この行を追加
-  const [username, setUsername] = useState('')
-  const [mailAddress, setMailAddress] = useState('')
-  const [password, setPassword] = useState('')
-  const [token, setToken] = useState('')
-  const [csrfToken, setCsrfToken] = useState('')
-  const [userInfo, setUserInfo] = useState<any>(null)
+  const router = useRouter();
+  const [username, setUsername] = useState('');
+  const [mailAddress, setMailAddress] = useState('');
+  const [password, setPassword] = useState('');
+  const [token, setToken] = useState('');
+  const [csrfToken, setCsrfToken] = useState('');
+  const [userInfo, setUserInfo] = useState<any>(null);
 
-  const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || ''
+  const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || '';
 
   useEffect(() => {
-    // const fetchCsrfToken = async () => {
-    //   try {
-    //     const res = await axios.get(`${API_BASE}/auth/csrf`, {
-    //       withCredentials: true
-    //     })
-    //     setCsrfToken(res.data.csrf_token)
-    //   } catch (err: any) {
-    //     console.error('CSRFトークン取得失敗', err)
-    //   }
-    // }
+    const fetchCsrfToken = async () => {
+      console.log('CSRFトークン取得開始...');
+      try {
+        const res = await fetch(`${API_BASE}/auth/csrf`, {
+          method: 'GET',
+          credentials: 'include'
+        });
+        if (!res.ok) {
+          throw new Error(`HTTPエラー: ${res.status}`);
+        }
+        const data = await res.json();
+        setCsrfToken(data.csrf_token);
+        console.log('✅ CSRFトークン取得成功:', data.csrf_token);
+      } catch (err: any) {
+        console.error('❌ CSRFトークン取得失敗:', err);
+      }
+    };
 
-    // fetchCsrfToken()
-  }, [API_BASE])
+    fetchCsrfToken();
+  }, [API_BASE]);
 
   const register = async () => {
+    console.log('新規登録処理開始...');
     try {
-      // await axios.post(`${API_BASE}/users/register`, {
-      //   username,
-      //   mailAddress,
-      //   password,
-      //   hasCar: true,
-      //   capacity: 4
-      // }, {
-      //   headers: { 'X-CSRF-Token': csrfToken },
-      //   withCredentials: true
-      // })
-      router.push('/resister');
-      alert('登録成功')
+      const res = await fetch(`${API_BASE}/users/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': csrfToken,
+        },
+        body: JSON.stringify({
+          username,
+          mailAddress,
+          password,
+          hasCar: true,
+          capacity: 4,
+        }),
+        credentials: 'include',
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message);
+      }
+
+      console.log('✅ 新規登録成功');
+      alert('登録成功');
     } catch (err: any) {
-      alert('登録失敗: ' + err.response?.data?.message)
+      console.error('❌ 新規登録失敗:', err.message);
+      alert('登録失敗: ' + err.message);
     }
-  }
+  };
 
   const login = async () => {
+    console.log('ログイン処理開始...');
     try {
-      // const res = await axios.post(`${API_BASE}/auth/login`, {
-      //   mailAddress,
-      //   password
-      // }, {
-      //   headers: { 'X-CSRF-Token': csrfToken },
-      //   withCredentials: true
-      // })
-      // setToken(res.data.access_token)
+      const res = await fetch(`${API_BASE}/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': csrfToken,
+        },
+        body: JSON.stringify({
+          mailAddress,
+          password,
+        }),
+        credentials: 'include',
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message);
+      }
+
+      const data = await res.json();
+      setToken(data.access_token);
+      console.log('✅ ログイン成功');
+      console.log('取得したトークン:', data.access_token);
+      alert('ログイン成功');
       router.push('/calendarList');
-      alert('ログイン成功')
-      
     } catch (err: any) {
-      alert('ログイン失敗: ' + err.response?.data?.message)
+      console.error('❌ ログイン失敗:', err.message);
+      alert('ログイン失敗: ' + err.message);
     }
-  }
+  };
 
   const getMe = async () => {
+    console.log('ユーザー情報取得開始...');
+    console.log('使用トークン:', token);
     try {
-      const res = await axios.get(`${API_BASE}/users/me`, {
+      const res = await fetch(`${API_BASE}/users/me`, {
+        method: 'GET',
         headers: {
-          Authorization: `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
         },
-        withCredentials: true
-      })
-      setUserInfo(res.data)
-    } catch (err: any) {
-      alert('取得失敗: ' + err.response?.data?.message)
-    }
-  }
+        credentials: 'include',
+      });
 
-  const handleEdit = () => {
-    alert('ステータス編集ボタンがクリックされました！');
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message);
+      }
+
+      const data = await res.json();
+      setUserInfo(data);
+      console.log('✅ ユーザー情報取得成功:', data);
+      alert('取得成功');
+    } catch (err: any) {
+      console.error('❌ ユーザー情報取得失敗:', err.message);
+      alert('取得失敗: ' + err.message);
+    }
   };
 
   return (
@@ -119,7 +161,7 @@ export default function Home() {
             <Input
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="!h-11 !rounded-md bg-white w-full max-w-md" 
+              className="!h-11 !rounded-md bg-white w-full max-w-md"
             />
           </div>
           <Button
@@ -137,45 +179,5 @@ export default function Home() {
         </div>
       </div>
     </div>
-    
-  )
+  );
 }
- // <div className="p-4 max-w-md mx-auto space-y-4">
-
-      
-    //   <h1 className="text-xl font-bold">ユーザー登録 & ログイン</h1>
-
-    //   <input
-    //     type="text"
-    //     placeholder="ユーザー名"
-    //     className="w-full p-2 border"
-    //     value={username}
-    //     onChange={(e) => setUsername(e.target.value)}
-    //   />
-    //   <input
-    //     type="text"
-    //     placeholder="メールアドレス"
-    //     className="w-full p-2 border"
-    //     value={mailAddress}
-    //     onChange={(e) => setMailAddress(e.target.value)}
-    //   />
-    //   <input
-    //     type="password"
-    //     placeholder="パスワード"
-    //     className="w-full p-2 border"
-    //     value={password}
-    //     onChange={(e) => setPassword(e.target.value)}
-    //   />
-    //   <div className="flex space-x-2">
-    //     <button onClick={register} className="bg-blue-500 text-white px-4 py-2 rounded">登録</button>
-    //     <button onClick={login} className="bg-green-500 text-white px-4 py-2 rounded">ログイン</button>
-    //     <button onClick={getMe} className="bg-gray-500 text-white px-4 py-2 rounded">ユーザー情報</button>
-    //   </div>
-
-    //   {userInfo && (
-    //     <div className="mt-4 border p-4 bg-gray-100">
-    //       <h2 className="font-bold">ユーザー情報</h2>
-    //       <pre>{JSON.stringify(userInfo, null, 2)}</pre>
-    //     </div>
-    //   )}
-    // </div> 
