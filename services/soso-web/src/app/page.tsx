@@ -39,37 +39,6 @@ export default function Home() {
     fetchCsrfToken();
   }, [API_BASE]);
 
-  const register = async () => {
-    console.log('新規登録処理開始...');
-    try {
-      const res = await fetch(`${API_BASE}/users/register`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRF-Token': csrfToken,
-        },
-        body: JSON.stringify({
-          username,
-          mailAddress,
-          password,
-          hasCar: true,
-          capacity: 4,
-        }),
-        credentials: 'include',
-      });
-
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message);
-      }
-
-      console.log('✅ 新規登録成功');
-      alert('登録成功');
-    } catch (err: any) {
-      console.error('❌ 新規登録失敗:', err.message);
-      alert('登録失敗: ' + err.message);
-    }
-  };
 
   const login = async () => {
     console.log('ログイン処理開始...');
@@ -171,11 +140,11 @@ export default function Home() {
             ログイン
           </Button>
           <Button
-            onClick={register}
-            className="bg-gray-400 hover:bg-gray-500 text-white w-full max-w-md flex justify-center"
-          >
-            新規登録
-          </Button>
+              onClick={() => router.push('/resister')}
+              className="bg-gray-400 hover:bg-gray-500 text-white w-full max-w-md flex justify-center"
+            >
+              新規登録
+            </Button>
         </div>
       </div>
     </div>
