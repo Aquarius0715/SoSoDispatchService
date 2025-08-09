@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState,useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import MyPageHeader from '@/src/components/Headers/MyPageHeader';
 import MyPageLeftSidebar from '@/src/components/Sidebar/MyPageLeftSidebar';
 import MyPageRightSidebar from '@/src/components/Sidebar/MyPageRightSidebar';
@@ -10,19 +10,18 @@ import clsx from 'clsx';
 import StatusEditModal from '@/src/components/Modal/StatusEditModal';
 import { useRouter } from 'next/navigation';
 import TeamAddModal from '@/src/components/Modal/TeamAddModal';
-
-
+import Cookies from 'js-cookie';
 export interface CalendarEntry {
   id: number | string;
   name: string;
 }
 
-// ユーザー情報の型定義を再利用
+// ユーザー情報の型定義
 interface UserStatus {
-    userName: string;
-    mailAddress: string;
-    hasCar: boolean;
-    capacity: number;
+  username: string;
+  mailAddress: string;
+  hasCar: boolean;
+  capacity: number;
 }
 
 interface calendarAddProps {
@@ -31,88 +30,94 @@ interface calendarAddProps {
 
 export default function MyPage() {
   const router = useRouter();
-// モーダルの表示状態を管理するステート
   const [isStatusEditModalOpen, setIsStatusEditModalOpen] = useState(false);
   const [isTeamAddModalOpen, setIsTeamAddModalOpen] = useState(false);
 
-  // ユーザー情報のステートを追加
-  const [userStatus, setUserStatus] = useState<UserStatus>({ // ★ UserStatus型を指定
-    userName: '田中 太郎',
-    mailAddress: 'tanaka.taro@example.com',
-    hasCar: true,
-    capacity: 3,
+  // ユーザー情報のステート。初期値は空に設定
+  const [userStatus, setUserStatus] = useState<UserStatus>({
+    username: '読み込み中...',
+    mailAddress: '',
+    hasCar: false,
+    capacity: 0,
   });
 
   const [calendars, setCalendars] = useState<CalendarEntry[]>([]);
+  
+  // ★ 追加: APIのベースURLを環境変数から取得
+  const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || '';
 
-const fetchCalendars = async () => { 
+  // ★ 修正: ユーザー情報を取得する関数
+  const fetchUserStatus = async (token: string) => {
+    if (!API_BASE) return;
     try {
-      // 1. localStorageからアクセストークンを取得
-      const accessToken = localStorage.getItem('accessToken');
-
-      // トークンがない場合は処理を中断
-      if (!accessToken) {
-        console.error('アクセストークンがありません。ログインしてください。');
-        // 必要に応じてログインページへのリダイレクト処理などを追加
-        return;
-      }
-
-      const response = await fetch('/calenders/my', {
-        // 2. headersを追加
+      const csrfToken = Cookies.get('csrf_token')?.toString() ?? ""
+      const response = await fetch(`${API_BASE}/users/me`, {
         headers: {
-          // 'Authorization'ヘッダーに、"Bearer "という文字列を付けてトークンをセット
-          'Authorization': `Bearer ${accessToken}`,
-          // もしCSRFトークンも必要であれば、同様に追加します。
-          // 'X-CSRF-Token': '取得したCSRFトークン'
-        }
+          'Authorization': `Bearer ${token}`,
+          'X-CSRF-Token': csrfToken,
+        },
+      });
+      if (!response.ok) {
+        throw new Error(`ユーザー情報の取得に失敗しました (Status: ${response.status})`);
+      }
+      const data: UserStatus = await response.json();
+      setUserStatus(data);
+    } catch (error) {
+      console.error('ユーザー情報の取得エラー:', error);
+      // トークンが無効な場合などはログアウトさせる
+      handleLogout();
+    }
+  };
+
+  // ★ 修正: カレンダー一覧を取得する関数
+  const fetchCalendars = async (token: string) => {
+    if (!API_BASE) return;
+    try {
+      // const csrfToken = Cookies.get(`csrf_token`)?.toString ?? ""
+      const csrfToken = Cookies.get('csrf_token')?.toString() ?? ""
+      const response = await fetch(`${API_BASE}/calenders/my`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'X-CSRF-Token': csrfToken,
+        },
       });
 
       if (!response.ok) {
-        // エラー発生時にステータスコードも表示するとデバッグしやすくなります
         throw new Error(`カレンダーの取得に失敗しました (Status: ${response.status})`);
       }
       const data: CalendarEntry[] = await response.json();
       setCalendars(data);
     } catch (error) {
-      console.error('カレンダーの取得に失敗:', error);
+      console.error('カレンダーの取得エラー:', error);
     }
   };
 
+  // ★ 修正: ページ読み込み時にlocalStorageからトークンを取得し、各種データを取得する
   useEffect(() => {
-    fetchCalendars();
-  }, []);
+    // localStorageからアクセストークンを取得
+    const accessToken = localStorage.getItem('access_token');
 
+    if (!accessToken) {
+      console.error('アクセストークンがありません。ログインしてください。');
+      router.push('../'); // ログインページへリダイレクト
+      return;
+    }
+
+    // トークンを使ってユーザー情報とカレンダー情報を取得
+    fetchUserStatus(accessToken);
+    fetchCalendars(accessToken);
+  }, [API_BASE, router]); // 依存配列にrouterを追加
+
+  // モックデータ（表示確認用）
   const drives: Drive[] = [
-    {
-      id: 1,
-      calendarName: 'テニスサークル',
-      eventName: '新歓コンパ',
-      driveState: DriveState.PICK_UP,
-      eventDate: '2024/04/15',
-      driveTime: '18:00',
-      seatsRequired: 3,
-    },
-    {
-      id: 2,
-      calendarName: '軽音学部',
-      eventName: 'ライブ打ち上げ',
-      driveState: DriveState.DROP_OFF,
-      eventDate: '2024/04/20',
-      driveTime: '21:00',
-      seatsRequired: 2,
-    },
-    {
-      id: 3,
-      calendarName: 'ゼミ',
-      eventName: '歓迎会', 
-      driveState: DriveState.PICK_UP,
-      eventDate: '2024/04/25',
-      driveTime: '19:00',
-      seatsRequired: 4,
-    },
+    { id: 1, calendarName: 'テニスサークル', eventName: '新歓コンパ', driveState: DriveState.PICK_UP, eventDate: '2024/04/15', driveTime: '18:00', seatsRequired: 3 },
+    { id: 2, calendarName: '軽音学部', eventName: 'ライブ打ち上げ', driveState: DriveState.DROP_OFF, eventDate: '2024/04/20', driveTime: '21:00', seatsRequired: 2 },
   ];
 
+  // ★ 修正: ログアウト処理
   const handleLogout = () => {
+    // localStorageからトークンを削除
+    localStorage.removeItem('access_token');
     router.push('../');
     alert('ログアウトしました');
   };
@@ -127,57 +132,53 @@ const fetchCalendars = async () => {
 
   const onCalendarClick = (name: string) => {
     router.push('/dashboard/' + name);
-    alert(`カレンダーID: ${name} がクリックされました`);
   };
-  // const onCalendarClick = (id: number | string) => {
-  //   router.push('../calendar/' + id);
-  //   alert(`カレンダーID: ${id} がクリックされました`);
-  // };
-  
-
 
   const handleAddCalendar = () => {
     setIsTeamAddModalOpen(true);
   };
-
-  // onSaveに渡す関数
-  // この関数が、モーダルからの編集内容を受け取る
-  // ★ ここを修正
+  
   const handleSaveStatus = (newStatus: UserStatus): void => {
-    setUserStatus(newStatus); // ユーザー情報を更新
-    setIsStatusEditModalOpen(false); // モーダルを閉じる
+    // ここでAPIを叩いてサーバー側の情報も更新するのが望ましい
+    console.log("新しいステータスを保存:", newStatus);
+    setUserStatus(newStatus);
+    setIsStatusEditModalOpen(false);
   };
 
+  // ★ 修正: カレンダー追加処理
   const handleSaveAddCalendar = async (newCalendar: calendarAddProps): Promise<void> => {
+    const accessToken = localStorage.getItem('access_token');
+    if (!accessToken) {
+      alert('認証エラー。再度ログインしてください。');
+      return;
+    }
+    if (!API_BASE) return;
+
     try {
-      const response = await fetch('/calenders/create', {
+      const csrfToken = Cookies.get('csrf_token')?.toString() ?? ""
+      const response = await fetch(`${API_BASE}/calenders/create`, {
         method: 'POST',
-        // handleSaveAddCalendar内のheaders
         headers: {
           'Content-Type': 'application/json',
-          // 'acssToken' は 'Authorization' の間違いである可能性があります
-          acssToken: localStorage.getItem('accessToken') || '',
+          // 正しいAuthorizationヘッダーを追加
+          'X-CSRF-Token': csrfToken,
         },
         body: JSON.stringify({ name: newCalendar.calendarName }),
-    });
+      });
+
       if (!response.ok) {
         throw new Error('カレンダーの追加に失敗しました');
       }
-      await fetchCalendars();
+      
+      // 追加が成功したら、カレンダー一覧を再取得して画面を更新
+      const token = localStorage.getItem('access_token');
+      if(token) fetchCalendars(token);
+
       setIsTeamAddModalOpen(false);
     } catch (error) {
-      console.error('カレンダーの追加に失敗:', error);
+      console.error('カレンダーの追加エラー:', error);
     }
   };
-
-  // const handleSaveAddCalendar = (newCalendar: calendarAddProps): void => {
-  //   const newEntry: CalendarEntry = {
-  //     id: calendars.length + 1,
-  //     name: newCalendar.calendarName,
-  //   };
-  //   setCalendars([...calendars, newEntry]);
-  //   setIsTeamAddModalOpen(false);
-  // };
 
   return (
     <div className="flex flex-col h-screen bg-gray-100">
@@ -188,11 +189,11 @@ const fetchCalendars = async () => {
       />
       <div className="flex flex-grow overflow-hidden">
         <MyPageLeftSidebar
-          userName={userStatus.userName} // ★ userStatusから値を取得
-          hasCar={userStatus.hasCar}     // ★ userStatusから値を取得
-          seatsRequired={userStatus.capacity} // ★ userStatusから値を取得
+          username={userStatus.username}
+          hasCar={userStatus.hasCar}
+          seatsRequired={userStatus.capacity}
           onEditClick={handleEditStatus}
-          mailAddress={userStatus.mailAddress} // ★ userStatusから値を取得
+          mailAddress={userStatus.mailAddress}
         />
         <main className={clsx("flex-grow p-8 overflow-y-auto")}>
           <h2 className="text-3xl font-bold text-gray-800 mb-6">参加しているカレンダー一覧</h2>
@@ -200,7 +201,7 @@ const fetchCalendars = async () => {
             {calendars.map((calendar) => (
               <Button
                 key={calendar.id}
-                onClick={() => onCalendarClick(calendar.name)} // ★ calendar.idからcalendar.nameに変更
+                onClick={() => onCalendarClick(calendar.name)}
                 className="p-4 bg-white rounded-lg shadow-md border border-gray-200 text-gray-800 hover:bg-gray-100"
               >
                 <p className="font-semibold">{calendar.name}</p>
@@ -208,14 +209,14 @@ const fetchCalendars = async () => {
             ))}
           </div>
           {!isTeamAddModalOpen && (
-                <Button
-                variant="circle"
-                onClick={handleAddCalendar}
-                className="fixed bottom-8 right-80 z-50"
-                >
-                <span className="text-2xl">+</span>
-                </Button>
-            )}
+            <Button
+              variant="circle"
+              onClick={handleAddCalendar}
+              className="fixed bottom-8 right-80 z-50"
+            >
+              <span className="text-2xl">+</span>
+            </Button>
+          )}
         </main>
         <MyPageRightSidebar drives={drives} />
       </div>

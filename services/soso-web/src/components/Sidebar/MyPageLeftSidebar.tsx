@@ -4,7 +4,7 @@ import Button from '../Button/Button';
 
 interface Props {
   className?: string;
-  userName?: string;
+  username?: string;
   hasCar?: boolean;
   mailAddress?: string;
   seatsRequired?: number;
@@ -25,7 +25,7 @@ function MyPageLeftSidebar(props: Props) {
         <h2 className='text-lg font-bold text-white mb-4'>ユーザーステータス</h2>
         
         {/* ★ 文字色を白や薄いグレーに変更 */}
-        <p className='text-md text-gray-100 font-semibold'>{props.userName}</p>
+        <p className='text-md text-gray-300 font-semibold'>{props.username}</p>
         <p className='text-sm text-gray-300 font-semibold'>{props.mailAddress}</p>
         <p className='text-sm text-gray-300'>車: {props.hasCar ? `あり(${props.seatsRequired}人)` : 'なし'}</p>
 
