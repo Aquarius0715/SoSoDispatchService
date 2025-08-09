@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Input from '../components/TextFieald/Input';
 import Button from '../components/Button/Button';
 import { useRouter } from 'next/navigation';
+import Cookies from "js-cookie"
 
 export default function Home() {
   const router = useRouter();
@@ -20,7 +21,6 @@ export default function Home() {
   useEffect(() => {
     const fetchCsrfToken = async () => {
       console.log('CSRFトークン取得開始...');
-      try {
         const res = await fetch(`${API_BASE}/auth/csrf`, {
           method: 'GET',
           credentials: 'include'
@@ -28,12 +28,8 @@ export default function Home() {
         if (!res.ok) {
           throw new Error(`HTTPエラー: ${res.status}`);
         }
-        const data = await res.json();
-        setCsrfToken(data.csrf_token);
-        console.log('✅ CSRFトークン取得成功:', data.csrf_token);
-      } catch (err: any) {
-        console.error('❌ CSRFトークン取得失敗:', err);
-      }
+        const csrfToken = Cookies.get(`csrf_token`)?.toString ?? ""
+        setCsrfToken(csrfToken);
     };
 
     fetchCsrfToken();
