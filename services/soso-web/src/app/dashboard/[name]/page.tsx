@@ -256,54 +256,74 @@ const handleSaveSosoChange = (editedData: EditedMemberData): void => {
   setEditSource(null);
 };
 
-    // handleEventClick関数も修正してイベントログを含める
-    const handleEventClick = (clickInfo: any) => {
-      console.log('clickInfo:', clickInfo);
-      console.log('🔴 イベントがクリックされました!');
-      
-      const eventId = clickInfo.event.id;
-      if (eventId) {
-        console.log('🟢 eventIdが存在します:', eventId);
-        
-        const eventMembers = clickInfo.event.extendedProps?.members || [];
-        const participatingMembers = members.filter(member => 
-          eventMembers.includes(member.username)
-        );
-        
-        console.log('🟢 参加メンバー:', participatingMembers);
-        
-        const eventProps: EventProps = {
-          id: eventId,
-          title: clickInfo.event.title || '',
-          start: clickInfo.event.startStr || '',
-          end: clickInfo.event.endStr || '',
-          extendedProps: {
-            ...clickInfo.event.extendedProps,
-            participatingMembers: participatingMembers,
-            eventLogs: eventLogs[eventId] || [] // イベント固有のログを追加
-          }
-        };
-        
-        // setSelectedManagementEvent(eventProps);
-        // setIsManagementModalOpen(true);
-        setIsEventDetailModalOpen(true);
-        setEventDetailData({
-          id: eventId,
-          date : clickInfo.event.startStr.split('T')[0] || '',
-          title: clickInfo.event.title || '',
-          details: clickInfo.event.extendedProps?.details || '',
-          dropOffTime: clickInfo.event.startStr || '',
-          pickUpTime: clickInfo.event.endStr || '',
-          dropOffCount: clickInfo.event.extendedProps?.dropOffCount || 0,
-          pickUpCount: clickInfo.event.extendedProps?.pickUpCount || 0,
-          departurePoint: clickInfo.event.extendedProps?.departurePoint || '',
-          destinationPoint: clickInfo.event.extendedProps?.destinationPoint || '',
-          members: clickInfo.event.extendedProps?.members || [],
-        });
-      } else {
-        console.error("🔴 Clicked event has no ID.");
+    // handleEventClick関数を修正
+const handleEventClick = (clickInfo: any) => {
+  console.log('clickInfo:', clickInfo);
+  console.log('🔴 イベントがクリックされました!');
+  
+  const eventId = clickInfo.event.id;
+  if (eventId) {
+    console.log('🟢 eventIdが存在します:', eventId);
+    
+    const eventMembers = clickInfo.event.extendedProps?.members || [];
+    const participatingMembers = members.filter(member => 
+      eventMembers.includes(member.username)
+    );
+    
+    console.log('🟢 参加メンバー:', participatingMembers);
+    
+    // ✅ イベントの日付と今日の日付を比較
+    const eventDate = new Date(clickInfo.event.startStr.split('T')[0]); // イベントの日付
+    const today = new Date(); // 今日の日付
+    today.setHours(0, 0, 0, 0); // 時間を00:00:00にリセット
+    eventDate.setHours(0, 0, 0, 0); // 時間を00:00:00にリセット
+    
+    console.log('🟢 イベント日付:', eventDate);
+    console.log('🟢 今日の日付:', today);
+    console.log('🟢 日付比較結果:', eventDate < today ? '過去' : '未来または今日');
+    
+    const eventProps: EventProps = {
+      id: eventId,
+      title: clickInfo.event.title || '',
+      start: clickInfo.event.startStr || '',
+      end: clickInfo.event.endStr || '',
+      extendedProps: {
+        ...clickInfo.event.extendedProps,
+        participatingMembers: participatingMembers,
+        eventLogs: eventLogs[eventId] || [] // イベント固有のログを追加
       }
     };
+    
+    // ✅ 日付比較に基づいてモーダルを選択
+    if (eventDate < today) {
+      // 過去のイベント → EventDetailModalを開く
+      console.log('🔵 過去のイベントです。EventDetailModalを開きます。');
+      setIsEventDetailModalOpen(true);
+      setEventDetailData({
+        id: eventId,
+        date: clickInfo.event.startStr.split('T')[0] || '',
+        title: clickInfo.event.title || '',
+        details: clickInfo.event.extendedProps?.details || '',
+        dropOffTime: clickInfo.event.startStr || '',
+        pickUpTime: clickInfo.event.endStr || '',
+        dropOffCount: clickInfo.event.extendedProps?.dropOffCount || 0,
+        pickUpCount: clickInfo.event.extendedProps?.pickUpCount || 0,
+        departurePoint: clickInfo.event.extendedProps?.departurePoint || '',
+        destinationPoint: clickInfo.event.extendedProps?.destinationPoint || '',
+        members: clickInfo.event.extendedProps?.members || [],
+        eventURL: clickInfo.event.extendedProps?.eventURL,
+        dispatchRegistered: clickInfo.event.extendedProps?.dispatchRegistered || [],
+      });
+    } else {
+      // 今日または未来のイベント → SOSOManagementModalを開く
+      console.log('🔵 今日または未来のイベントです。SOSOManagementModalを開きます。');
+      setSelectedManagementEvent(eventProps);
+      setIsManagementModalOpen(true);
+    }
+  } else {
+    console.error("🔴 Clicked event has no ID.");
+  }
+};
 
     const handleAddEventClick = (e: React.MouseEvent, arg: any) => {
       console.log("🔵 handleAddEventClickが実行されました。");
