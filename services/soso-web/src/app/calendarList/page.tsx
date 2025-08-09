@@ -138,11 +138,44 @@ export default function MyPage() {
     setIsTeamAddModalOpen(true);
   };
   
-  const handleSaveStatus = (newStatus: UserStatus): void => {
-    // ここでAPIを叩いてサーバー側の情報も更新するのが望ましい
-    console.log("新しいステータスを保存:", newStatus);
-    setUserStatus(newStatus);
-    setIsStatusEditModalOpen(false);
+  const handleSaveStatus = async (newStatus: UserStatus) => {
+    const accessToken = localStorage.getItem('access_token');
+    if (!accessToken) {
+      alert('認証エラー。再度ログインしてください。');
+      return;
+    }
+    if (!API_BASE) return;
+
+    try {
+      const csrfToken = Cookies.get('csrf_token')?.toString() ?? "";
+      // バックエンドのユーザー更新APIエンドポイントを呼び出す (例: PUT /users/me)
+      const response = await fetch(`${API_BASE}/users/me`, {
+        method: 'PATCH', // ★ 修正: 'PUT'から'PATCH'に変更
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`,
+          'X-CSRF-Token': csrfToken,
+        },
+        body: JSON.stringify(newStatus),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ message: 'サーバーエラー' }));
+        throw new Error(errorData.message || `更新に失敗しました (Status: ${response.status})`);
+      }
+
+      // APIから返された最新のユーザー情報でStateを更新
+      const updatedUser: UserStatus = await response.json();
+      setUserStatus(updatedUser);
+
+      // モーダルを閉じる
+      setIsStatusEditModalOpen(false);
+      alert('ステータスを更新しました。');
+
+    } catch (error: any) {
+      console.error('ステータスの更新エラー:', error);
+      alert(`更新に失敗しました: ${error.message}`);
+    }
   };
 
   // ★ 修正: カレンダー追加処理
@@ -224,8 +257,8 @@ export default function MyPage() {
       <StatusEditModal
         isOpen={isStatusEditModalOpen}
         onClose={() => setIsStatusEditModalOpen(false)}
-        onSave={handleSaveStatus}
-        initialStatus={userStatus}
+        onSave={handleSaveStatus} // ★ 作成した更新関数をモーダルに渡す
+        initialStatus={userStatus} // ★ 現在のユーザー情報を初期値として渡す
       />
 
       <TeamAddModal
