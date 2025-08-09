@@ -192,6 +192,26 @@ components:
         username:  { type: string }
         sosoPoint: { type: integer }
       required: [userId, username, sosoPoint]
+    SosoPointUpdateRequest:
+      type: object
+      description: |
+        SoSoポイントの更新リクエスト。`eventId` は空文字なら未紐付け扱いである。
+        `newPoint` は差分ではなく「更新後の絶対値」である。
+      properties:
+        newPoint:
+          type: integer
+          minimum: 0
+          description: 更新後のポイント（絶対値）
+          example: 12
+        reason:
+          type: string
+          description: 変更理由（任意）
+          example: "遅刻の減点をリセット"
+        eventId:
+          type: string
+          description: イベントID（任意・空文字可）
+          example: "a6f1d5ad-2c2f-4d3f-9a11-0fb7d2b1e9c3"
+      required: [newPoint]
 
 tags:
   - name: Auth        # 認証
@@ -449,6 +469,68 @@ paths:
               schema:
                 type: array
                 items: { $ref: '#/components/schemas/Event' }
+
+  /calenders/{calender_id}/members/{user_id}/point:
+    put:
+      tags: [Calenders]
+      summary: メンバーの SoSoポイントを更新する
+      description: |
+        指定ユーザーの SoSoポイントを更新し、変更ログを記録する。`eventId` を指定すると
+        当該イベントに紐付く更新として保存される（空文字なら未紐付け扱い）。
+      security:
+        - csrfToken: []
+        - bearerAuth: []
+      parameters:
+        # 認証系ヘッダー
+        - $ref: '#/components/parameters/XCsrfTokenHeader'
+        - $ref: '#/components/parameters/AuthorizationHeader'
+        # パスパラメータ
+        - name: calender_id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+          description: カレンダーID
+        - name: user_id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+          description: 対象ユーザーID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SosoPointUpdateRequest' }
+            examples:
+              updateWithEvent:
+                summary: イベント紐付けあり
+                value:
+                  newPoint: 15
+                  reason: "イベント参加の加点"
+                  eventId: "a6f1d5ad-2c2f-4d3f-9a11-0fb7d2b1e9c3"
+              updateWithoutEvent:
+                summary: イベント紐付けなし（空文字）
+                value:
+                  newPoint: 7
+                  reason: "手動調整"
+                  eventId: ""
+      responses:
+        "200":
+          description: 更新成功（ボディなし）
+        "400":
+          description: 不正なリクエスト
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        "401":
+          description: 未認証（JWT 不備）
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        "403":
+          description: 権限不足
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
 
   # ----------------------------
   # Events
