@@ -26,6 +26,7 @@ interface UserStatus {
 
 interface calendarAddProps {
   calendarName: string;
+  reason?: string;
 }
 
 export default function MyPage() {

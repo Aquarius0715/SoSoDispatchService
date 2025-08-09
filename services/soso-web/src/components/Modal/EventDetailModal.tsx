@@ -2,30 +2,34 @@ import React, { useState } from 'react';
 import Button from '../Button/Button';
 import Input from '../TextFieald/Input';
 
-interface EventDetails {
-  EventTitle: string;
-  EventDate: string;
-  EventTime: string;
-  EventDetail: string;
-  EventURL: string;
-  member: string[];
-  DropOffNumber: number;
-  PickUpNumber: number;
-  departurePoint: string;
-  destination: string;
-  dispatchRegistered: string[];
+// EventDetailModal.tsx のEventDetailsインターフェースを修正
+export interface EventDetails {
+  id: string;
+  date: string;              // EventDate → date
+  title: string;             // EventTitle → title  
+  details: string;           // EventDetail → details (detailではなくdetails)
+  dropOffTime: string;       // 追加
+  pickUpTime: string;        // 追加
+  dropOffCount: number;      // 追加
+  pickUpCount: number;       // 追加
+  departurePoint: string;    // 追加
+  destinationPoint: string;  // 追加
+  members: string[];         // 追加
+  eventURL?: string;         // オプション
+  dispatchRegistered?: string[]; // オプション
 }
 
 interface ModalProps {
-  eventDetails: EventDetails;
+  isOpen: boolean;
   onClose: () => void;
+  eventData: EventDetails; // 追加: イベントデータを受け取る
 }
 
-const EventDetailModal: React.FC<ModalProps> = ({ eventDetails, onClose }) => {
+const EventDetailModal: React.FC<ModalProps> = ({ eventData, onClose }) => {
   const [seatsRequired, setSeatsRequired] = useState<number | ''>('');
-  const [dropOffRemaining, setDropOffRemaining] = useState(eventDetails.DropOffNumber);
-  const [pickUpRemaining, setPickUpRemaining] = useState(eventDetails.PickUpNumber);
-  const [registered, setRegistered] = useState(eventDetails.dispatchRegistered);
+  const [dropOffRemaining, setDropOffRemaining] = useState(eventData.dropOffCount);
+  const [pickUpRemaining, setPickUpRemaining] = useState(eventData.pickUpCount);
+  const [registered, setRegistered] = useState<string[]>(eventData.dispatchRegistered || []);
 
   const handleRegister = (type: 'dropOff' | 'pickUp') => {
     if (typeof seatsRequired === 'number' && seatsRequired > 0) {
@@ -46,7 +50,7 @@ const EventDetailModal: React.FC<ModalProps> = ({ eventDetails, onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center p-4">
+    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center p-4 z-999">
       <div className="bg-white p-6 rounded-lg w-full max-w-md shadow-lg border border-gray-300 max-h-screen overflow-y-auto">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl text-zinc-600 font-bold">イベント詳細</h2>
@@ -62,34 +66,34 @@ const EventDetailModal: React.FC<ModalProps> = ({ eventDetails, onClose }) => {
         </div>
 
         <div className="bg-gray-100 p-4 rounded-lg mb-4 text-zinc-600">
-          <h3 className="font-normal font-['Inter'] text-black text-lg mb-2">{eventDetails.EventTitle}</h3>
-          <p>日付: {eventDetails.EventDate}</p>
-          <p>時刻: {eventDetails.EventTime}</p>
-          <p>詳細: {eventDetails.EventDetail}</p>
+          <h3 className="font-normal font-['Inter'] text-black text-lg mb-2">{eventData.title}</h3>
+          <p className="mb-3">日付: {eventData.date}</p>
+          <p className="mb-3">時間: {eventData.dropOffTime}</p>
+          <p>詳細: {eventData.details}</p>
         </div>
 
         <div className="bg-gray-100 p-4 rounded-lg mb-4 text-zinc-600">
           <h3 className="font-normal font-['Inter'] text-black text-lg mb-2">参加者</h3>
-          <p>{eventDetails.member.join('・')}</p>
+          <p>{eventData.members.join('・')}</p>
         </div>
 
         <div className="flex justify-between space-x-4 mb-4 text-zinc-600">
           <div className="bg-gray-100 p-4 rounded-lg flex-1">
             <h3 className="font-normal font-['Inter'] text-black text-lg mb-2">送り</h3>
-            <p className="mb-3">合計: {eventDetails.DropOffNumber}人</p>
+            <p className="mb-3">合計: {eventData.dropOffCount}人</p>
             <p>残り: {dropOffRemaining}人</p>
           </div>
           <div className="bg-gray-100 p-4 rounded-lg flex-1">
             <h3 className="font-normal font-['Inter'] text-black text-lg mb-2">迎え</h3>
-            <p className="mb-3">合計: {eventDetails.PickUpNumber}人</p>
+            <p className="mb-3">合計: {eventData.pickUpCount}人</p>
             <p >残り: {pickUpRemaining}人</p>
           </div>
         </div>
 
         <div className="bg-gray-100 p-4 rounded-lg mb-4 text-zinc-600">
           <h3 className="font-normal font-['Inter'] text-black text-lg mb-2">会場</h3>
-          <p>{eventDetails.departurePoint} → {eventDetails.destination}</p>
-          <p>会場URL: {eventDetails.EventURL}</p>
+          <p>{eventData.departurePoint} → {eventData.destinationPoint}</p>
+          <p>会場URL: {eventData.eventURL}</p>
         </div>
 
         <div className="bg-gray-100 p-4 rounded-lg mb-4 text-zinc-600">
