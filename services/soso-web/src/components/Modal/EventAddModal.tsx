@@ -157,7 +157,7 @@ const handlePickUpCountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
   
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 bg-opacity-50">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
       <div className="bg-white rounded-lg shadow-lg w-1/3 overflow-y-auto max-h-screen">
         <div className="p-4 border-b flex justify-between items-center">
           <h3 className="text-xl font-bold text-black">予定追加</h3>

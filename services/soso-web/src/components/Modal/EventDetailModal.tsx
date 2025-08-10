@@ -46,7 +46,7 @@ const EventDetailModal: React.FC<ModalProps> = ({ eventDetails, onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center p-4">
+    <div className="fixed inset-0 bg-black/50 bg-opacity-50 flex justify-center items-center p-4">
       <div className="bg-white p-6 rounded-lg w-full max-w-md shadow-lg border border-gray-300 max-h-screen overflow-y-auto">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl text-zinc-600 font-bold">イベント詳細</h2>
