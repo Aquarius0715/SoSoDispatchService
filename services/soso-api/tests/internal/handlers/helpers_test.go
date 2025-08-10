@@ -255,4 +255,26 @@ const (
 		FROM events
 		WHERE id = ?
 		LIMIT 1`
+
+	SQLFindMyTransportEvents = `
+		SELECT
+			e.id                             AS event_id,
+			ep.user_id                       AS user_id,
+			ep.type                          AS type,
+			c.name                           AS calender_name,
+			e.title                          AS event_title,
+			e.start_time                     AS start_time,
+			CASE
+				WHEN ep.type = 'go'     THEN e.seats_required_go
+				WHEN ep.type = 'return' THEN e.seats_required_return
+				ELSE 0
+			END                              AS seats_required
+		FROM event_participants AS ep
+		INNER JOIN events     AS e ON e.id = ep.event_id
+		INNER JOIN calenders  AS c ON c.id = e.calender_id
+		WHERE
+			ep.user_id = ?
+			AND ep.status = 'registered'
+			AND ep.type IN ('go', 'return')
+		ORDER BY e.start_time ASC`
 )
