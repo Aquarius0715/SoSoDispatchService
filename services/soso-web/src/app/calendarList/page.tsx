@@ -11,9 +11,12 @@ import StatusEditModal from '@/src/components/Modal/StatusEditModal';
 import { useRouter } from 'next/navigation';
 import TeamAddModal from '@/src/components/Modal/TeamAddModal';
 import Cookies from 'js-cookie';
+
 export interface CalendarEntry {
   id: number | string;
   name: string;
+  description?: string;
+  ownerId?: number | string;
 }
 
 // ユーザー情報の型定義
@@ -47,7 +50,7 @@ export default function MyPage() {
   
   // ★ 追加: APIのベースURLを環境変数から取得
   const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || '';
-
+    console.log('現在のAPI_BASE:', API_BASE);
   // ★ 修正: ユーザー情報を取得する関数
   const fetchUserStatus = async (token: string) => {
     if (!API_BASE) return;
@@ -66,8 +69,8 @@ export default function MyPage() {
       setUserStatus(data);
     } catch (error) {
       console.error('ユーザー情報の取得エラー:', error);
-      // トークンが無効な場合などはログアウトさせる
-      handleLogout();
+       // ★ 修正: すぐにログアウトせず、コンソールにエラーを表示する
+      // handleLogout(); // 一時的にコメントアウト
     }
   };
 
@@ -88,6 +91,7 @@ export default function MyPage() {
         throw new Error(`カレンダーの取得に失敗しました (Status: ${response.status})`);
       }
       const data: CalendarEntry[] = await response.json();
+      console.log('取得したカレンダー:', data);
       setCalendars(data);
     } catch (error) {
       console.error('カレンダーの取得エラー:', error);
