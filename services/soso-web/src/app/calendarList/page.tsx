@@ -33,6 +33,7 @@ export default function MyPage() {
   const router = useRouter();
   const [isStatusEditModalOpen, setIsStatusEditModalOpen] = useState(false);
   const [isTeamAddModalOpen, setIsTeamAddModalOpen] = useState(false);
+  const [isCreatingCalendar, setIsCreatingCalendar] = useState(false);
 
   // ユーザー情報のステート。初期値は空に設定
   const [userStatus, setUserStatus] = useState<UserStatus>({
@@ -188,13 +189,15 @@ export default function MyPage() {
     }
     if (!API_BASE) return;
 
+    setIsCreatingCalendar(true);
+
     try {
       const csrfToken = Cookies.get('csrf_token')?.toString() ?? ""
       const response = await fetch(`${API_BASE}/calenders/create`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          // 正しいAuthorizationヘッダーを追加
+          'Authorization': `Bearer ${accessToken}`, // ★ この行を追加
           'X-CSRF-Token': csrfToken,
         },
         body: JSON.stringify({ name: newCalendar.calendarName }),
@@ -205,12 +208,17 @@ export default function MyPage() {
       }
       
       // 追加が成功したら、カレンダー一覧を再取得して画面を更新
-      const token = localStorage.getItem('access_token');
-      if(token) fetchCalendars(token);
+      // const token = localStorage.getItem('access_token');
+      // if(token) fetchCalendars(token);
+      await fetchCalendars(accessToken);
 
       setIsTeamAddModalOpen(false);
-    } catch (error) {
+      alert('カレンダーを追加しました');
+    } catch (error: any) {
       console.error('カレンダーの追加エラー:', error);
+      alert(`カレンダーの追加に失敗しました: ${error.message}`);
+    }finally {
+      setIsCreatingCalendar(false);
     }
   };
 
@@ -266,6 +274,7 @@ export default function MyPage() {
         isOpen={isTeamAddModalOpen}
         onClose={() => setIsTeamAddModalOpen(false)}
         onSave={handleSaveAddCalendar}
+        isSaving={isCreatingCalendar} // ★ カレンダー作成中の状態を渡す
       />
     </div>
   );
