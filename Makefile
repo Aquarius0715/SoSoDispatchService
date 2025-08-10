@@ -23,7 +23,7 @@ api:
 
 ## 全ビルドし直して起動（キャッシュなし）
 rebuild:
-	$(DC) down
+	$(DC) down -v --remove-orphans
 	$(DC) build --no-cache
 	$(DC) up -d
 
