@@ -251,6 +251,32 @@ components:
           minimum: 0
           description: 要求座席数（ハンドラの ev.SeatsRequired に一致）
           example: 3
+    SosoPointHistory:
+      type: object
+      description: SoSoポイントの変更履歴
+      properties:
+        id:          { type: integer, format: int64 }
+        calenderId:  { type: string, format: uuid }
+        userId:      { type: string, format: uuid }
+        changedAt:   { type: string, format: date-time }
+        changedBy:
+          type: string
+          description: 操作ユーザーID（省略時はシステム）
+        eventId:
+          type: string
+          description: 関連イベントID（省略可）
+        oldPoint:    { type: integer }
+        newPoint:    { type: integer }
+        pointDelta:  { type: integer, description: newPoint - oldPoint }
+        reason:      { type: string }
+      required:
+        - id
+        - calenderId
+        - userId
+        - changedAt
+        - oldPoint
+        - newPoint
+        - pointDelta
 
 tags:
   - name: Auth        # 認証
@@ -593,6 +619,56 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/Error' }
+  /calenders/{calender_id}/soso_point_history:
+    get:
+      tags: [Calenders]
+      summary: カレンダー内の SoSoポイント履歴一覧
+      description: 指定カレンダーに紐づくポイント変更履歴を新しい順で返す。
+      security:
+        - csrfToken: []
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/XCsrfTokenHeader'
+        - $ref: '#/components/parameters/AuthorizationHeader'
+        - name: calender_id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "200":
+          description: 取得成功
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/SosoPointHistory' }
+              examples:
+                sample:
+                  summary: 例
+                  value:
+                    - id: 12
+                      calenderId: "b4b8f4b4-7d0d-4c3f-8a1c-8b3b2d7f0a11"
+                      userId: "2f0c3b5a-1a22-43b1-8c5a-6f2b9a1d2e3f"
+                      changedAt: "2025-08-01T10:00:00Z"
+                      changedBy: "owner-user-id"
+                      oldPoint: 10
+                      newPoint: 15
+                      pointDelta: 5
+                      reason: "イベント参加の加点"
+                    - id: 11
+                      calenderId: "b4b8f4b4-7d0d-4c3f-8a1c-8b3b2d7f0a11"
+                      userId: "2f0c3b5a-1a22-43b1-8c5a-6f2b9a1d2e3f"
+                      changedAt: "2025-07-30T09:00:00Z"
+                      oldPoint: 15
+                      newPoint: 13
+                      pointDelta: -2
+                      reason: "手動調整"
+        "401":
+          description: 未認証
+          content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
+        "403":
+          description: 権限不足
+          content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
 
   # ----------------------------
   # Events
@@ -725,4 +801,46 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/Error' }
+  /events/{event_id}/soso_point_history:
+    get:
+      tags: [Events]
+      summary: イベントに紐づく SoSoポイント履歴一覧
+      description: 指定イベントに紐づくポイント変更履歴を新しい順で返す。
+      security:
+        - csrfToken: []
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/XCsrfTokenHeader'
+        - $ref: '#/components/parameters/AuthorizationHeader'
+        - name: event_id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "200":
+          description: 取得成功
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/SosoPointHistory' }
+              examples:
+                sample:
+                  summary: 例
+                  value:
+                    - id: 20
+                      calenderId: "b4b8f4b4-7d0d-4c3f-8a1c-8b3b2d7f0a11"
+                      userId: "2f0c3b5a-1a22-43b1-8c5a-6f2b9a1d2e3f"
+                      eventId: "a6f1d5ad-2c2f-4d3f-9a11-0fb7d2b1e9c3"
+                      changedAt: "2025-08-02T03:00:00Z"
+                      oldPoint: 5
+                      newPoint: 8
+                      pointDelta: 3
+                      reason: "往路参加加点"
+        "401":
+          description: 未認証
+          content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
+        "403":
+          description: 権限不足
+          content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
         
