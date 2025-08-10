@@ -206,6 +206,23 @@ export default function MyPage() {
       if (!response.ok) {
         throw new Error('カレンダーの追加に失敗しました');
       }
+
+      const data = await response.json();
+      const calender_id = data.id;
+
+      const join_response = await fetch(`${API_BASE}/calenders/` + calender_id + "/join", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`, // ★ この行を追加
+          'X-CSRF-Token': csrfToken,
+        },
+        body: JSON.stringify({ name: newCalendar.calendarName }),
+      });
+
+      if (!join_response.ok) {
+        throw new Error('カレンダー追加時の初期処理に失敗しました[cannot join initial calendar]')
+      }
       
       // 追加が成功したら、カレンダー一覧を再取得して画面を更新
       // const token = localStorage.getItem('access_token');
