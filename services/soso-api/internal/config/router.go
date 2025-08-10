@@ -129,6 +129,7 @@ func SetupRouter(cfg *Config) *echo.Echo {
 	calG.PUT("/:calender_id/members/:user_id/point", sosoPH.Update)
 	calG.POST("/:calender_id/events", eventH.Create)
 	calG.GET("/:calender_id/events", eventH.ListByCalender)
+	calG.GET("/:calender_id/soso_history", sosoPH.ListByCalender)
 
 	eveG := e.Group("/events", csrfMW, echojwt.WithConfig(jwtCfg))
 	eveG.GET("/:event_id", eventH.FindById)
@@ -137,6 +138,7 @@ func SetupRouter(cfg *Config) *echo.Echo {
 	eveG.GET("/:event_id/detail", eventH.Detail)
 	eveG.GET("/:event_id/members", eventH.Members)
 	eveG.GET("/dispatch/me", calenderH.FindMyTransportEvents)
+	eveG.GET("/:event_id/soso_history", sosoPH.ListByEvent)
 
 	// シャットダウン時クローズ
 	e.Server.RegisterOnShutdown(func() { _ = db.Close() })
