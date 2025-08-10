@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"time"
 )
 
 type SosoPointRepository struct {
@@ -12,6 +13,19 @@ type SosoPointRepository struct {
 
 func NewSosoPointRepository(db *sql.DB) *SosoPointRepository {
 	return &SosoPointRepository{DB: db}
+}
+
+type SosoPointHistory struct {
+	ID         int64
+	CalenderID string
+	UserID     string
+	ChangedAt  time.Time
+	ChangedBy  *string
+	EventID    *string
+	OldPoint   int
+	NewPoint   int
+	PointDelta int
+	Reason     string
 }
 
 // UpdatePointWithLog updates `calender_memberships.soso_point` and
@@ -74,4 +88,112 @@ func (r *SosoPointRepository) UpdatePointWithLog(
 	}
 
 	return tx.Commit()
+}
+
+const (
+	SQLSosoPointHistoryFindByEventID = `
+SELECT
+  id, calender_id, user_id, changed_at, changed_by, event_id,
+  old_point, new_point, point_delta, reason
+FROM soso_point_histories
+WHERE event_id = ?
+ORDER BY changed_at DESC, id DESC
+`
+
+	SQLSosoPointHistoryFindByCalenderID = `
+SELECT
+  id, calender_id, user_id, changed_at, changed_by, event_id,
+  old_point, new_point, point_delta, reason
+FROM soso_point_histories
+WHERE calender_id = ?
+ORDER BY changed_at DESC, id DESC
+`
+)
+
+// FindHistoriesByEventID は event_id に紐づくポイント履歴を新しい順で返す
+func (r *SosoPointRepository) FindHistoriesByEventID(
+	ctx context.Context, eventID string,
+) ([]SosoPointHistory, error) {
+
+	rows, err := r.DB.QueryContext(ctx, SQLSosoPointHistoryFindByEventID, eventID)
+	if err != nil {
+		return nil, fmt.Errorf("query histories by event_id: %w", err)
+	}
+	defer rows.Close()
+
+	var list []SosoPointHistory
+	for rows.Next() {
+		var (
+			h                      SosoPointHistory
+			changedByNS, eventIDNS sql.NullString
+			reasonNS               sql.NullString
+		)
+		if err := rows.Scan(
+			&h.ID, &h.CalenderID, &h.UserID, &h.ChangedAt,
+			&changedByNS, &eventIDNS,
+			&h.OldPoint, &h.NewPoint, &h.PointDelta, &reasonNS,
+		); err != nil {
+			return nil, fmt.Errorf("scan histories by event_id: %w", err)
+		}
+		if changedByNS.Valid {
+			v := changedByNS.String
+			h.ChangedBy = &v
+		}
+		if eventIDNS.Valid {
+			v := eventIDNS.String
+			h.EventID = &v
+		}
+		if reasonNS.Valid {
+			h.Reason = reasonNS.String
+		}
+		list = append(list, h)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("rows err histories by event_id: %w", err)
+	}
+	return list, nil
+}
+
+// FindHistoriesByCalenderID は calender_id に紐づくポイント履歴を新しい順で返す
+func (r *SosoPointRepository) FindHistoriesByCalenderID(
+	ctx context.Context, calenderID string,
+) ([]SosoPointHistory, error) {
+
+	rows, err := r.DB.QueryContext(ctx, SQLSosoPointHistoryFindByCalenderID, calenderID)
+	if err != nil {
+		return nil, fmt.Errorf("query histories by calender_id: %w", err)
+	}
+	defer rows.Close()
+
+	var list []SosoPointHistory
+	for rows.Next() {
+		var (
+			h                      SosoPointHistory
+			changedByNS, eventIDNS sql.NullString
+			reasonNS               sql.NullString
+		)
+		if err := rows.Scan(
+			&h.ID, &h.CalenderID, &h.UserID, &h.ChangedAt,
+			&changedByNS, &eventIDNS,
+			&h.OldPoint, &h.NewPoint, &h.PointDelta, &reasonNS,
+		); err != nil {
+			return nil, fmt.Errorf("scan histories by calender_id: %w", err)
+		}
+		if changedByNS.Valid {
+			v := changedByNS.String
+			h.ChangedBy = &v
+		}
+		if eventIDNS.Valid {
+			v := eventIDNS.String
+			h.EventID = &v
+		}
+		if reasonNS.Valid {
+			h.Reason = reasonNS.String
+		}
+		list = append(list, h)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("rows err histories by calender_id: %w", err)
+	}
+	return list, nil
 }
