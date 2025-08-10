@@ -112,7 +112,7 @@ const DashboardPage: NextPage<DashboardPageProps> = ({ params }) => {
     pickUpCount: 0,
     departurePoint: '',
     destinationPoint: '',
-    members: ['田中 太郎', '佐藤 花子', '山田 次郎'],
+    members: members.map(member => member.username), // 初期メンバーを設定
   };
 
   // page.tsx - 重複している handleSaveSosoChange 関数を1つにまとめる
