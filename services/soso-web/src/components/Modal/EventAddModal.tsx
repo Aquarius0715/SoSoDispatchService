@@ -26,13 +26,11 @@ interface EventAddModalProps {
   onSave: (status: EventStatus) => void;
   initialStatus: EventStatus;
 }
-
-// 参加者データの仮配列
-const initialParticipants = [
-  { id: 1, name: '田中太郎', isChecked: false },
-  { id: 2, name: '佐藤花子', isChecked: false },
-  { id: 3, name: '山田次郎', isChecked: false },
-];
+interface Participant {
+  id: number;
+  name: string;
+  isChecked: boolean;
+}
 
 const EventAddModal: React.FC<EventAddModalProps> = ({
   isOpen,
@@ -49,7 +47,9 @@ const EventAddModal: React.FC<EventAddModalProps> = ({
   const [pickUpCount, setPickUpCount] = useState(initialStatus.pickUpCount);
   const [departurePoint, setDeparturePoint] = useState(initialStatus.departurePoint);
   const [destinationPoint, setDestinationPoint] = useState(initialStatus.destinationPoint);
-  const [participants, setParticipants] = useState(initialParticipants);
+
+  const [participants, setParticipants] = useState<Participant[]>([]);
+
   const [dropOffCountInput, setDropOffCountInput] = useState(
   initialStatus.dropOffCount === 0 ? '' : String(initialStatus.dropOffCount)
 );
@@ -87,7 +87,18 @@ const EventAddModal: React.FC<EventAddModalProps> = ({
       setPickUpCount(initialStatus.pickUpCount);
       setDeparturePoint(initialStatus.departurePoint);
       setDestinationPoint(initialStatus.destinationPoint);
-      setParticipants(initialParticipants.map(p => ({ ...p, isChecked: false })));
+      //setParticipants(initialStatus.members.map(p => ({ ...p, isChecked: false })));
+      setParticipants(
+        initialStatus.members.map((memberName, index) => ({
+          id: index + 1,
+          name: memberName,
+          isChecked: false
+        }))
+      );
+
+      
+
+      //string[]からPar
     }
   }, [isOpen, initialStatus]);
 
@@ -103,8 +114,8 @@ const EventAddModal: React.FC<EventAddModalProps> = ({
   }, [isOpen]);
 
   const handleCheckboxChange = (id: number) => {
-    setParticipants(
-      participants.map(p =>
+    setParticipants(prevParticipants =>
+      prevParticipants.map(p =>
         p.id === id ? { ...p, isChecked: !p.isChecked } : p
       )
     );
