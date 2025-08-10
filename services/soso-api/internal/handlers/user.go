@@ -111,3 +111,65 @@ func (h *UserHandler) Me(c echo.Context) error {
 		"updatedAt":   u.UpdatedAt,
 	})
 }
+// ★★★ この構造体の定義を追加してください ★★★
+// ユーザー情報更新リクエストの入力DTO
+type UpdateMeRequest struct {
+	Username    string `json:"username" validate:"required,username"`
+	MailAddress string `json:"mailAddress" validate:"required,mailAddress"`
+	HasCar      bool   `json:"hasCar"`
+	Capacity    int    `json:"capacity" validate:"required,capacity"`
+}
+// 新しく追加
+func (h *UserHandler) UpdateMe(c echo.Context) error {
+	// --- ステップ1: リクエストのバリデーション ---
+	var req UpdateMeRequest
+	if err := c.Bind(&req); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid payload")
+	}
+	if err := c.Validate(&req); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+	if req.HasCar && req.Capacity <= 0 {
+		return echo.NewHTTPError(http.StatusBadRequest, "capacity required when has_car is true")
+	}
+
+	// --- ステップ2: ユーザーIDの取得 (Me関数から流用) ---
+	tok, ok := c.Get("user").(*jwt.Token)
+	if !ok {
+		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized")
+	}
+	claims, ok := tok.Claims.(*jwt.RegisteredClaims)
+	if !ok || claims.Subject == "" {
+		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized")
+	}
+	uid := claims.Subject
+
+	// --- ステップ3: DB更新の準備 ---
+	ctx := c.Request().Context()
+	// 他のユーザーが同じメールアドレスやユーザー名を使っていないかチェック (任意ですが推奨)
+	// (この部分はRegister関数を参考に実装できますが、今回は省略します)
+
+	u := &model.User{
+		ID:          uid, // 更新対象のユーザーID
+		Username:    req.Username,
+		MailAddress: req.MailAddress,
+		HasCar:      req.HasCar,
+		Capacity:    req.Capacity,
+	}
+
+	// --- ステップ4: リポジトリを呼び出してDBを更新 ---
+	// ※注意: この時点では UserRepo.Update はまだ存在しません
+	if err := h.UserRepo.Update(ctx, u); err != nil {
+		return err // DBエラーはそのまま返す
+	}
+
+	// --- ステップ5: 成功レスポンスを返す ---
+	// 更新後の情報を返すのが親切
+	return c.JSON(http.StatusOK, map[string]any{
+		"id":          u.ID,
+		"username":    u.Username,
+		"mailAddress": u.MailAddress,
+		"hasCar":      u.HasCar,
+		"capacity":    u.Capacity,
+	})
+}
