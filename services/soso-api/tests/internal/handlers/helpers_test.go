@@ -185,7 +185,7 @@ const (
 			c.id	AS id,
 			c.name	AS name,
 			c.description AS description,
-			c.owner_id AS owner_id,
+			c.owner_id AS owner_id
 		FROM
 			calender_memberships AS cm
 			INNER JOIN calenders AS c

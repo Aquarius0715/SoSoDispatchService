@@ -87,3 +87,53 @@ func (r *CalenderRepository) Create(ctx context.Context, c *model.Calender) erro
 	`, c.ID, c.Name, c.Description, c.OwnerId)
 	return err
 }
+
+func (r *CalenderRepository) FindMyTransportEvents(ctx context.Context, userID string) ([]*model.MyTransportEvent, error) {
+	rows, err := r.DB.QueryContext(ctx, `
+		SELECT
+			e.id                             AS event_id,
+			ep.user_id                       AS user_id,
+			ep.type                          AS type,
+			c.name                           AS calender_name,
+			e.title                          AS event_title,
+			e.start_time                     AS start_time,
+			CASE
+				WHEN ep.type = 'go'     THEN e.seats_required_go
+				WHEN ep.type = 'return' THEN e.seats_required_return
+				ELSE 0
+			END                              AS seats_required
+		FROM event_participants AS ep
+		INNER JOIN events     AS e ON e.id = ep.event_id
+		INNER JOIN calenders  AS c ON c.id = e.calender_id
+		WHERE
+			ep.user_id = ?
+			AND ep.status = 'registered'
+			AND ep.type IN ('go', 'return')
+		ORDER BY e.start_time ASC
+	`, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var list []*model.MyTransportEvent
+	for rows.Next() {
+		var ev model.MyTransportEvent
+		if err := rows.Scan(
+			&ev.EventID,
+			&ev.UserID,
+			&ev.Type,
+			&ev.CalenderName,
+			&ev.EventTitle,
+			&ev.StartTime,
+			&ev.SeatsRequired,
+		); err != nil {
+			return nil, err
+		}
+		list = append(list, &ev)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return list, nil
+}
