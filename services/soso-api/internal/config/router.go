@@ -136,6 +136,7 @@ func SetupRouter(cfg *Config) *echo.Echo {
 	eveG.POST("/:event_id/return", eventH.RegisterReturn)
 	eveG.GET("/:event_id/detail", eventH.Detail)
 	eveG.GET("/:event_id/members", eventH.Members)
+	eveG.GET("/dispatch/me", calenderH.FindMyTransportEvents)
 
 	// シャットダウン時クローズ
 	e.Server.RegisterOnShutdown(func() { _ = db.Close() })

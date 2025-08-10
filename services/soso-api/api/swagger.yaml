@@ -765,6 +765,30 @@ paths:
         '403':
           $ref: '#/components/responses/ForbiddenError'
 
+  /events/dispatch/me:
+    get:
+      tags: [events]
+      summary: 自分の配車予定一覧取得（実装済み）
+      description: |
+        アクセスJWTの subject（=自分のユーザーID）に紐づく配車参加・送迎予定を一覧で返す。
+        返却フィールドはハンドラのレスポンス整形に合わせており、`type` は文字列の列挙値である。
+      operationId: listMyDispatches
+      security:
+        - AccessToken: []
+      responses:
+        '200':
+          description: 取得成功
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/transportEventResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
 components:
   securitySchemes:
     AccessToken:
@@ -1086,3 +1110,38 @@ components:
         joinedAt:
           type: string
           format: date-time
+    transportEventResponse:
+      type: object
+      required:
+        - eventId
+        - userId
+        - type
+        - calenderName
+        - eventTitle
+        - startTime
+      properties:
+        eventId:
+          type: string
+          example: resv_12345
+        userId:
+          type: string
+          example: usr_12345
+        type:
+          type: string
+          description: 参加種別（model.TransportType）
+          enum: [participants, pick_up, drop_off]
+          example: participants
+        calenderName:
+          type: string
+          example: 情報局カレンダー
+        eventTitle:
+          type: string
+          example: 月次会議出発
+        startTime:
+          type: string
+          format: date-time
+          example: 2025-07-20T09:00:00Z
+        seatsRequired:
+          type: integer
+          format: int32
+          example: 3

@@ -136,3 +136,55 @@ func TestCalenderRepository_FindCalendersByUserId_NotFound(t *testing.T) {
 	assert.Len(t, list, 0)
 	assert.NoError(t, mock.ExpectationsWereMet())
 }
+
+func TestCalenderRepository_FindMyTransportEvents_Hit(t *testing.T) {
+	repo, mock, close := newCalenderRepoMock(t)
+	defer close()
+
+	now := time.Now()
+	rows := sqlmock.NewRows([]string{
+		"event_id", "user_id", "type", "calender_name", "event_title", "start_time", "seats_required",
+	}).AddRow(
+		"e1", "u1", "go", "情報局", "朝送迎", now, 2,
+	).AddRow(
+		"e2", "u1", "return", "情報局", "夕方送迎", now.Add(1*time.Hour), 3,
+	)
+
+	mock.ExpectQuery(SQLFindMyTransportEvents).
+		WithArgs("u1").
+		WillReturnRows(rows)
+
+	list, err := repo.FindMyTransportEvents(context.Background(), "u1")
+	assert.NoError(t, err)
+	assert.Len(t, list, 2)
+
+	assert.Equal(t, "e1", list[0].EventID)
+	assert.Equal(t, model.TransportType("go"), list[0].Type)
+	assert.Equal(t, 2, list[0].SeatsRequired)
+
+	assert.Equal(t, "e2", list[1].EventID)
+	assert.Equal(t, model.TransportType("return"), list[1].Type)
+	assert.Equal(t, 3, list[1].SeatsRequired)
+
+	assert.True(t, list[0].StartTime.Before(list[1].StartTime) || list[0].StartTime.Equal(list[1].StartTime))
+
+	assert.NoError(t, mock.ExpectationsWereMet())
+}
+
+func TestCalenderRepository_FindMyTransportEvents_Empty(t *testing.T) {
+	repo, mock, close := newCalenderRepoMock(t)
+	defer close()
+
+	empty := sqlmock.NewRows([]string{
+		"event_id", "user_id", "type", "calender_name", "event_title", "start_time", "seats_required",
+	})
+
+	mock.ExpectQuery(SQLFindMyTransportEvents).
+		WithArgs("u1").
+		WillReturnRows(empty)
+
+	list, err := repo.FindMyTransportEvents(context.Background(), "u1")
+	assert.NoError(t, err)
+	assert.Len(t, list, 0)
+	assert.NoError(t, mock.ExpectationsWereMet())
+}

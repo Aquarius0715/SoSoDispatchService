@@ -95,3 +95,36 @@ func (h *CalenderHandler) Create(c echo.Context) error {
 		"ownerId":     ca.OwnerId,
 	})
 }
+
+func (h *CalenderHandler) FindMyTransportEvents(c echo.Context) error {
+	tok, ok := c.Get("user").(*jwt.Token)
+	if !ok {
+		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized")
+	}
+	claims, ok := tok.Claims.(*jwt.RegisteredClaims)
+	if !ok || claims.Subject == "" {
+		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized")
+	}
+	userID := claims.Subject
+
+	ctx := c.Request().Context()
+	events, err := h.CalenderRepo.FindMyTransportEvents(ctx, userID)
+	if err != nil {
+		return err
+	}
+
+	// レスポンス（フロント向けのフィールド名に整形）
+	resp := make([]map[string]any, len(events))
+	for i, ev := range events {
+		resp[i] = map[string]any{
+			"eventId":       ev.EventID,
+			"userId":        ev.UserID,
+			"type":          ev.Type, // model.TransportType（JSONでは文字列になる）
+			"calenderName":  ev.CalenderName,
+			"eventTitle":    ev.EventTitle,
+			"startTime":     ev.StartTime, // RFC3339 でシリアライズされる
+			"seatsRequired": ev.SeatsRequired,
+		}
+	}
+	return c.JSON(http.StatusOK, resp)
+}
