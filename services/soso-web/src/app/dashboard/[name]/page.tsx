@@ -340,7 +340,8 @@ const handleEventClick = (clickInfo: any) => {
 
     const handleLogout = () => {
       console.log("🔵 ログアウトが実行されました。");
-      router.push('/');
+      localStorage.removeItem('access_token');
+      router.push('../');
       alert('ログアウトしました');
     };
 
