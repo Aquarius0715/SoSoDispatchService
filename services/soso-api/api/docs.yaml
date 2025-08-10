@@ -336,6 +336,29 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/User' }
+    patch:   #★新しく追加
+      tags: [Users]
+      summary: ユーザー情報更新
+      security:
+        - csrfToken: []
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:    { type: string, minLength: 3, maxLength: 30 }
+                mailAddress: { type: string, format: email }
+                hasCar:      { type: boolean }
+                capacity:    { type: integer, minimum: 0 }
+              # required: [username, mailAddress, hasCar, capacity]
+      responses:
+        "200":
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/User' }
 
   # ----------------------------
   # Calenders

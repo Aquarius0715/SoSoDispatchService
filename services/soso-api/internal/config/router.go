@@ -117,6 +117,8 @@ func SetupRouter(cfg *Config) *echo.Echo {
 	// Users
 	usersPriv := usersG.Group("", echojwt.WithConfig(jwtCfg)) // 同じ /users 配下
 	usersPriv.GET("/me", userH.Me)
+	// usersPriv.GET("/me", userH.Me) の下に追加
+	usersPriv.PATCH("/me", userH.UpdateMe) // userH.UpdateMeは新しく作る関数
 
 	// Calenders
 	calG := e.Group("/calenders", csrfMW, echojwt.WithConfig(jwtCfg))

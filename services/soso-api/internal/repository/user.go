@@ -115,3 +115,22 @@ func (r *UserRepository) FindByID(ctx context.Context, id string) (*model.User, 
 	}
 	return &u, nil
 }
+
+//新しくに追加
+
+func (r *UserRepository) Update(ctx context.Context, u *model.User) error {
+	// データベースに対してUPDATE文を実行する
+	_, err := r.DB.ExecContext(ctx, `
+		UPDATE users
+		SET
+			username = ?,
+			mail_address = ?,
+			has_car = ?,
+			capacity = ?
+		WHERE
+			id = ?
+	`, u.Username, u.MailAddress, u.HasCar, u.Capacity, u.ID) // WHERE句のidを最後に追加
+
+	// エラーがあればそれを返す
+	return err
+}
