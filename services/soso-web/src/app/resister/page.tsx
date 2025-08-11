@@ -182,15 +182,20 @@ export default function RegisterPage() {
             <Dropdown
                 trigger={dropdownTrigger}
                 className="w-full max-w-md">
-                {capacityOptions.map(num => (
-                <div
-                  key={num}
-                  className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-center"
-                  onClick={() => setCapacity(num)}
+            {onClose => (
+              capacityOptions.map(num => (
+                <div 
+                  key={num} 
+                  className="px-4 py-2 text-black hover:bg-gray-100 cursor-pointer text-center" 
+                  onClick={() => {
+                    setCapacity(num);
+                    onClose(); // ★ ここで親から受け取ったonClose関数を呼び出す
+                  }}
                 >
                   {num}人
                 </div>
-              ))}
+              ))
+            )}
             </Dropdown>
         </div>
         <Button
