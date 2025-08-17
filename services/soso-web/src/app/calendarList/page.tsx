@@ -132,8 +132,8 @@ export default function MyPage() {
     alert('ロゴがクリックされました');
   };
 
-  const onCalendarClick = (name: string) => {
-    router.push('/dashboard/' + name);
+  const onCalendarClick = (id: string) => {
+    router.push('/dashboard/' + id);
   };
 
   const handleAddCalendar = () => {
@@ -260,7 +260,7 @@ export default function MyPage() {
             {calendars.map((calendar) => (
               <Button
                 key={calendar.id}
-                onClick={() => onCalendarClick(calendar.name)}
+                onClick={() => onCalendarClick(calendar.id.toString())}
                 className="p-4 bg-white rounded-lg shadow-md border border-gray-200 text-gray-800 hover:bg-gray-100"
               >
                 <p className="font-semibold">{calendar.name}</p>

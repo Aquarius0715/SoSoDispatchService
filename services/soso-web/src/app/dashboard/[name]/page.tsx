@@ -19,6 +19,7 @@ import SOSOManagementModal from '@/src/components/Modal/SOSOManagementModal';
 import SOSOEditModal from '@/src/components/Modal/SOSOEditModal';
 import EventDetailModal from '@/src/components/Modal/EventDetailModal';
 import { EventDetails } from '@/src/components/Modal/EventDetailModal';
+import Cookies from 'js-cookie';
 
 // サイドバーで必要となるデータの型をインポート
 import { Member } from '@/src/components/MemberList/MenberList';
