@@ -57,12 +57,16 @@ interface EventProps {
 // ▼ 変更: params を受け取らない
 export default function DashboardPage() {
   const router = useRouter();
-  const { name } = useParams() as { name: string }; // ← 修正: 動的URLの [name] を取得
+  // ★ 修正: id と slug の両方を取得
+  const { id, slug } = useParams() as { id: string; slug: string };
 
   // --- ▼▼▼ すべてのState管理をここにまとめる ▼▼▼ ---
-  // ▼ 変更: 初期値に name を使う（UUIDなので decode 不要）
-  const [nameState, setNameState] = useState<string>(name ?? '');
-  const [decodedTitle, setDecodedTitle] = useState<string>(name ?? '');
+  // ★ 修正: id と slug を別々に管理し、slug をデコードして表示用タイトルに使用
+  const [idState, setIdState] = useState<string>(id ?? '');
+  const [slugState, setSlugState] = useState<string>(slug ?? '');
+  const [decodedTitle, setDecodedTitle] = useState<string>(
+    slug ? decodeURIComponent(slug) : ''
+  );
 
   const [isManagementModalOpen, setIsManagementModalOpen] = useState(false);
   const [selectedManagementEvent, setSelectedManagementEvent] = useState<EventProps | null>(null);
@@ -87,24 +91,23 @@ export default function DashboardPage() {
   const [eventDetailData, setEventDetailData] = useState<EventDetails | null>(null);
 
   // --- ▼▼▼ useEffect ▼▼▼ ---
-  // ▼ 削除: params を Promise として解決する処理は不要
-  // useEffect(() => {
-  //   console.log("🟡 useEffect: paramsが変更されました。");
-  //   const resolveParams = async () => {
-  //     const resolvedParams = await params;
-  //     setName(resolvedParams.id);
-  //     setDecodedTitle(decodeURIComponent(resolvedParams.id));
-  //   };
-  //   resolveParams();
-  // }, [params]);
-
-  // もしルートが変わる可能性があるなら（同じコンポーネント内で name が変化）
-  // name 変化に合わせて state を追随させたい場合は以下を追加:
+  // ★ 修正: id と slug の変化に合わせて state を更新
   useEffect(() => {
-    if (!name) return;
-    setNameState(name);
-    setDecodedTitle(name);
-  }, [name]);
+    console.log('🔍 useEffect実行:');
+    console.log('  - id:', id);
+    console.log('  - slug:', slug);
+    
+    if (!id || !slug) {
+      console.log('🔴 id または slug が未定義です');
+      return;
+    }
+    
+    setIdState(id);
+    setSlugState(slug);
+    const decoded = decodeURIComponent(slug);
+    setDecodedTitle(decoded);
+    console.log('🔍 設定されたタイトル:', decoded);
+  }, [id, slug]);
 
   // --- ▼▼▼ 定数定義 ▼▼▼ ---
   const initialEventStatus: EventStatus = {
@@ -371,7 +374,7 @@ export default function DashboardPage() {
         pageTitle={decodedTitle}
         onLogout={handleLogout}
         onClickLogo={handleLogoClick}
-        calendarUrl={`https://example.com/dashboard/share/${nameState}`}
+        calendarUrl={`https://example.com/dashboard/share/${idState}/${slugState}`}
       />
       <div className="flex flex-grow overflow-hidden">
         <CalendarLeftSidebar members={members} onEditMember={handleEditMember} className="h-full" />
