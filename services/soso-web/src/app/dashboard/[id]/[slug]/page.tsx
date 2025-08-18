@@ -56,6 +56,53 @@ interface EventProps {
   // APIのベースURLを環境変数から取得
   const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || '';
 
+type ApiEvent = {
+  id: string;
+  calenderId: string;
+  creatorId: string;
+  title: string;
+  description?: string;
+  startTime: string; // ISO
+  endTime: string;   // ISO
+  originLocation?: string;
+  destinationLocation?: string;
+  seatsRequiredGo: number;
+  seatsRequiredReturn: number;
+  participantUserIds: string[];
+};
+
+type ApiCalenderMember = {
+  id: string;          // ← UUID（schemaのid）
+  username: string;
+  hasCar: boolean;
+  capacity: number;    // ← あなたのUIの seatsRequired に対応
+  sosoPoint: number;
+};
+
+const authHeaders = (): HeadersInit => ({
+  'Content-Type': 'application/json',
+  Authorization: `Bearer ${localStorage.getItem('access_token') ?? ''}`,
+  'X-CSRF-Token': Cookies.get('csrf_token') ?? '',
+});
+
+// ApiEvent -> FullCalendar形式
+const mapApiEventToFC = (e: ApiEvent): EventInput => ({
+  id: e.id,
+  title: e.title,
+  start: e.startTime,
+  end: e.endTime,
+  extendedProps: {
+    details: e.description ?? '',
+    dropOffTime: e.startTime,
+    pickUpTime: e.endTime,
+    dropOffCount: e.seatsRequiredGo,
+    pickUpCount: e.seatsRequiredReturn,
+    departurePoint: e.originLocation ?? '',
+    destinationPoint: e.destinationLocation ?? '',
+    members: e.participantUserIds, // ID配列（名前にしたければ後で突き合わせ）
+  },
+});
+
 // ★ export default function の書き方に変更
 // ▼ 変更: params を受け取らない
 export default function DashboardPage() {
@@ -92,6 +139,10 @@ export default function DashboardPage() {
   const [editSource, setEditSource] = useState<'sidebar' | 'management' | null>(null);
   const [isEventDetailModalOpen, setIsEventDetailModalOpen] = useState(false);
   const [eventDetailData, setEventDetailData] = useState<EventDetails | null>(null);
+
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
 
   // --- ▼▼▼ useEffect ▼▼▼ ---
   // ★ 修正: id と slug の変化に合わせて state を更新
