@@ -53,8 +53,8 @@ interface EventProps {
   extendedProps?: any;
 }
 
-  // APIのベースURLを環境変数から取得
-  const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || '';
+// APIのベースURLを環境変数から取得
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || '';
 
 type ApiEvent = {
   id: string;
@@ -120,17 +120,12 @@ export default function DashboardPage() {
 
   const [isManagementModalOpen, setIsManagementModalOpen] = useState(false);
   const [selectedManagementEvent, setSelectedManagementEvent] = useState<EventProps | null>(null);
-  const [events, setEvents] = useState<EventInput[]>([
-    { id: '1', title: 'チームミーティング', start: '2025-08-11T10:30:00', end: '2025-08-11T12:00:00' },
-  ]);
+  // ★ 修正: 初期値を空配列に変更（APIから取得するため）
+  const [events, setEvents] = useState<EventInput[]>([]);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<string>('');
-  const [members, setMembers] = useState<Member[]>([
-    { id: 1, username: '佐藤 健太', hasCar: true, seatsRequired: 4, sosoPoint: 150 },
-    { id: 2, username: '鈴木 陽子', hasCar: false, sosoPoint: 50 },
-    { id: 3, username: '高橋 一郎', hasCar: false, sosoPoint: 80 },
-    { id: 4, username: '伊藤 花子', hasCar: true, seatsRequired: 6, sosoPoint: 200 },
-  ]);
+  // ★ 修正: 初期値を空配列に変更（APIから取得するため）
+  const [members, setMembers] = useState<Member[]>([]);
   const [logs, setLogs] = useState<SOSOTransaction[]>([]);
 
   const [isSOSOEditModalOpen, setIsSOSOEditModalOpen] = useState(false);
@@ -142,7 +137,6 @@ export default function DashboardPage() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
 
   // --- ▼▼▼ useEffect ▼▼▼ ---
   // ★ 修正: id と slug の変化に合わせて state を更新
@@ -162,6 +156,70 @@ export default function DashboardPage() {
     setDecodedTitle(decoded);
     console.log('🔍 設定されたタイトル:', decoded);
   }, [id, slug]);
+
+  // ★ 新規追加: APIからイベントとメンバーを取得
+  useEffect(() => {
+    if (!id) return;
+
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+      router.replace('/'); // 未ログインならログインへ
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    const controller = new AbortController();
+    const headers = authHeaders();
+
+    const evReq = fetch(`${API_BASE}/calenders/${id}/events`, {
+      headers,
+      signal: controller.signal,
+      cache: 'no-store',
+    });
+
+    const memReq = fetch(`${API_BASE}/calenders/${id}/members`, {
+      headers,
+      signal: controller.signal,
+      cache: 'no-store',
+    });
+
+    Promise.all([evReq, memReq])
+      .then(async ([evRes, memRes]) => {
+        if (!evRes.ok) throw new Error(`events HTTP ${evRes.status}`);
+        if (!memRes.ok) throw new Error(`members HTTP ${memRes.status}`);
+
+        const evData = (await evRes.json()) as ApiEvent[];
+        const memData = (await memRes.json()) as ApiCalenderMember[];
+
+        console.log('🔍 取得したイベントデータ:', evData);
+        console.log('🔍 取得したメンバーデータ:', memData);
+
+        // イベントをFullCalendarへ
+        setEvents(evData.map(mapApiEventToFC));
+
+        // メンバーをUI型へ（capacity -> seatsRequired に対応付け）
+        const uiMembers: Member[] = memData.map((m, idx) => ({
+          id: idx + 1,                  // 既存UIがnumber想定なら連番でOK（UUIDを保持したいなら別フィールド追加）
+          username: m.username,
+          hasCar: m.hasCar,
+          seatsRequired: m.capacity,    // ← ここがポイント
+          sosoPoint: m.sosoPoint,
+          // userUuid: m.id,             // 必要なら隠しフィールドで保管
+        }));
+        setMembers(uiMembers);
+      })
+      .catch((e) => {
+        if (e?.name !== 'AbortError') {
+          setError(e.message ?? '取得に失敗しました');
+          console.error('🔴 API取得エラー:', e);
+        }
+      })
+      .finally(() => setLoading(false));
+
+    return () => controller.abort();
+  }, [id, router]);
 
   // --- ▼▼▼ 定数定義 ▼▼▼ ---
   const initialEventStatus: EventStatus = {
@@ -421,6 +479,26 @@ export default function DashboardPage() {
   console.log('🟢 DashboardPageがレンダリングされました。'); 
   console.log('🟢 isManagementModalOpen:', isManagementModalOpen);
   console.log('🟢 selectedManagementEvent:', selectedManagementEvent);
+
+  // ★ ローディング表示を追加
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-lg">読み込み中...</div>
+      </div>
+    );
+  }
+
+  // ★ エラー表示を追加
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-red-500">エラー: {error}</div>
+      </div>
+    );
+  }
+
+  
 
   return (
     <div className="flex flex-col h-screen bg-gray-100">
