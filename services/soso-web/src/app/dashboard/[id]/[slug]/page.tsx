@@ -53,6 +53,9 @@ interface EventProps {
   extendedProps?: any;
 }
 
+  // APIのベースURLを環境変数から取得
+  const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || '';
+
 // ★ export default function の書き方に変更
 // ▼ 変更: params を受け取らない
 export default function DashboardPage() {
