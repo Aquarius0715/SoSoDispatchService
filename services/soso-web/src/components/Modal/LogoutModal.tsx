@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Button from '@/src/components/Elements/Button'; // ← Button コンポーネントのパスを調整してください
+import Button from '../Button/Button';
 
 const LogoutComponent = () => {
   const router = useRouter();
