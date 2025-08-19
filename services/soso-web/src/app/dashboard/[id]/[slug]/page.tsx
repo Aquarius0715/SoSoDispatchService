@@ -138,6 +138,17 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // 既存: 一覧取得（関数にして再利用）
+  const fetchEvents = async (calendarId: string) => {
+    const res = await fetch(`${API_BASE}/calenders/${calendarId}/events`, {
+      headers: authHeaders(),
+      cache: 'no-store',
+    });
+    if (!res.ok) throw new Error(`events HTTP ${res.status}`);
+    const data: ApiEvent[] = await res.json();
+    setEvents(data.map(mapApiEventToFC));
+  };
+
   // --- ▼▼▼ useEffect ▼▼▼ ---
   // ★ 修正: id と slug の変化に合わせて state を更新
   useEffect(() => {
@@ -230,9 +241,12 @@ export default function DashboardPage() {
     members: []
   };
 
-  // --- ▼▼▼ ハンドラ関数 ▼▼▼ ---
-  const handleSaveNewEvent = (eventData: EventStatus) => {
-    console.log("🔵 handleSaveNewEventが実行されました。");
+// --- ▼▼▼ ハンドラ関数 ▼▼▼ ---
+const handleSaveNewEvent = async (eventData: EventStatus) => {
+  console.log("🔵 handleSaveNewEventが実行されました。");
+  console.log("🔵 受け取ったeventData:", eventData);
+  
+  try {
     const startDateTime = eventData.dropOffTime 
       ? `${eventData.date}T${eventData.dropOffTime}:00`
       : `${eventData.date}T09:00:00`;
@@ -241,27 +255,58 @@ export default function DashboardPage() {
       ? `${eventData.date}T${eventData.pickUpTime}:00`
       : `${eventData.date}T10:00:00`;
 
-    const newEvent: EventInput = {
-      id: Date.now().toString(),
+    // APIに送信するデータを構築
+    const apiEventData = {
       title: eventData.title,
-      start: startDateTime,
-      end: endDateTime,
-      extendedProps: {
-        details: eventData.details,
-        dropOffTime: eventData.dropOffTime,
-        pickUpTime: eventData.pickUpTime,
-        dropOffCount: eventData.dropOffCount,
-        pickUpCount: eventData.pickUpCount,
-        departurePoint: eventData.departurePoint,
-        destinationPoint: eventData.destinationPoint,
-        members: eventData.members,
-      }
+      description: eventData.details,
+      startTime: startDateTime,
+      endTime: endDateTime,
+      originLocation: eventData.departurePoint,
+      destinationLocation: eventData.destinationPoint,
+      seatsRequiredGo: eventData.dropOffCount,
+      seatsRequiredReturn: eventData.pickUpCount,
+      participantUserIds: eventData.members, // メンバーのIDリスト
     };
 
-    setEvents(prevEvents => [...prevEvents, newEvent]);
+    console.log('🔵 APIに送信するデータ:', JSON.stringify(apiEventData, null, 2));
+
+    // ヘッダーを確認
+    const headers = authHeaders();
+    console.log('🔵 送信ヘッダー:', headers);
+
+    // APIにPOSTリクエストを送信
+    const response = await fetch(`${API_BASE}/calenders/${id}/events`, {
+      method: 'POST',
+      headers: headers,
+      body: JSON.stringify(apiEventData),
+    });
+
+    console.log('🔵 レスポンスステータス:', response.status);
+    console.log('🔵 レスポンスヘッダー:', Object.fromEntries(response.headers.entries()));
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('🔴 エラーレスポンス:', errorText);
+      throw new Error(`イベント作成に失敗しました: HTTP ${response.status} - ${errorText}`);
+    }
+
+    const createdEvent = (await response.json()) as ApiEvent;
+    console.log('🔵 作成されたイベント:', createdEvent);
+
+    // 成功した場合、イベントリストを再取得
+    await fetchEvents(id);
+    
+    // モーダルを閉じる
     setIsAddModalOpen(false);
-    console.log('🔵 新しいイベントが追加されました:', newEvent);
-  };
+    
+    console.log('🔵 新しいイベントが正常に作成されました');
+    
+  } catch (error) {
+    console.error('🔴 イベント作成エラー:', error);
+    alert(`イベントの作成に失敗しました: ${error}`);
+    // エラーが発生してもモーダルは開いたままにする
+  }
+};
 
   const handleSaveManagement = (eventData: any) => {
     console.log("🔵 handleSaveManagementが実行されました。");
