@@ -79,11 +79,27 @@ type ApiCalenderMember = {
   sosoPoint: number;
 };
 
-const authHeaders = (): HeadersInit => ({
-  'Content-Type': 'application/json',
-  Authorization: `Bearer ${localStorage.getItem('access_token') ?? ''}`,
-  'X-CSRF-Token': Cookies.get('csrf_token') ?? '',
-});
+// ★ authHeaders関数を修正
+const authHeaders = (): HeadersInit => {
+  const token = localStorage.getItem('access_token') ?? '';
+  const csrf = Cookies.get('csrf_token') ?? '';
+  
+  console.log('🔍 認証情報確認:');
+  console.log('  - Access Token:', token ? `${token.substring(0, 20)}...` : '未設定');
+  console.log('  - CSRF Token:', csrf || '未設定');
+  
+  const headers: HeadersInit = {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`,
+  };
+  
+  // CSRFトークンが存在する場合のみ追加
+  if (csrf) {
+    headers['X-CSRF-Token'] = csrf;
+  }
+  
+  return headers;
+};
 
 // ApiEvent -> FullCalendar形式
 const mapApiEventToFC = (e: ApiEvent): EventInput => ({
@@ -247,28 +263,45 @@ const handleSaveNewEvent = async (eventData: EventStatus) => {
   console.log("🔵 受け取ったeventData:", eventData);
   
   try {
+    // ★ 修正: ISO 8601フォーマットに変更
     const startDateTime = eventData.dropOffTime 
-      ? `${eventData.date}T${eventData.dropOffTime}:00`
-      : `${eventData.date}T09:00:00`;
+      ? `${eventData.date}T${eventData.dropOffTime}:00.000Z`
+      : `${eventData.date}T09:00:00.000Z`;
     
     const endDateTime = eventData.pickUpTime 
-      ? `${eventData.date}T${eventData.pickUpTime}:00`
-      : `${eventData.date}T10:00:00`;
+      ? `${eventData.date}T${eventData.pickUpTime}:00.000Z`
+      : `${eventData.date}T10:00:00.000Z`;
 
-    // APIに送信するデータを構築
+    // ★ 修正: データ検証を追加
     const apiEventData = {
-      title: eventData.title,
-      description: eventData.details,
+      title: String(eventData.title || ''), // 空文字列対策
+      description: String(eventData.details || ''), // 空文字列対策
       startTime: startDateTime,
       endTime: endDateTime,
-      originLocation: eventData.departurePoint,
-      destinationLocation: eventData.destinationPoint,
-      seatsRequiredGo: eventData.dropOffCount,
-      seatsRequiredReturn: eventData.pickUpCount,
-      participantUserIds: eventData.members, // メンバーのIDリスト
+      originLocation: String(eventData.departurePoint || ''), // 空文字列対策
+      destinationLocation: String(eventData.destinationPoint || ''), // 空文字列対策
+      seatsRequiredGo: Number(eventData.dropOffCount) || 0, // 数値保証
+      seatsRequiredReturn: Number(eventData.pickUpCount) || 0, // 数値保証
+      participantUserIds: Array.isArray(eventData.members) ? eventData.members : [], // 配列保証
     };
 
+    // ★ 詳細なデバッグ情報
     console.log('🔵 APIに送信するデータ:', JSON.stringify(apiEventData, null, 2));
+    console.log('🔵 各フィールドの詳細:');
+    console.log('  - title:', typeof apiEventData.title, `"${apiEventData.title}"`);
+    console.log('  - description:', typeof apiEventData.description, `"${apiEventData.description}"`);
+    console.log('  - startTime:', typeof apiEventData.startTime, `"${apiEventData.startTime}"`);
+    console.log('  - endTime:', typeof apiEventData.endTime, `"${apiEventData.endTime}"`);
+    console.log('  - originLocation:', typeof apiEventData.originLocation, `"${apiEventData.originLocation}"`);
+    console.log('  - destinationLocation:', typeof apiEventData.destinationLocation, `"${apiEventData.destinationLocation}"`);
+    console.log('  - seatsRequiredGo:', typeof apiEventData.seatsRequiredGo, apiEventData.seatsRequiredGo);
+    console.log('  - seatsRequiredReturn:', typeof apiEventData.seatsRequiredReturn, apiEventData.seatsRequiredReturn);
+    console.log('  - participantUserIds:', typeof apiEventData.participantUserIds, apiEventData.participantUserIds);
+
+    // ★ バリデーション追加
+    if (!apiEventData.title.trim()) {
+      throw new Error('イベントタイトルは必須です');
+    }
 
     // ヘッダーを確認
     const headers = authHeaders();
