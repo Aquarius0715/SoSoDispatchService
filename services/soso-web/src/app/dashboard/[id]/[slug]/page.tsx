@@ -486,7 +486,7 @@ const handleSaveNewEvent = async (eventData: EventStatus) => {
       };
       
       // ✅ 日付比較に基づいてモーダルを選択
-      if (eventDate < today) {
+      if (eventDate > today) {
         // 過去のイベント → EventDetailModalを開く
         console.log('🔵 過去のイベントです。EventDetailModalを開きます。');
         setIsEventDetailModalOpen(true);
