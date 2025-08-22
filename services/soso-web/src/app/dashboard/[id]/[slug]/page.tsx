@@ -619,23 +619,9 @@ const handleSaveNewEvent = async (eventData: EventStatus) => {
                 </div>
               )}
               eventContent={(arg) => {
-                const startTime = arg.event.start
-                  ? new Date(arg.event.start).toLocaleTimeString('ja-JP', {
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })
-                  : '';
-
                 return (
-                  <div className="flex items-center space-x-2 text-xs text-gray-800 truncate">
-                    {/* 青い丸 */}
-                    <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0" />
-
-                    {/* 時刻とタイトル */}
-                    <div>
-                      <span className="font-medium">{startTime}</span>{' '}
-                      <span>{arg.event.title}</span>
-                    </div>
+                  <div className="flex items-center justify-center w-full h-full text-xs text-gray-800 text-center truncate">
+                    {arg.event.title}
                   </div>
                 );
               }}
