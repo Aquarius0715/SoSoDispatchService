@@ -262,15 +262,18 @@ const handleSaveNewEvent = async (eventData: EventStatus) => {
   console.log("🔵 handleSaveNewEventが実行されました。");
   console.log("🔵 受け取ったeventData:", eventData);
   
+  const toUTC = (date: string, time: string) => {
+  return new Date(`${date}T${time}:00+09:00`).toISOString();
+};
   try {
     // ★ 修正: ISO 8601フォーマットに変更
     const startDateTime = eventData.dropOffTime 
-      ? `${eventData.date}T${eventData.dropOffTime}:00.000Z`
-      : `${eventData.date}T09:00:00.000Z`;
+      ? toUTC(eventData.date, eventData.dropOffTime)
+      : toUTC(eventData.date, '09:00:00');
     
     const endDateTime = eventData.pickUpTime 
-      ? `${eventData.date}T${eventData.pickUpTime}:00.000Z`
-      : `${eventData.date}T10:00:00.000Z`;
+      ? toUTC(eventData.date, eventData.pickUpTime)
+      : toUTC(eventData.date, '10:00:00');
 
     // ★ 修正: データ検証を追加
     const apiEventData = {

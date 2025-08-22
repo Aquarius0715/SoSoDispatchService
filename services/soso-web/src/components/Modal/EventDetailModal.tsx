@@ -49,6 +49,20 @@ const EventDetailModal: React.FC<ModalProps> = ({ eventData, onClose }) => {
     }
   };
 
+  // ★ 追加（コンポーネント上部などに）
+  const fmtJstDate = (iso: string | undefined) =>
+    iso ? new Date(iso).toLocaleDateString('ja-JP', {
+      timeZone: 'Asia/Tokyo',
+      year: 'numeric', month: '2-digit', day: '2-digit'
+    }) : '';
+
+  const fmtJstTime = (iso: string | undefined) =>
+    iso ? new Date(iso).toLocaleTimeString('ja-JP', {
+      timeZone: 'Asia/Tokyo',
+      hour: '2-digit', minute: '2-digit', hour12: false
+    }) : '';
+
+
   return (
     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center p-4 z-999">
       <div className="bg-white p-6 rounded-lg w-full max-w-md shadow-lg border border-gray-300 max-h-screen overflow-y-auto">
@@ -67,8 +81,9 @@ const EventDetailModal: React.FC<ModalProps> = ({ eventData, onClose }) => {
 
         <div className="bg-gray-100 p-4 rounded-lg mb-4 text-zinc-600">
           <h3 className="font-normal font-['Inter'] text-black text-lg mb-2">{eventData.title}</h3>
-          <p className="mb-3">日付: {eventData.date}</p>
-          <p className="mb-3">時間: {eventData.dropOffTime}</p>
+          <p className="mb-3">日付: {fmtJstDate(eventData.dropOffTime || eventData.pickUpTime)}</p>
+          <p className="mb-3">開始時間: {fmtJstTime(eventData.dropOffTime || eventData.pickUpTime)}</p>
+          <p className="mb-3">終了時間: {fmtJstTime(eventData.pickUpTime || eventData.pickUpTime)}</p>
           <p>詳細: {eventData.details}</p>
         </div>
 
