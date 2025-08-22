@@ -52,7 +52,7 @@ export default function MyPage() {
   const fetchUserStatus = async (token: string) => {
     if (!API_BASE) return;
     try {
-      const csrfToken = Cookies.get('csrf_token')?.toString() ?? ""
+      const csrfToken = Cookies.get('XSRF-TOKEN')?.toString() ?? ""
       const response = await fetch(`${API_BASE}/users/me`, {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -75,8 +75,7 @@ export default function MyPage() {
   const fetchCalendars = async (token: string) => {
     if (!API_BASE) return;
     try {
-      // const csrfToken = Cookies.get(`csrf_token`)?.toString ?? ""
-      const csrfToken = Cookies.get('csrf_token')?.toString() ?? ""
+      const csrfToken = Cookies.get('XSRF-TOKEN')?.toString() ?? "";
       const response = await fetch(`${API_BASE}/calenders/my`, {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -162,7 +161,7 @@ const onCalendarClick = (id: string) => {
     if (!API_BASE) return;
 
     try {
-      const csrfToken = Cookies.get('csrf_token')?.toString() ?? "";
+      const csrfToken = Cookies.get('XSRF-TOKEN')?.toString() ?? "";
       // バックエンドのユーザー更新APIエンドポイントを呼び出す (例: PUT /users/me)
       const response = await fetch(`${API_BASE}/users/me`, {
         method: 'PATCH', // ★ 修正: 'PUT'から'PATCH'に変更
@@ -172,6 +171,7 @@ const onCalendarClick = (id: string) => {
           'X-CSRF-Token': csrfToken,
         },
         body: JSON.stringify(newStatus),
+        credentials: 'include',
       });
 
       if (!response.ok) {
@@ -205,7 +205,7 @@ const onCalendarClick = (id: string) => {
     setIsCreatingCalendar(true);
 
     try {
-      const csrfToken = Cookies.get('csrf_token')?.toString() ?? ""
+      const csrfToken = Cookies.get('XSRF-TOKEN')?.toString() ?? "";
       const response = await fetch(`${API_BASE}/calenders/create`, {
         method: 'POST',
         headers: {
@@ -214,6 +214,7 @@ const onCalendarClick = (id: string) => {
           'X-CSRF-Token': csrfToken,
         },
         body: JSON.stringify({ name: newCalendar.calendarName }),
+        credentials: 'include',
       });
 
       if (!response.ok) {
@@ -231,6 +232,7 @@ const onCalendarClick = (id: string) => {
           'X-CSRF-Token': csrfToken,
         },
         body: JSON.stringify({ name: newCalendar.calendarName }),
+        credentials: 'include',
       });
 
       if (!join_response.ok) {
@@ -252,6 +254,11 @@ const onCalendarClick = (id: string) => {
     }
   };
 
+  // リクエスト前にこれを追加してデバッグ
+  console.log('🔍 デバッグ情報:');
+  // console.log('  - Access Token:', localStorage.getItem('access_token') ? '設定済み' : '未設定');
+  console.log('  - API Base:', API_BASE);
+  console.log('  - csrf Token:', Cookies.get('XSRF-TOKEN') ? '設定済み' : '未設定');
   return (
     <div className="flex flex-col h-screen bg-gray-100">
       <MyPageHeader
