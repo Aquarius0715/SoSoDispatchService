@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Button from '../Button/Button';
 import Input from '../TextFieald/Input';
+import Cookies from 'js-cookie';
 
 // EventDetailModal.tsx のEventDetailsインターフェースを修正
 export interface EventDetails {
@@ -30,22 +31,93 @@ const EventDetailModal: React.FC<ModalProps> = ({ eventData, onClose }) => {
   const [dropOffRemaining, setDropOffRemaining] = useState(eventData.dropOffCount);
   const [pickUpRemaining, setPickUpRemaining] = useState(eventData.pickUpCount);
   const [registered, setRegistered] = useState<string[]>(eventData.dispatchRegistered || []);
+  const [isRegistering, setIsRegistering] = useState(false); // ローディング状態
 
-  const handleRegister = (type: 'dropOff' | 'pickUp') => {
-    if (typeof seatsRequired === 'number' && seatsRequired > 0) {
-      if (type === 'dropOff' && seatsRequired <= dropOffRemaining) {
+    // ★ APIのベースURLと認証ヘッダー
+  const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || '';
+
+    // ★ authHeaders関数を修正
+  const authHeaders = (): HeadersInit => {
+    const token = localStorage.getItem('access_token') ?? '';
+    const csrf = Cookies.get('csrf_token') ?? '';
+    
+    console.log('🔍 認証情報確認:');
+    console.log('  - Access Token:', token ? `${token.substring(0, 20)}...` : '未設定');
+    console.log('  - CSRF Token:', csrf || '未設定');
+    
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    };
+    
+    // CSRFトークンが存在する場合のみ追加
+    if (csrf) {
+      headers['X-CSRF-Token'] = csrf;
+    }
+    
+    return headers;
+  };
+
+  const handleRegister = async (type: 'dropOff' | 'pickUp') => {
+    if (typeof seatsRequired !== 'number' || seatsRequired <= 0) {
+      alert('有効な人数を入力してください。');
+      return;
+    }
+
+    // ★ 残席数チェック
+    const remaining = type === 'dropOff' ? dropOffRemaining : pickUpRemaining;
+    if (seatsRequired > remaining) {
+      alert('指定された人数は登録できません。');
+      return;
+    }
+
+    setIsRegistering(true);
+
+    try {
+      // ★ APIエンドポイント選択
+      const endpoint = type === 'dropOff' 
+        ? `${API_BASE}/events/${eventData.id}/return`  // 送り登録
+        : `${API_BASE}/events/${eventData.id}/pickup`; // 迎え登録
+
+      console.log('🔵 配車登録API呼び出し:', {
+        endpoint,
+        type,
+        seatsRequired,
+        eventId: eventData.id
+      });
+
+      // ★ API呼び出し（リクエストボディが必要かは要確認）
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: authHeaders(),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`配車登録に失敗: HTTP ${response.status} - ${errorText}`);
+      }
+
+      // ★ 成功時の処理
+      if (type === 'dropOff') {
         setDropOffRemaining(dropOffRemaining - seatsRequired);
         setRegistered(prev => [...prev, `山田次郎 (送り: ${seatsRequired}人)`]);
         alert(`送りで${seatsRequired}人登録しました。`);
-      } else if (type === 'pickUp' && seatsRequired <= pickUpRemaining) {
+      } else {
         setPickUpRemaining(pickUpRemaining - seatsRequired);
         setRegistered(prev => [...prev, `山田次郎 (迎え: ${seatsRequired}人)`]);
         alert(`迎えで${seatsRequired}人登録しました。`);
-      } else {
-        alert('指定された人数は登録できません。');
       }
-    } else {
-      alert('有効な人数を入力してください。');
+
+      // ★ 入力値をクリア
+      setSeatsRequired('');
+
+      console.log('🔵 配車登録が正常に完了しました');
+
+    } catch (error) {
+      console.error('🔴 配車登録エラー:', error);
+      alert(`配車登録に失敗しました: ${error}`);
+    } finally {
+      setIsRegistering(false);
     }
   };
 
@@ -132,24 +204,24 @@ const EventDetailModal: React.FC<ModalProps> = ({ eventData, onClose }) => {
                   setSeatsRequired(value === '' ? '' : Number(value));
                 }
               }}
+              disabled={isRegistering} // ★ 登録中は無効化
             />
             <span className="text-sm">人</span>
           </div>
           <div className="flex space-x-4">
             <Button
               className="bg-gray-700 px-0 py-4 hover:bg-gray-600 flex-1 text-white"
-              onClick={() => handleRegister('pickUp')}
-              disabled={typeof seatsRequired !== 'number' || seatsRequired <= 0}
-            >
-              迎え登録
-            </Button>
-            <Button
-              className="bg-gray-700 px-0 py-4 hover:bg-gray-600 flex-1 text-white"
               onClick={() => handleRegister('dropOff')}
-              disabled={typeof seatsRequired !== 'number' || seatsRequired <= 0}
-
+              disabled={typeof seatsRequired !== 'number' || seatsRequired <= 0 || isRegistering}
             >
-              送り登録
+              {isRegistering ? '登録中...' : '送り登録'}
+            </Button>
+                        <Button
+              className="bg-gray-700 px-0 py-4 hover:bg-gray-600 flex-1 text-white"
+              onClick={() => handleRegister('pickUp')}
+              disabled={typeof seatsRequired !== 'number' || seatsRequired <= 0 || isRegistering}
+            >
+              {isRegistering ? '登録中...' : '迎え登録'}
             </Button>
           </div>
         </div>
