@@ -82,8 +82,8 @@ type ApiCalenderMember = {
 // ★ authHeaders関数を修正
 const authHeaders = (): HeadersInit => {
   const token = localStorage.getItem('access_token') ?? '';
-  const csrf = Cookies.get('csrf_token') ?? '';
-  
+  const csrf = Cookies.get('XSRF-TOKEN') ?? '';
+
   console.log('🔍 認証情報確認:');
   console.log('  - Access Token:', token ? `${token.substring(0, 20)}...` : '未設定');
   console.log('  - CSRF Token:', csrf || '未設定');
@@ -315,6 +315,7 @@ const handleSaveNewEvent = async (eventData: EventStatus) => {
       method: 'POST',
       headers: headers,
       body: JSON.stringify(apiEventData),
+      credentials: 'include',
     });
 
     console.log('🔵 レスポンスステータス:', response.status);
