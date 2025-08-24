@@ -39,7 +39,7 @@ const EventDetailModal: React.FC<ModalProps> = ({ eventData, onClose }) => {
     // ★ authHeaders関数を修正
   const authHeaders = (): HeadersInit => {
     const token = localStorage.getItem('access_token') ?? '';
-    const csrf = Cookies.get('csrf_token') ?? '';
+    const csrf = Cookies.get('XSRF-TOKEN') ?? '';
     
     console.log('🔍 認証情報確認:');
     console.log('  - Access Token:', token ? `${token.substring(0, 20)}...` : '未設定');
@@ -82,7 +82,7 @@ const EventDetailModal: React.FC<ModalProps> = ({ eventData, onClose }) => {
       console.log('🔵 配車登録API呼び出し:', {
         endpoint,
         type,
-        seatsRequired,
+        // seatsRequired,
         eventId: eventData.id
       });
 
@@ -90,6 +90,7 @@ const EventDetailModal: React.FC<ModalProps> = ({ eventData, onClose }) => {
       const response = await fetch(endpoint, {
         method: 'POST',
         headers: authHeaders(),
+        credentials: 'include',
       });
 
       if (!response.ok) {
