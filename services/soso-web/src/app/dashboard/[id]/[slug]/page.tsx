@@ -281,7 +281,7 @@ export default function DashboardPage() {
   };
 
   // ★ 新規追加: イベント固有のSOSO履歴取得関数
-  const fetchEventSOSOHistory = async (eventId: string) => {
+  const fetchEventSOSOHistory = async (eventId: string, eventTitle?: string) => {
     try {
       const headers = await authHeaders();
       const res = await fetch(`${API_BASE}/events/${eventId}/soso_history`, {
@@ -322,7 +322,7 @@ export default function DashboardPage() {
 
         return {
           id: item.id,
-          eventName: item.eventId ? `イベント関連` : '手動調整',
+          eventName: eventTitle || item.eventName || 'イベント関連', // ★ イベントタイトルを使用
           dateTime: new Date(item.changedAt).toISOString(),
           changer: getUserName(item.changedBy) || 'システム',
           changee: getUserName(item.userId),
@@ -622,7 +622,7 @@ const handleSaveNewEvent = async (eventData: EventStatus) => {
       console.log('🔵 selectedManagementEvent:', selectedManagementEvent);
       
       // ★ イベント固有の履歴を取得してSOSOManagementModalを更新
-      const eventHistory = await fetchEventSOSOHistory(selectedManagementEvent.id);
+      const eventHistory = await fetchEventSOSOHistory(selectedManagementEvent.id, selectedManagementEvent.title);
       
       // selectedManagementEventを更新された履歴で更新
       const updatedEvent = {
@@ -646,7 +646,7 @@ const handleSaveNewEvent = async (eventData: EventStatus) => {
   };
 
   // handleEventClick関数を修正
-  const handleEventClick = (clickInfo: any) => {
+  const handleEventClick = async (clickInfo: any) => {
     console.log('clickInfo:', clickInfo);
     console.log('🔴 イベントがクリックされました!');
     
@@ -670,6 +670,15 @@ const handleSaveNewEvent = async (eventData: EventStatus) => {
       console.log('🟢 イベント日付:', eventDate);
       console.log('🟢 今日の日付:', today);
       console.log('🟢 日付比較結果:', eventDate < today ? '過去' : '未来または今日');
+
+      // ★ イベント固有の履歴を取得
+      let eventHistory: SOSOTransaction[] = [];
+      try {
+        eventHistory = await fetchEventSOSOHistory(eventId, clickInfo.event.title);
+        console.log('🟢 イベント履歴取得成功:', eventHistory);
+      } catch (error) {
+        console.error('🔴 イベント履歴取得失敗:', error);
+      }
       
       const eventProps: EventProps = {
         id: eventId,
@@ -679,7 +688,7 @@ const handleSaveNewEvent = async (eventData: EventStatus) => {
         extendedProps: {
           ...clickInfo.event.extendedProps,
           participatingMembers: participatingMembers,
-          eventLogs: eventLogs[eventId] || [] // イベント固有のログを追加
+          eventLogs: eventHistory // ★ APIから取得した履歴を設定
         }
       };
       

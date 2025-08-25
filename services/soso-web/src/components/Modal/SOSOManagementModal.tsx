@@ -33,6 +33,8 @@ function SOSOManagementModal({ initialData, className, isOpen, onClose, onSave, 
     if (isOpen) {
       console.log("🟢 SOSOManagementModalがオープンされました。");
       console.log("🟢 initialData:", initialData);
+      console.log("🟢 eventLogs数:", initialData.extendedProps?.eventLogs?.length || 0);
+      console.log("🟢 eventLogsの内容:", initialData.extendedProps?.eventLogs);
     } else {
       console.log("🔴 SOSOManagementModalがクローズされました。");
     }
