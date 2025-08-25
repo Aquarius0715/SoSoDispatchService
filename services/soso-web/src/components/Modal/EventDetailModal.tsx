@@ -27,7 +27,7 @@ interface ModalProps {
 }
 
 const EventDetailModal: React.FC<ModalProps> = ({ eventData, onClose }) => {
-  const [seatsRequired, setSeatsRequired] = useState<number | ''>('');
+  const [seatsRequired, setSeatsRequired] = useState<number | ''>(1); // デフォルト値を1に設定
   const [dropOffRemaining, setDropOffRemaining] = useState(eventData.dropOffCount);
   const [pickUpRemaining, setPickUpRemaining] = useState(eventData.pickUpCount);
   const [registered, setRegistered] = useState<string[]>([]);
@@ -162,21 +162,13 @@ const EventDetailModal: React.FC<ModalProps> = ({ eventData, onClose }) => {
     }
 
     //新規追加
-    // ★ 重複登録防止チェック（強化版）
+    // ★ 重複登録防止チェック（調整版）
     if (type === 'dropOff' && userDropOffRegistered) {
       alert('既に送り登録済みです。');
       return;
     }
     if (type === 'pickUp' && userPickUpRegistered) {
       alert('既に迎え登録済みです。');
-      return;
-    }
-
-    // ★ 一度でも登録済みのユーザーは追加登録を防ぐ
-    if (userDropOffRegistered || userPickUpRegistered) {
-      const currentType = type === 'dropOff' ? '送り' : '迎え';
-      const registeredType = userDropOffRegistered ? '送り' : '迎え';
-      alert(`既に${registeredType}登録済みのため、${currentType}登録はできません。`);
       return;
     }
 
@@ -403,7 +395,6 @@ const EventDetailModal: React.FC<ModalProps> = ({ eventData, onClose }) => {
 
         <div className="text-zinc-600">
           <h3 className="font-normal font-['Inter'] text-black text-lg mb-2">配車登録</h3>
-          {/*  
           <div className="flex items-center mb-4">
             <p className="text-sm mr-2">乗車可能人数</p>
             <Input
@@ -420,50 +411,40 @@ const EventDetailModal: React.FC<ModalProps> = ({ eventData, onClose }) => {
             />
             <span className="text-sm">人</span>
           </div>
-          */}
           <div className="flex space-x-4">
             <Button
               className={`px-0 py-4 flex-1 text-white ${
                 userDropOffRegistered 
                   ? 'bg-green-600 hover:bg-green-700' 
-                  : (userPickUpRegistered ? 'bg-red-400 cursor-not-allowed' : 'bg-gray-700 hover:bg-gray-600')
+                  : 'bg-gray-700 hover:bg-gray-600'
               }`}
               onClick={() => handleRegister('dropOff')}
-              //新規追加
               disabled={
                 typeof seatsRequired !== 'number' || 
                 seatsRequired <= 0 || 
                 isRegistering || 
-                userDropOffRegistered || 
-                userPickUpRegistered  // ★ 迎え登録済みでも送り登録を無効化
+                userDropOffRegistered // 送り登録済みの場合のみ無効化
               }
             >
-              {/* 新規追加 */}
               {isRegistering ? '登録中...' : 
-               userDropOffRegistered ? '送り登録済み' : 
-               userPickUpRegistered ? '登録済み' : '送り登録'}
+               userDropOffRegistered ? '送り登録済み' : '送り登録'}
             </Button>
             <Button
-              // 新規追加
               className={`px-0 py-4 flex-1 text-white ${
                 userPickUpRegistered 
                   ? 'bg-green-600 hover:bg-green-700' 
-                  : (userDropOffRegistered ? 'bg-red-400 cursor-not-allowed' : 'bg-gray-700 hover:bg-gray-600')
+                  : 'bg-gray-700 hover:bg-gray-600'
               }`}
               onClick={() => handleRegister('pickUp')}
-              // 新規追加
               disabled={
                 typeof seatsRequired !== 'number' || 
                 seatsRequired <= 0 || 
                 isRegistering || 
-                userPickUpRegistered || 
-                userDropOffRegistered  // ★ 送り登録済みでも迎え登録を無効化
+                userPickUpRegistered // 迎え登録済みの場合のみ無効化
               }
             >
-              {/* 新規追加 */}
               {isRegistering ? '登録中...' : 
-               userPickUpRegistered ? '迎え登録済み' : 
-               userDropOffRegistered ? '登録済み' : '迎え登録'}
+               userPickUpRegistered ? '迎え登録済み' : '迎え登録'}
             </Button>
           </div>
         </div>
