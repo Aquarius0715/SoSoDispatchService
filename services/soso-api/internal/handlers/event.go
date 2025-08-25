@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	//"fmt" //新規追加
 	"net/http"
 	"time"
 
@@ -196,6 +197,25 @@ func (h *EventHandler) registerParticipant(c echo.Context, tp model.Type) error 
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized")
 	}
 	userID := claims.Subject
+
+	// //新規追加
+	// /* ---- 重複チェック ---- */
+	// exists, err := h.EventParticipantRepo.ExistsByEventAndUser(
+	// 	c.Request().Context(),
+	// 	eventID,
+	// 	userID,
+	// 	tp,
+	// )
+	// if err != nil {
+	// 	return fmt.Errorf("check existing participation: %w", err)
+	// }
+	// if exists {
+	// 	typeStr := "pickup"
+	// 	if tp == model.Return {
+	// 		typeStr = "dropoff"
+	// 	}
+	// 	return echo.NewHTTPError(http.StatusConflict, fmt.Sprintf("already registered for %s", typeStr))
+	// }
 
 	/* ---- 1 行だけ Insert ---- */
 	ep := model.EventParticipant{

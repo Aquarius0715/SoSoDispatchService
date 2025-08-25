@@ -113,6 +113,29 @@ func (r *EventParticipantRepository) FindByEventIDAndType(
 	return list, nil
 }
 
+// // 新規追加
+// // ExistsByEventAndUser checks if a participant record exists for the given event and user
+// func (r *EventParticipantRepository) ExistsByEventAndUser(
+// 	ctx context.Context,
+// 	eventID string,
+// 	userID string,
+// 	participantType model.Type,
+// ) (bool, error) {
+// 	const q = `
+// 		SELECT COUNT(*)
+// 		FROM event_participants
+// 		WHERE event_id = ? AND user_id = ? AND type = ?
+// 	`
+
+// 	var count int
+// 	err := r.DB.QueryRowContext(ctx, q, eventID, userID, string(participantType)).Scan(&count)
+// 	if err != nil {
+// 		return false, fmt.Errorf("check participant existence: %w", err)
+// 	}
+
+// 	return count > 0, nil
+// }
+
 /* 参加者とユーザー情報をまとめた DTO */
 type ParticipantInfo struct {
 	UserName string

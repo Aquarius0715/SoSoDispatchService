@@ -30,11 +30,108 @@ const EventDetailModal: React.FC<ModalProps> = ({ eventData, onClose }) => {
   const [seatsRequired, setSeatsRequired] = useState<number | ''>('');
   const [dropOffRemaining, setDropOffRemaining] = useState(eventData.dropOffCount);
   const [pickUpRemaining, setPickUpRemaining] = useState(eventData.pickUpCount);
-  const [registered, setRegistered] = useState<string[]>(eventData.dispatchRegistered || []);
+  const [registered, setRegistered] = useState<string[]>([]);
   const [isRegistering, setIsRegistering] = useState(false); // ローディング状態
+  //新規追加
+  const [isLoadingRegistrations, setIsLoadingRegistrations] = useState(true);
+  const [userDropOffRegistered, setUserDropOffRegistered] = useState(false); // 現在のユーザーの送り登録状況
+  const [userPickUpRegistered, setUserPickUpRegistered] = useState(false); // 現在のユーザーの迎え登録状況
 
     // ★ APIのベースURLと認証ヘッダー
   const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || '';
+
+  //新規追加
+  // ★ 配車登録データを取得する関数
+  const fetchDispatchRegistrations = async () => {
+    try {
+      setIsLoadingRegistrations(true);
+      
+      // イベント詳細APIから現在の登録状況を取得
+      const response = await fetch(`${API_BASE}/events/${eventData.id}`, {
+        headers: authHeaders(),
+        credentials: 'include',
+      });
+
+      if (response.ok) {
+        const eventDetails = await response.json();
+        console.log('🔍 イベント詳細レスポンス:', eventDetails);
+
+        // 現在のユーザーIDを取得（複数のキーを試行）
+        let currentUserId = localStorage.getItem('user_id') || 
+                           localStorage.getItem('userId') || 
+                           localStorage.getItem('id');
+        
+        // JWTトークンからユーザーIDを取得する場合
+        if (!currentUserId) {
+          const token = localStorage.getItem('access_token');
+          if (token) {
+            try {
+              const payload = JSON.parse(atob(token.split('.')[1]));
+              currentUserId = payload.user_id || payload.userId || payload.sub || payload.id;
+            } catch (error) {
+              console.warn('JWTトークンの解析に失敗:', error);
+            }
+          }
+        }
+        
+        console.log('🔍 現在のユーザーID:', currentUserId);
+        console.log('🔍 LocalStorage keys:', Object.keys(localStorage));
+        
+        // 既存の配車登録データから情報を取得
+        const registrations: string[] = [];
+        let currentUserDropOff = false;
+        let currentUserPickUp = false;
+        
+        // 送り登録をチェック
+        if (eventDetails.dropOffRegistrations && Array.isArray(eventDetails.dropOffRegistrations)) {
+          for (const reg of eventDetails.dropOffRegistrations) {
+            if (reg.userId === currentUserId) {
+              currentUserDropOff = true;
+              registrations.push(`あなた (送り登録済み)`);
+            } else {
+              registrations.push(`${reg.userId.substring(0, 8)}... (送り登録)`);
+            }
+          }
+        }
+        
+        // 迎え登録をチェック
+        if (eventDetails.pickUpRegistrations && Array.isArray(eventDetails.pickUpRegistrations)) {
+          for (const reg of eventDetails.pickUpRegistrations) {
+            if (reg.userId === currentUserId) {
+              currentUserPickUp = true;
+              registrations.push(`あなた (迎え登録済み)`);
+            } else {
+              registrations.push(`${reg.userId.substring(0, 8)}... (迎え登録)`);
+            }
+          }
+        }
+        
+        // 現在のユーザーの登録状況をステートに保存
+        setUserDropOffRegistered(currentUserDropOff);
+        setUserPickUpRegistered(currentUserPickUp);
+        
+        setRegistered(registrations);
+        console.log('🔍 配車登録一覧:', registrations);
+        console.log('🔍 現在のユーザー状況:', {
+          dropOff: currentUserDropOff,
+          pickUp: currentUserPickUp,
+          userId: currentUserId
+        });      } else {
+        console.error('配車登録データの取得に失敗:', response.status);
+        setRegistered([]);
+      }
+    } catch (error) {
+      console.error('配車登録データの取得エラー:', error);
+      setRegistered([]);
+    } finally {
+      setIsLoadingRegistrations(false);
+    }
+  };
+
+  // ★ コンポーネントマウント時に配車登録データを取得
+  React.useEffect(() => {
+    fetchDispatchRegistrations();
+  }, [eventData.id]);
 
     // ★ authHeaders関数を修正
   const authHeaders = (): HeadersInit => {
@@ -64,6 +161,25 @@ const EventDetailModal: React.FC<ModalProps> = ({ eventData, onClose }) => {
       return;
     }
 
+    //新規追加
+    // ★ 重複登録防止チェック（強化版）
+    if (type === 'dropOff' && userDropOffRegistered) {
+      alert('既に送り登録済みです。');
+      return;
+    }
+    if (type === 'pickUp' && userPickUpRegistered) {
+      alert('既に迎え登録済みです。');
+      return;
+    }
+
+    // ★ 一度でも登録済みのユーザーは追加登録を防ぐ
+    if (userDropOffRegistered || userPickUpRegistered) {
+      const currentType = type === 'dropOff' ? '送り' : '迎え';
+      const registeredType = userDropOffRegistered ? '送り' : '迎え';
+      alert(`既に${registeredType}登録済みのため、${currentType}登録はできません。`);
+      return;
+    }
+
     // ★ 残席数チェック
     const remaining = type === 'dropOff' ? dropOffRemaining : pickUpRemaining;
     if (seatsRequired > remaining) {
@@ -79,38 +195,124 @@ const EventDetailModal: React.FC<ModalProps> = ({ eventData, onClose }) => {
         ? `${API_BASE}/events/${eventData.id}/return`  // 送り登録
         : `${API_BASE}/events/${eventData.id}/pickup`; // 迎え登録
 
+      //新規追加
+      // ★ リクエストボディを追加（テスト用）
+      const requestBody = {
+        seatsRequired: seatsRequired,
+      };
+
       console.log('🔵 配車登録API呼び出し:', {
         endpoint,
         type,
-        // seatsRequired,
-        eventId: eventData.id
+        seatsRequired,
+        eventId: eventData.id,
+        requestBody
       });
 
-      // ★ API呼び出し（リクエストボディが必要かは要確認）
-      const response = await fetch(endpoint, {
+      // ★ テスト用: まずボディなしで試す
+      console.log('🧪 テスト: リクエストボディなしで試行...');
+      let response = await fetch(endpoint, {
         method: 'POST',
         headers: authHeaders(),
         credentials: 'include',
+        // body: JSON.stringify(requestBody), // ★ 一時的にコメントアウト
       });
+
+      //新規追加
+      // もし404や400エラーの場合、ボディありで再試行
+      if (!response.ok && (response.status === 400 || response.status === 404)) {
+        console.log('🧪 テスト: リクエストボディありで再試行...');
+        response = await fetch(endpoint, {
+          method: 'POST',
+          headers: authHeaders(),
+          credentials: 'include',
+          body: JSON.stringify(requestBody), // ★ ボディありで再試行
+        });
+      }
+
+      console.log('🔍 レスポンス情報:');
+      console.log('  - Status:', response.status);
+      console.log('  - Status Text:', response.statusText);
+      console.log('  - Headers:', Object.fromEntries(response.headers.entries()));
+      console.log('  - URL:', response.url);
+      console.log('  - OK:', response.ok);
 
       if (!response.ok) {
         const errorText = await response.text();
-        throw new Error(`配車登録に失敗: HTTP ${response.status} - ${errorText}`);
+        //新規追加
+        console.error('🔴 エラーレスポンス:', errorText);
+        console.error('🔴 詳細情報:');
+        console.error('  - Request URL:', endpoint);
+        console.error('  - Request Method: POST');
+        console.error('  - Event ID:', eventData.id);
+        console.error('  - User Token Present:', !!localStorage.getItem('access_token'));
+        console.error('  - CSRF Token Present:', !!Cookies.get('XSRF-TOKEN'));
+        
+        let errorMessage = `配車登録に失敗: HTTP ${response.status}`;
+        
+        // 重複登録エラーの場合
+        if (response.status === 409 || errorText.includes('already registered')) {
+          const registrationType = type === 'pickUp' ? '迎え' : '送り';
+          errorMessage = `既に${registrationType}登録済みです`;
+          
+          // 登録状況を更新
+          if (type === 'pickUp') {
+            setUserPickUpRegistered(true);
+          } else {
+            setUserDropOffRegistered(true);
+          }
+          
+          // 登録データを再取得
+          await fetchDispatchRegistrations();
+          
+        } else if (response.status === 500) {
+          // 500エラーの場合、より詳細な情報を提供
+          errorMessage = `サーバーエラーが発生しました。既に登録済みの可能性があります。`;
+        } else {
+          try {
+            const errorData = JSON.parse(errorText);
+            errorMessage += ` - ${errorData.message || errorData.error || errorText}`;
+          } catch (e) {
+            errorMessage += ` - ${errorText}`;
+          }
+        }
+        
+        throw new Error(errorMessage);
       }
+
+      // レスポンスボディが空の場合を考慮
+      let responseData = null;
+      const contentLength = response.headers.get('content-length');
+      if (contentLength && contentLength !== '0') {
+        try {
+          responseData = await response.json();
+        } catch (e) {
+          console.log('🔵 JSONパースできませんが成功:', response.status);
+          responseData = {};
+        }
+      } else {
+        console.log('🔵 空のレスポンスですが成功:', response.status);
+        responseData = {};
+      }
+      console.log('🔵 成功レスポンス:', responseData);
 
       // ★ 成功時の処理
       if (type === 'dropOff') {
         setDropOffRemaining(dropOffRemaining - seatsRequired);
-        setRegistered(prev => [...prev, `山田次郎 (送り: ${seatsRequired}人)`]);
+        setUserDropOffRegistered(true); // 現在のユーザーの送り登録状況を更新
         alert(`送りで${seatsRequired}人登録しました。`);
       } else {
         setPickUpRemaining(pickUpRemaining - seatsRequired);
-        setRegistered(prev => [...prev, `山田次郎 (迎え: ${seatsRequired}人)`]);
+        setUserPickUpRegistered(true); // 現在のユーザーの迎え登録状況を更新
         alert(`迎えで${seatsRequired}人登録しました。`);
       }
 
       // ★ 入力値をクリア
       setSeatsRequired('');
+      //新規追加
+
+      // ★ 配車登録リストを更新
+      await fetchDispatchRegistrations();
 
       console.log('🔵 配車登録が正常に完了しました');
 
@@ -186,9 +388,17 @@ const EventDetailModal: React.FC<ModalProps> = ({ eventData, onClose }) => {
 
         <div className="bg-gray-100 p-4 rounded-lg mb-4 text-zinc-600">
           <h3 className="font-normal font-['Inter'] text-black text-lg mb-2">配車登録済み</h3>
-          {registered.map((item, index) => (
-            <p key={index}>{item}</p>
-          ))}
+          {/* 新規追加 */}
+          {isLoadingRegistrations ? (
+            <p className="text-gray-500">読み込み中...</p>
+          ) : registered.length > 0 ? (
+            registered.map((item, index) => (
+              <p key={index}>{item}</p>
+           //新規追加
+            ))
+          ) : (
+            <p className="text-gray-500">配車登録はありません</p>
+          )}
         </div>
 
         <div className="text-zinc-600">
@@ -211,18 +421,47 @@ const EventDetailModal: React.FC<ModalProps> = ({ eventData, onClose }) => {
           </div>
           <div className="flex space-x-4">
             <Button
-              className="bg-gray-700 px-0 py-4 hover:bg-gray-600 flex-1 text-white"
+              className={`px-0 py-4 flex-1 text-white ${
+                userDropOffRegistered 
+                  ? 'bg-green-600 hover:bg-green-700' 
+                  : (userPickUpRegistered ? 'bg-red-400 cursor-not-allowed' : 'bg-gray-700 hover:bg-gray-600')
+              }`}
               onClick={() => handleRegister('dropOff')}
-              disabled={typeof seatsRequired !== 'number' || seatsRequired <= 0 || isRegistering}
+              //新規追加
+              disabled={
+                typeof seatsRequired !== 'number' || 
+                seatsRequired <= 0 || 
+                isRegistering || 
+                userDropOffRegistered || 
+                userPickUpRegistered  // ★ 迎え登録済みでも送り登録を無効化
+              }
             >
-              {isRegistering ? '登録中...' : '送り登録'}
+              {/* 新規追加 */}
+              {isRegistering ? '登録中...' : 
+               userDropOffRegistered ? '送り登録済み' : 
+               userPickUpRegistered ? '登録済み' : '送り登録'}
             </Button>
-                        <Button
-              className="bg-gray-700 px-0 py-4 hover:bg-gray-600 flex-1 text-white"
+            <Button
+              // 新規追加
+              className={`px-0 py-4 flex-1 text-white ${
+                userPickUpRegistered 
+                  ? 'bg-green-600 hover:bg-green-700' 
+                  : (userDropOffRegistered ? 'bg-red-400 cursor-not-allowed' : 'bg-gray-700 hover:bg-gray-600')
+              }`}
               onClick={() => handleRegister('pickUp')}
-              disabled={typeof seatsRequired !== 'number' || seatsRequired <= 0 || isRegistering}
+              // 新規追加
+              disabled={
+                typeof seatsRequired !== 'number' || 
+                seatsRequired <= 0 || 
+                isRegistering || 
+                userPickUpRegistered || 
+                userDropOffRegistered  // ★ 送り登録済みでも迎え登録を無効化
+              }
             >
-              {isRegistering ? '登録中...' : '迎え登録'}
+              {/* 新規追加 */}
+              {isRegistering ? '登録中...' : 
+               userPickUpRegistered ? '迎え登録済み' : 
+               userDropOffRegistered ? '登録済み' : '迎え登録'}
             </Button>
           </div>
         </div>
