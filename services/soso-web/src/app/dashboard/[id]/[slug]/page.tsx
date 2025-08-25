@@ -79,9 +79,66 @@ type ApiCalenderMember = {
   sosoPoint: number;
 };
 
+// ★ JWTトークンの期限をチェックする関数
+const isTokenExpired = (token: string): boolean => {
+  try {
+    const payload = token.split('.')[1];
+    const decodedPayload = JSON.parse(atob(payload));
+    const exp = decodedPayload.exp;
+    const current = Math.floor(Date.now() / 1000);
+    return current >= exp;
+  } catch (error) {
+    console.error('🔴 トークンの期限チェックに失敗:', error);
+    return true; // エラーの場合は期限切れとして扱う
+  }
+};
+
+// ★ トークンリフレッシュ関数
+const refreshToken = async (): Promise<boolean> => {
+  try {
+    console.log('🔄 トークンリフレッシュを実行中...');
+    
+    const response = await fetch(`${API_BASE}/auth/refresh`, {
+      method: 'POST',
+      credentials: 'include', // リフレッシュトークンCookieを送信
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': Cookies.get('XSRF-TOKEN') || '',
+      },
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      localStorage.setItem('access_token', data.access_token);
+      console.log('🟢 トークンリフレッシュ成功');
+      return true;
+    } else {
+      console.error('🔴 トークンリフレッシュ失敗:', response.status, await response.text());
+      return false;
+    }
+  } catch (error) {
+    console.error('🔴 トークンリフレッシュエラー:', error);
+    return false;
+  }
+};
+
 // ★ authHeaders関数を修正
-const authHeaders = (): HeadersInit => {
-  const token = localStorage.getItem('access_token') ?? '';
+const authHeaders = async (): Promise<HeadersInit> => {
+  let token = localStorage.getItem('access_token') ?? '';
+  
+  // トークンが期限切れの場合はリフレッシュを試行
+  if (token && isTokenExpired(token)) {
+    console.log('⚠️ トークンが期限切れです。リフレッシュを試行します...');
+    const refreshSuccess = await refreshToken();
+    if (refreshSuccess) {
+      token = localStorage.getItem('access_token') ?? '';
+    } else {
+      console.log('🔴 トークンリフレッシュに失敗しました。ログインページにリダイレクトします。');
+      window.location.href = '/';
+      return {};
+    }
+  }
+  
   const csrf = Cookies.get('XSRF-TOKEN') ?? '';
 
   console.log('🔍 認証情報確認:');
@@ -156,8 +213,9 @@ export default function DashboardPage() {
 
   // 既存: 一覧取得（関数にして再利用）
   const fetchEvents = async (calendarId: string) => {
+    const headers = await authHeaders();
     const res = await fetch(`${API_BASE}/calenders/${calendarId}/events`, {
-      headers: authHeaders(),
+      headers: headers,
       cache: 'no-store',
     });
     if (!res.ok) throw new Error(`events HTTP ${res.status}`);
@@ -194,26 +252,27 @@ export default function DashboardPage() {
       return;
     }
 
-    setLoading(true);
-    setError(null);
+    const loadData = async () => {
+      setLoading(true);
+      setError(null);
 
-    const controller = new AbortController();
-    const headers = authHeaders();
+      try {
+        const controller = new AbortController();
+        const headers = await authHeaders();
 
-    const evReq = fetch(`${API_BASE}/calenders/${id}/events`, {
-      headers,
-      signal: controller.signal,
-      cache: 'no-store',
-    });
+        const evReq = fetch(`${API_BASE}/calenders/${id}/events`, {
+          headers,
+          signal: controller.signal,
+          cache: 'no-store',
+        });
 
-    const memReq = fetch(`${API_BASE}/calenders/${id}/members`, {
-      headers,
-      signal: controller.signal,
-      cache: 'no-store',
-    });
+        const memReq = fetch(`${API_BASE}/calenders/${id}/members`, {
+          headers,
+          signal: controller.signal,
+          cache: 'no-store',
+        });
 
-    Promise.all([evReq, memReq])
-      .then(async ([evRes, memRes]) => {
+        const [evRes, memRes] = await Promise.all([evReq, memReq]);
         if (!evRes.ok) throw new Error(`events HTTP ${evRes.status}`);
         if (!memRes.ok) throw new Error(`members HTTP ${memRes.status}`);
 
@@ -236,16 +295,17 @@ export default function DashboardPage() {
           // userUuid: m.id,             // 必要なら隠しフィールドで保管
         }));
         setMembers(uiMembers);
-      })
-      .catch((e) => {
+      } catch (e: any) {
         if (e?.name !== 'AbortError') {
           setError(e.message ?? '取得に失敗しました');
           console.error('🔴 API取得エラー:', e);
         }
-      })
-      .finally(() => setLoading(false));
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    return () => controller.abort();
+    loadData();
   }, [id, router]);
 
   // --- ▼▼▼ 定数定義 ▼▼▼ ---
@@ -307,7 +367,7 @@ const handleSaveNewEvent = async (eventData: EventStatus) => {
     }
 
     // ヘッダーを確認
-    const headers = authHeaders();
+    const headers = await authHeaders();
     console.log('🔵 送信ヘッダー:', headers);
 
     // APIにPOSTリクエストを送信
@@ -662,6 +722,7 @@ const handleSaveNewEvent = async (eventData: EventStatus) => {
           onClose={handleCloseSOSOEditModal}
           onSave={handleSaveSosoChange}
           initialData={selectedMemberForEdit}
+          calenderId={id} // ★ カレンダーIDを追加
         />
       )}
 
