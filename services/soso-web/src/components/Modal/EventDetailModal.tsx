@@ -420,11 +420,12 @@ const EventDetailModal: React.FC<ModalProps> = ({ eventData, onClose }) => {
               }`}
               onClick={() => handleRegister('dropOff')}
               disabled={
-                typeof seatsRequired !== 'number' || 
-                seatsRequired <= 0 || 
-                isRegistering || 
-                userDropOffRegistered // 送り登録済みの場合のみ無効化
-              }
+                      typeof seatsRequired !== 'number' || 
+                      seatsRequired <= 0 || 
+                      isRegistering || 
+                      userDropOffRegistered || 
+                      userPickUpRegistered  // ★ 問題：両方を無効化
+                    }
             >
               {isRegistering ? '登録中...' : 
                userDropOffRegistered ? '送り登録済み' : '送り登録'}
@@ -437,11 +438,11 @@ const EventDetailModal: React.FC<ModalProps> = ({ eventData, onClose }) => {
               }`}
               onClick={() => handleRegister('pickUp')}
               disabled={
-                typeof seatsRequired !== 'number' || 
-                seatsRequired <= 0 || 
-                isRegistering || 
-                userPickUpRegistered // 迎え登録済みの場合のみ無効化
-              }
+                      typeof seatsRequired !== 'number' || 
+                      seatsRequired <= 0 || 
+                      isRegistering || 
+                      userDropOffRegistered // 送り登録済みの場合のみ無効化
+                    }
             >
               {isRegistering ? '登録中...' : 
                userPickUpRegistered ? '迎え登録済み' : '迎え登録'}
