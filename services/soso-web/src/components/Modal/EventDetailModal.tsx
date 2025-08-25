@@ -138,9 +138,9 @@ const EventDetailModal: React.FC<ModalProps> = ({ eventData, onClose }) => {
     const token = localStorage.getItem('access_token') ?? '';
     const csrf = Cookies.get('XSRF-TOKEN') ?? '';
     
-    console.log('🔍 認証情報確認:');
-    console.log('  - Access Token:', token ? `${token.substring(0, 20)}...` : '未設定');
-    console.log('  - CSRF Token:', csrf || '未設定');
+    // console.log('🔍 認証情報確認:');
+    // console.log('  - Access Token:', token ? `${token.substring(0, 20)}...` : '未設定');
+    // console.log('  - CSRF Token:', csrf || '未設定');
     
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
