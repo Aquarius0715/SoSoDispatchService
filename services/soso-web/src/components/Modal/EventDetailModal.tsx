@@ -403,6 +403,7 @@ const EventDetailModal: React.FC<ModalProps> = ({ eventData, onClose }) => {
 
         <div className="text-zinc-600">
           <h3 className="font-normal font-['Inter'] text-black text-lg mb-2">配車登録</h3>
+          {/*  
           <div className="flex items-center mb-4">
             <p className="text-sm mr-2">乗車可能人数</p>
             <Input
@@ -419,6 +420,7 @@ const EventDetailModal: React.FC<ModalProps> = ({ eventData, onClose }) => {
             />
             <span className="text-sm">人</span>
           </div>
+          */}
           <div className="flex space-x-4">
             <Button
               className={`px-0 py-4 flex-1 text-white ${
