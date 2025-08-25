@@ -223,6 +223,121 @@ export default function DashboardPage() {
     setEvents(data.map(mapApiEventToFC));
   };
 
+  // ★ 新規追加: SOSOポイント履歴取得関数
+  const fetchSOSOHistory = async (calendarId: string) => {
+    try {
+      const headers = await authHeaders();
+      const res = await fetch(`${API_BASE}/calenders/${calendarId}/soso_history`, {
+        headers: headers,
+        cache: 'no-store',
+      });
+      if (!res.ok) {
+        console.error('🔴 SOSO履歴取得エラー:', res.status);
+        return;
+      }
+      const historyData = await res.json();
+      console.log('🔍 取得したSOSO履歴:', historyData);
+      
+      // 現在のメンバーデータからUUID -> ユーザー名のマッピングを作成
+      const uuidToUsername = new Map<string, string>();
+      members.forEach(member => {
+        if (member.userUuid) {
+          uuidToUsername.set(member.userUuid, member.username);
+        }
+      });
+      
+      // API レスポンスを SOSOTransaction 形式に変換
+      const transactions: SOSOTransaction[] = historyData.map((item: any) => {
+        // UUIDをユーザー名に変換する関数
+        const getUserName = (uuid: string) => {
+          if (!uuid) return '不明なユーザー';
+          
+          const username = uuidToUsername.get(uuid);
+          if (username) return username;
+          
+          // UUIDの場合は短縮表示
+          if (uuid.length === 36 && uuid.includes('-')) {
+            return `ユーザー (${uuid.substring(0, 8)}...)`;
+          }
+          
+          return uuid;
+        };
+
+        return {
+          id: item.id,
+          eventName: item.eventId ? `イベント関連` : '手動調整',
+          dateTime: new Date(item.changedAt).toISOString(),
+          changer: getUserName(item.changedBy) || 'システム',
+          changee: getUserName(item.userId),
+          sosoPoints: item.pointDelta,
+          reason: item.reason || '理由なし',
+        };
+      });
+      
+      setLogs(transactions);
+    } catch (error) {
+      console.error('🔴 SOSO履歴取得エラー:', error);
+    }
+  };
+
+  // ★ 新規追加: イベント固有のSOSO履歴取得関数
+  const fetchEventSOSOHistory = async (eventId: string) => {
+    try {
+      const headers = await authHeaders();
+      const res = await fetch(`${API_BASE}/events/${eventId}/soso_history`, {
+        headers: headers,
+        cache: 'no-store',
+      });
+      if (!res.ok) {
+        console.error('🔴 イベントSOSO履歴取得エラー:', res.status);
+        return [];
+      }
+      const historyData = await res.json();
+      console.log('🔍 取得したイベントSOSO履歴:', historyData);
+      
+      // 現在のメンバーデータからUUID -> ユーザー名のマッピングを作成
+      const uuidToUsername = new Map<string, string>();
+      members.forEach(member => {
+        if (member.userUuid) {
+          uuidToUsername.set(member.userUuid, member.username);
+        }
+      });
+      
+      // API レスポンスを SOSOTransaction 形式に変換
+      const transactions: SOSOTransaction[] = historyData.map((item: any) => {
+        // UUIDをユーザー名に変換する関数
+        const getUserName = (uuid: string) => {
+          if (!uuid) return '不明なユーザー';
+          
+          const username = uuidToUsername.get(uuid);
+          if (username) return username;
+          
+          // UUIDの場合は短縮表示
+          if (uuid.length === 36 && uuid.includes('-')) {
+            return `ユーザー (${uuid.substring(0, 8)}...)`;
+          }
+          
+          return uuid;
+        };
+
+        return {
+          id: item.id,
+          eventName: item.eventId ? `イベント関連` : '手動調整',
+          dateTime: new Date(item.changedAt).toISOString(),
+          changer: getUserName(item.changedBy) || 'システム',
+          changee: getUserName(item.userId),
+          sosoPoints: item.pointDelta,
+          reason: item.reason || '理由なし',
+        };
+      });
+      
+      return transactions;
+    } catch (error) {
+      console.error('🔴 イベントSOSO履歴取得エラー:', error);
+      return [];
+    }
+  };
+
   // --- ▼▼▼ useEffect ▼▼▼ ---
   // ★ 修正: id と slug の変化に合わせて state を更新
   useEffect(() => {
@@ -272,12 +387,27 @@ export default function DashboardPage() {
           cache: 'no-store',
         });
 
-        const [evRes, memRes] = await Promise.all([evReq, memReq]);
+        const histReq = fetch(`${API_BASE}/calenders/${id}/soso_history`, {
+          headers,
+          signal: controller.signal,
+          cache: 'no-store',
+        });
+
+        const [evRes, memRes, histRes] = await Promise.all([evReq, memReq, histReq]);
         if (!evRes.ok) throw new Error(`events HTTP ${evRes.status}`);
         if (!memRes.ok) throw new Error(`members HTTP ${memRes.status}`);
 
         const evData = (await evRes.json()) as ApiEvent[];
         const memData = (await memRes.json()) as ApiCalenderMember[];
+        
+        // SOSO履歴は取得に失敗してもアプリを停止させない
+        let histData: any[] = [];
+        if (histRes.ok) {
+          histData = await histRes.json();
+          console.log('🔍 取得したSOSO履歴:', histData);
+        } else {
+          console.warn('⚠️ SOSO履歴の取得に失敗しました:', histRes.status);
+        }
 
         console.log('🔍 取得したイベントデータ:', evData);
         console.log('🔍 取得したメンバーデータ:', memData);
@@ -292,9 +422,44 @@ export default function DashboardPage() {
           hasCar: m.hasCar,
           seatsRequired: m.capacity,    // ← ここがポイント
           sosoPoint: m.sosoPoint,
-          // userUuid: m.id,             // 必要なら隠しフィールドで保管
+          userUuid: m.id,             // ★ UUIDを保持
         }));
         setMembers(uiMembers);
+
+        // UUIDからユーザー名へのマッピングを作成
+        const uuidToUsername = new Map<string, string>();
+        memData.forEach(member => {
+          uuidToUsername.set(member.id, member.username);
+        });
+
+        // SOSO履歴をSOSOTransaction形式に変換
+        const transactions: SOSOTransaction[] = histData.map((item: any) => {
+          // UUIDをユーザー名に変換する関数
+          const getUserName = (uuid: string) => {
+            if (!uuid) return '不明なユーザー';
+            
+            const username = uuidToUsername.get(uuid);
+            if (username) return username;
+            
+            // UUIDの場合は短縮表示
+            if (uuid.length === 36 && uuid.includes('-')) {
+              return `ユーザー (${uuid.substring(0, 8)}...)`;
+            }
+            
+            return uuid;
+          };
+
+          return {
+            id: item.id,
+            eventName: item.eventId ? `イベント関連` : '手動調整',
+            dateTime: new Date(item.changedAt).toISOString(),
+            changer: getUserName(item.changedBy) || 'システム',
+            changee: getUserName(item.userId),
+            sosoPoints: item.pointDelta,
+            reason: item.reason || '理由なし',
+          };
+        });
+        setLogs(transactions);
       } catch (e: any) {
         if (e?.name !== 'AbortError') {
           setError(e.message ?? '取得に失敗しました');
@@ -432,7 +597,7 @@ const handleSaveNewEvent = async (eventData: EventStatus) => {
   };
 
   // page.tsx のhandleSaveSosoChange関数を修正
-  const handleSaveSosoChange = (editedData: EditedMemberData): void => {
+  const handleSaveSosoChange = async (editedData: EditedMemberData): Promise<void> => {
     console.log("🔵 handleSaveSosoChangeが実行されました。");
     
     // メンバー情報を更新
@@ -444,62 +609,31 @@ const handleSaveNewEvent = async (eventData: EventStatus) => {
       )
     );
     
-    // selectedMemberForEditから前の値を取得
-    if (selectedMemberForEdit && selectedManagementEvent) {
-      const pointChange = editedData.sosoPoint - selectedMemberForEdit.sosoPoint;
-      if (pointChange !== 0) {
-        const newLog: SOSOTransaction = {
-          id: Date.now(),
-          eventName: selectedManagementEvent.title,
-          dateTime: new Date().toISOString(),
-          changer: '管理者',
-          changee: editedData.username,
-          sosoPoints: pointChange,
-          reason: editedData.reason || '（理由の記載なし）',
-        };
-        
-        // 全体のログに追加
-        setLogs(prevLogs => [newLog, ...prevLogs]);
-        
-        // ★★★ 新しいeventLogsを即座に計算 ★★★
-        const updatedEventLogs = [
-          newLog,
-          ...(eventLogs[selectedManagementEvent.id] || [])
-        ];
-        
-        // イベント固有のログに追加
-        setEventLogs(prevEventLogs => ({
-          ...prevEventLogs,
-          [selectedManagementEvent.id]: updatedEventLogs
-        }));
-        
-        // ★★★ 管理モーダルを即座に更新された履歴で再表示 ★★★
-        const updatedEvent = {
-          ...selectedManagementEvent,
-          extendedProps: {
-            ...selectedManagementEvent.extendedProps,
-            eventLogs: updatedEventLogs // 新しく計算したログを使用
-          }
-        };
-        
-        console.log('🔵 更新されたイベントログ:', updatedEventLogs);
-        console.log('🔵 更新されたイベント:', updatedEvent);
-        
-        // selectedManagementEventを更新
-        setSelectedManagementEvent(updatedEvent);
-        
-        console.log('🔵 新しいトランザクションが追加されました:', newLog);
-      }
-    }
+    // ★ SOSOポイント更新後に履歴を再取得
+    await fetchSOSOHistory(id);
     
     // モーダルを閉じて状態をリセット
     setIsSOSOEditModalOpen(false);
     setSelectedMemberForEdit(null);
     
     // 編集元に応じて処理を分岐
-    if (editSource === 'management') {
+    if (editSource === 'management' && selectedManagementEvent) {
       console.log('🔵 SOSOManagementModalに戻ります');
       console.log('🔵 selectedManagementEvent:', selectedManagementEvent);
+      
+      // ★ イベント固有の履歴を取得してSOSOManagementModalを更新
+      const eventHistory = await fetchEventSOSOHistory(selectedManagementEvent.id);
+      
+      // selectedManagementEventを更新された履歴で更新
+      const updatedEvent = {
+        ...selectedManagementEvent,
+        extendedProps: {
+          ...selectedManagementEvent.extendedProps,
+          eventLogs: eventHistory
+        }
+      };
+      
+      setSelectedManagementEvent(updatedEvent);
       
       // SOSOManagementModalに戻る
       setTimeout(() => {
@@ -723,6 +857,7 @@ const handleSaveNewEvent = async (eventData: EventStatus) => {
           onSave={handleSaveSosoChange}
           initialData={selectedMemberForEdit}
           calenderId={id} // ★ カレンダーIDを追加
+          eventId={editSource === 'management' && selectedManagementEvent ? selectedManagementEvent.id : undefined} // ★ 管理モーダルからの場合はイベントID
         />
       )}
 

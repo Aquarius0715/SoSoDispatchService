@@ -14,9 +14,10 @@ interface Props {
   onSave: (editedData: EditedMemberData) => void;
   initialData: Member;
   calenderId: string; // カレンダーIDを追加
+  eventId?: string; // ★ イベントIDを追加（オプション）
 }
 
-const SOSOEditModal: React.FC<Props> = ({ isOpen, onClose, onSave, initialData, calenderId }) => {
+const SOSOEditModal: React.FC<Props> = ({ isOpen, onClose, onSave, initialData, calenderId, eventId }) => {
   const [editedData, setEditedData] = useState<EditedMemberData>({
     ...initialData,
     reason: '',
@@ -25,6 +26,45 @@ const SOSOEditModal: React.FC<Props> = ({ isOpen, onClose, onSave, initialData, 
 
   // ★ APIのベースURLと認証ヘッダー
   const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || '';
+
+  // ★ トークンリフレッシュ関数
+  const refreshToken = async (): Promise<boolean> => {
+    try {
+      const refreshTokenValue = localStorage.getItem('refresh_token');
+      if (!refreshTokenValue) {
+        console.error('🔴 リフレッシュトークンが見つかりません');
+        return false;
+      }
+
+      const response = await fetch(`${API_BASE}/auth/refresh`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          refresh_token: refreshTokenValue,
+        }),
+      });
+
+      if (!response.ok) {
+        console.error('🔴 トークンリフレッシュ失敗:', response.status);
+        return false;
+      }
+
+      const data = await response.json();
+      if (data.access_token) {
+        localStorage.setItem('access_token', data.access_token);
+        console.log('🟢 トークンリフレッシュ成功');
+        return true;
+      }
+
+      return false;
+    } catch (error) {
+      console.error('🔴 トークンリフレッシュエラー:', error);
+      return false;
+    }
+  };
 
   // ★ 認証ヘッダー生成関数
   const authHeaders = (): HeadersInit => {
@@ -109,7 +149,7 @@ const SOSOEditModal: React.FC<Props> = ({ isOpen, onClose, onSave, initialData, 
       const requestBody = {
         newPoint: editedData.sosoPoint,
         reason: editedData.reason.trim(),
-        eventId: '', // イベントに紐付かない手動調整
+        eventId: eventId || '', // ★ イベントIDがある場合は設定、ない場合は手動調整
       };
 
       console.log('🔵 SOSOポイント更新API呼び出し:', {
@@ -127,12 +167,30 @@ const SOSOEditModal: React.FC<Props> = ({ isOpen, onClose, onSave, initialData, 
         }
       });
 
-      const response = await fetch(endpoint, {
+      let response = await fetch(endpoint, {
         method: 'PUT',
         headers: authHeaders(),
         credentials: 'include',
         body: JSON.stringify(requestBody),
       });
+
+      // ★ 401エラーの場合、トークンリフレッシュを試行
+      if (response.status === 401) {
+        console.log('🔄 401エラー検出 - トークンリフレッシュを試行');
+        const refreshSuccess = await refreshToken();
+        
+        if (refreshSuccess) {
+          console.log('🔄 リフレッシュ後にリトライ');
+          response = await fetch(endpoint, {
+            method: 'PUT',
+            headers: authHeaders(),
+            credentials: 'include',
+            body: JSON.stringify(requestBody),
+          });
+        } else {
+          throw new Error('認証エラー: ログインし直してください');
+        }
+      }
 
       console.log('🔍 レスポンス情報:');
       console.log('  - Status:', response.status);
