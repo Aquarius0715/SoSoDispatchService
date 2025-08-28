@@ -21,10 +21,18 @@ api:
 	$(DC) build soso-api soso-database soso-api-document
 	$(DC) up -d soso-api soso-database soso-api-document
 
-## 全ビルドし直して起動（キャッシュなし）
+# Storybook 使うときだけ明示してビルド/起動
+storybook-up:
+	COMPOSE_PROFILES=storybook $(DC) up -d soso-web-storybook
+
+storybook-build:
+	COMPOSE_PROFILES=storybook $(DC) build --no-cache soso-web-storybook
+	COMPOSE_PROFILES=storybook $(DC) up -d soso-web-storybook
+
+## Storybook以外ビルドし直して起動（キャッシュなし）
 rebuild:
 	$(DC) down -v --remove-orphans
-	$(DC) build --no-cache
+	$(DC) build --no-cache soso-api soso-database soso-api-document soso-web
 	$(DC) up -d
 
 dev:

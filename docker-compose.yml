@@ -69,6 +69,7 @@ services:
       - soso-api
 
   soso-web-storybook:
+    profiles: ["storybook"]
     build:
       context: services/soso-web
       dockerfile: Dockerfile.storybook  # Storybook用Dockerfileを指定
