@@ -155,6 +155,10 @@ const EventDetailModal: React.FC<ModalProps> = ({ eventData, onClose }) => {
     return headers;
   };
 
+  const handlePickUp = async () => {
+    await handleRegister('pickUp');
+  };
+
   const handleRegister = async (type: 'dropOff' | 'pickUp') => {
     if (typeof seatsRequired !== 'number' || seatsRequired <= 0) {
       alert('有効な人数を入力してください。');
@@ -189,16 +193,16 @@ const EventDetailModal: React.FC<ModalProps> = ({ eventData, onClose }) => {
 
       //新規追加
       // ★ リクエストボディを追加（テスト用）
-      const requestBody = {
-        seatsRequired: seatsRequired,
-      };
+      // const requestBody = {
+      //   seatsRequired: seatsRequired, ///////初期値が1になってる！！！
+      // };
 
       console.log('🔵 配車登録API呼び出し:', {
         endpoint,
         type,
         seatsRequired,
         eventId: eventData.id,
-        requestBody
+        //requestBody
       });
 
       // ★ テスト用: まずボディなしで試す
@@ -210,17 +214,18 @@ const EventDetailModal: React.FC<ModalProps> = ({ eventData, onClose }) => {
         // body: JSON.stringify(requestBody), // ★ 一時的にコメントアウト
       });
 
-      //新規追加
-      // もし404や400エラーの場合、ボディありで再試行
-      if (!response.ok && (response.status === 400 || response.status === 404)) {
-        console.log('🧪 テスト: リクエストボディありで再試行...');
-        response = await fetch(endpoint, {
-          method: 'POST',
-          headers: authHeaders(),
-          credentials: 'include',
-          body: JSON.stringify(requestBody), // ★ ボディありで再試行
-        });
-      }
+      //　リクエストbodyを求めていないからやらない！！！
+      // //新規追加
+      // // もし404や400エラーの場合、ボディありで再試行
+      // if (!response.ok && (response.status === 400 || response.status === 404)) {
+      //   console.log('🧪 テスト: リクエストボディありで再試行...');
+      //   response = await fetch(endpoint, {
+      //     method: 'POST',
+      //     headers: authHeaders(),
+      //     credentials: 'include',
+      //     body: JSON.stringify(requestBody), // ★ ボディありで再試行
+      //   });
+      // }
 
       console.log('🔍 レスポンス情報:');
       console.log('  - Status:', response.status);
