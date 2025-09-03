@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"strings"
 
@@ -65,9 +66,32 @@ func (r *EventParticipantRepository) BulkInsert(
 
 	if _, err := tx.ExecContext(ctx, query, args...); err != nil {
 		_ = tx.Rollback()
+		if isDuplicateError(err) {
+			return ErrDuplicateEntry
+		}
 		return fmt.Errorf("exec bulk insert: %w", err)
 	}
 	return tx.Commit()
+}
+
+// sentinel error for duplicate (unique constraint) insert
+var ErrDuplicateEntry = errors.New("duplicate entry")
+
+// isDuplicateError performs a lightweight check for DB unique-violation
+// messages. It uses string matching to remain DB-driver-agnostic.
+func isDuplicateError(err error) bool {
+	if err == nil {
+		return false
+	}
+	l := strings.ToLower(err.Error())
+	if strings.Contains(l, "duplicate") ||
+		strings.Contains(l, "unique constraint") ||
+		strings.Contains(l, "unique_violation") ||
+		strings.Contains(l, "unique constraint failed") ||
+		strings.Contains(l, "duplicate key value") {
+		return true
+	}
+	return false
 }
 
 func (r *EventParticipantRepository) FindByEventIDAndType(
