@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"time"
@@ -8,6 +9,7 @@ import (
 	"soso/internal/model"
 	"soso/internal/repository"
 
+	"github.com/go-sql-driver/mysql"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
@@ -198,8 +200,7 @@ func (h *EventHandler) registerParticipant(c echo.Context, tp model.Type) error 
 	}
 	userID := claims.Subject
 
-	// //新規追加
-	/* ---- 重複チェック ---- */
+	/* ---- 重複チェック（UX向上。最終整合はDBで担保）---- */
 	exists, err := h.EventParticipantRepo.ExistsByEventAndUser(
 		c.Request().Context(),
 		eventID,
@@ -207,7 +208,8 @@ func (h *EventHandler) registerParticipant(c echo.Context, tp model.Type) error 
 		tp,
 	)
 	if err != nil {
-		return fmt.Errorf("check existing participation: %w", err)
+		c.Logger().Errorf("ExistsByEventAndUser failed: %v", err)
+		return echo.NewHTTPError(http.StatusInternalServerError, "internal error")
 	}
 	if exists {
 		typeStr := "pickup"
@@ -217,7 +219,7 @@ func (h *EventHandler) registerParticipant(c echo.Context, tp model.Type) error 
 		return echo.NewHTTPError(http.StatusConflict, fmt.Sprintf("already registered for %s", typeStr))
 	}
 
-	/* ---- 1 行だけ Insert ---- */
+	/* ---- Insert 本体 ---- */
 	ep := model.EventParticipant{
 		EventID:      eventID,
 		UserID:       userID,
@@ -230,9 +232,32 @@ func (h *EventHandler) registerParticipant(c echo.Context, tp model.Type) error 
 		c.Request().Context(),
 		[]model.EventParticipant{ep},
 	); err != nil {
-		return err
+		// ログ（型と詳細）
+		c.Logger().Errorf("BulkInsert failed: %T: %v", err, err)
+
+		// ユニーク違反ぽければ 409 にマップ
+		if isDuplicateError(err) {
+			typeStr := "pickup"
+			if tp == model.Return {
+				typeStr = "dropoff"
+			}
+			return echo.NewHTTPError(http.StatusConflict, fmt.Sprintf("already registered for %s", typeStr))
+		}
+
+		// それ以外は500を整形して返す（素通ししない）
+		return echo.NewHTTPError(http.StatusInternalServerError, "internal error")
 	}
+
 	return c.NoContent(http.StatusCreated)
+}
+
+/* ---- DB のユニーク違反をざっくり検知（ドライバ非依存の簡易版） ---- */
+func isDuplicateError(err error) bool {
+	var me *mysql.MySQLError
+	if errors.As(err, &me) {
+		return me.Number == 1062 // 1062 = duplicate entry
+	}
+	return false
 }
 
 /*

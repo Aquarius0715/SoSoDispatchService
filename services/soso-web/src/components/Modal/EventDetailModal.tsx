@@ -40,6 +40,7 @@ const EventDetailModal: React.FC<ModalProps> = ({ eventData, onClose }) => {
     // ★ APIのベースURLと認証ヘッダー
   const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || '';
 
+  console.log("🔍 イベントID:", eventData.id);
   //新規追加
   // ★ 配車登録データを取得する関数
   const fetchDispatchRegistrations = async () => {
