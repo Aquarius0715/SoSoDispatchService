@@ -36,6 +36,8 @@ const EventDetailModal: React.FC<ModalProps> = ({ eventData, onClose }) => {
   const [isLoadingRegistrations, setIsLoadingRegistrations] = useState(true);
   const [userDropOffRegistered, setUserDropOffRegistered] = useState(false); // 現在のユーザーの送り登録状況
   const [userPickUpRegistered, setUserPickUpRegistered] = useState(false); // 現在のユーザーの迎え登録状況
+  // detail API のレスポンスを格納するローカル state
+  const [detailData, setDetailData] = useState<any | null>(null);
 
     // ★ APIのベースURLと認証ヘッダー
   const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || '';
@@ -47,15 +49,18 @@ const EventDetailModal: React.FC<ModalProps> = ({ eventData, onClose }) => {
     try {
       setIsLoadingRegistrations(true);
       
-      // イベント詳細APIから現在の登録状況を取得
-      const response = await fetch(`${API_BASE}/events/${eventData.id}`, {
+  // イベント詳細APIから現在の登録状況を取得 (/detail エンドポイント)
+  const response = await fetch(`${API_BASE}/events/${eventData.id}/detail`, {
         headers: authHeaders(),
         credentials: 'include',
       });
 
       if (response.ok) {
-        const eventDetails = await response.json();
-        console.log('🔍 イベント詳細レスポンス:', eventDetails);
+  const eventDetails = await response.json();
+  console.log('🔍 イベント詳細レスポンス (/detail):', eventDetails);
+
+  // 保存して UI で参照できるようにする
+  setDetailData(eventDetails);
 
         // 現在のユーザーIDを取得（複数のキーを試行）
         let currentUserId = localStorage.getItem('user_id') || 
@@ -78,32 +83,15 @@ const EventDetailModal: React.FC<ModalProps> = ({ eventData, onClose }) => {
         console.log('🔍 現在のユーザーID:', currentUserId);
         console.log('🔍 LocalStorage keys:', Object.keys(localStorage));
         
-        // 既存の配車登録データから情報を取得
+        // /detail のレスポンスは参加者一覧を `participants` に返す想定
         const registrations: string[] = [];
         let currentUserDropOff = false;
         let currentUserPickUp = false;
-        
-        // 送り登録をチェック
-        if (eventDetails.dropOffRegistrations && Array.isArray(eventDetails.dropOffRegistrations)) {
-          for (const reg of eventDetails.dropOffRegistrations) {
-            if (reg.userId === currentUserId) {
-              currentUserDropOff = true;
-              registrations.push(`あなた (送り登録済み)`);
-            } else {
-              registrations.push(`${reg.userId.substring(0, 8)}... (送り登録)`);
-            }
-          }
-        }
-        
-        // 迎え登録をチェック
-        if (eventDetails.pickUpRegistrations && Array.isArray(eventDetails.pickUpRegistrations)) {
-          for (const reg of eventDetails.pickUpRegistrations) {
-            if (reg.userId === currentUserId) {
-              currentUserPickUp = true;
-              registrations.push(`あなた (迎え登録済み)`);
-            } else {
-              registrations.push(`${reg.userId.substring(0, 8)}... (迎え登録)`);
-            }
+
+        if (Array.isArray(eventDetails.participants)) {
+          for (const p of eventDetails.participants) {
+            // participants はユーザ名の配列の想定
+            registrations.push(p);
           }
         }
         
@@ -111,7 +99,7 @@ const EventDetailModal: React.FC<ModalProps> = ({ eventData, onClose }) => {
         setUserDropOffRegistered(currentUserDropOff);
         setUserPickUpRegistered(currentUserPickUp);
         
-        setRegistered(registrations);
+  setRegistered(registrations);
         console.log('🔍 配車登録一覧:', registrations);
         console.log('🔍 現在のユーザー状況:', {
           dropOff: currentUserDropOff,
@@ -353,35 +341,35 @@ const EventDetailModal: React.FC<ModalProps> = ({ eventData, onClose }) => {
         </div>
 
         <div className="bg-gray-100 p-4 rounded-lg mb-4 text-zinc-600">
-          <h3 className="font-normal font-['Inter'] text-black text-lg mb-2">{eventData.title}</h3>
-          <p className="mb-3">日付: {fmtJstDate(eventData.dropOffTime || eventData.pickUpTime)}</p>
-          <p className="mb-3">開始時間: {fmtJstTime(eventData.dropOffTime || eventData.pickUpTime)}</p>
-          <p className="mb-3">終了時間: {fmtJstTime(eventData.pickUpTime || eventData.pickUpTime)}</p>
-          <p>詳細: {eventData.details}</p>
+          <h3 className="font-normal font-['Inter'] text-black text-lg mb-2">{detailData?.title ?? eventData.title}</h3>
+          <p className="mb-3">日付: {fmtJstDate(detailData?.startTime ?? eventData.dropOffTime ?? eventData.pickUpTime)}</p>
+          <p className="mb-3">開始時間: {fmtJstTime(detailData?.startTime ?? eventData.dropOffTime ?? eventData.pickUpTime)}</p>
+          <p className="mb-3">終了時間: {fmtJstTime(detailData?.endTime ?? eventData.pickUpTime ?? eventData.pickUpTime)}</p>
+          <p>詳細: {detailData?.description ?? eventData.details}</p>
         </div>
 
         <div className="bg-gray-100 p-4 rounded-lg mb-4 text-zinc-600">
           <h3 className="font-normal font-['Inter'] text-black text-lg mb-2">参加者</h3>
-          <p>{eventData.members.join('・')}</p>
+          <p>{(detailData?.participants ?? eventData.members).join ? (detailData?.participants ?? eventData.members).join('・') : ''}</p>
         </div>
 
         <div className="flex justify-between space-x-4 mb-4 text-zinc-600">
           <div className="bg-gray-100 p-4 rounded-lg flex-1">
             <h3 className="font-normal font-['Inter'] text-black text-lg mb-2">送り</h3>
-            <p className="mb-3">合計: {eventData.dropOffCount}人</p>
+            <p className="mb-3">合計: {detailData?.seatsRequiredReturn ?? eventData.dropOffCount}人</p>
             <p>残り: {dropOffRemaining}人</p>
           </div>
           <div className="bg-gray-100 p-4 rounded-lg flex-1">
             <h3 className="font-normal font-['Inter'] text-black text-lg mb-2">迎え</h3>
-            <p className="mb-3">合計: {eventData.pickUpCount}人</p>
+            <p className="mb-3">合計: {detailData?.seatsRequiredGo ?? eventData.pickUpCount}人</p>
             <p >残り: {pickUpRemaining}人</p>
           </div>
         </div>
 
         <div className="bg-gray-100 p-4 rounded-lg mb-4 text-zinc-600">
           <h3 className="font-normal font-['Inter'] text-black text-lg mb-2">会場</h3>
-          <p>{eventData.departurePoint} → {eventData.destinationPoint}</p>
-          <p>会場URL: {eventData.eventURL}</p>
+          <p>{detailData?.originLocation ?? eventData.departurePoint} → {detailData?.destinationLocation ?? eventData.destinationPoint}</p>
+          <p>会場URL: {detailData?.eventURL ?? eventData.eventURL}</p>
         </div>
 
         <div className="bg-gray-100 p-4 rounded-lg mb-4 text-zinc-600">
