@@ -60,7 +60,16 @@ const EventDetailModal: React.FC<ModalProps> = ({ eventData, onClose }) => {
   console.log('🔍 イベント詳細レスポンス (/detail):', eventDetails);
 
   // 保存して UI で参照できるようにする
-  setDetailData(eventDetails);
+        setDetailData(eventDetails);
+
+        // detail の残席情報があれば反映する
+        // backend のレスポンスでは remainingGoSeats / remainingReturnSeats を想定
+        if (typeof eventDetails.remainingReturnSeats === 'number') {
+          setDropOffRemaining(eventDetails.remainingReturnSeats);
+        }
+        if (typeof eventDetails.remainingGoSeats === 'number') {
+          setPickUpRemaining(eventDetails.remainingGoSeats);
+        }
 
         // 現在のユーザーIDを取得（複数のキーを試行）
         let currentUserId = localStorage.getItem('user_id') || 
@@ -142,6 +151,32 @@ const EventDetailModal: React.FC<ModalProps> = ({ eventData, onClose }) => {
     }
     
     return headers;
+  };
+
+  // ユーザーの capacity を取得するヘルパー
+  const getUserCapacity = (): number => {
+    // 1) localStorage に明示的な capacity があれば優先
+    const capStr = localStorage.getItem('capacity');
+    if (capStr) {
+      const v = parseInt(capStr, 10);
+      if (!isNaN(v) && v > 0) return v;
+    }
+
+    // 2) JWT の payload に capacity があれば利用
+    const token = localStorage.getItem('access_token');
+    if (token) {
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        const c = payload.capacity || payload.cap || payload.capacity_number;
+        const v = parseInt(String(c || ''), 10);
+        if (!isNaN(v) && v > 0) return v;
+      } catch (e) {
+        // ignore
+      }
+    }
+
+    // デフォルトは1
+    return 1;
   };
 
   const handlePickUp = async () => {
@@ -284,11 +319,14 @@ const EventDetailModal: React.FC<ModalProps> = ({ eventData, onClose }) => {
 
       // ★ 成功時の処理
       if (type === 'dropOff') {
-        setDropOffRemaining(dropOffRemaining - seatsRequired);
+  // ユーザーのcapacityを取得して残席を減算
+  const userCapacity = getUserCapacity();
+  setDropOffRemaining((prev) => Math.max(prev - userCapacity, 0));
         setUserDropOffRegistered(true); // 現在のユーザーの送り登録状況を更新
         alert(`送りで${seatsRequired}人登録しました。`);
       } else {
-        setPickUpRemaining(pickUpRemaining - seatsRequired);
+  const userCapacity = getUserCapacity();
+  setPickUpRemaining((prev) => Math.max(prev - userCapacity, 0));
         setUserPickUpRegistered(true); // 現在のユーザーの迎え登録状況を更新
         alert(`迎えで${seatsRequired}人登録しました。`);
       }
