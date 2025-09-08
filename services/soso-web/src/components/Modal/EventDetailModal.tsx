@@ -27,7 +27,7 @@ interface ModalProps {
 }
 
 const EventDetailModal: React.FC<ModalProps> = ({ eventData, onClose }) => {
-  const [seatsRequired, setSeatsRequired] = useState<number | ''>(1); // デフォルト値を1に設定
+  const [seatsRequired, setSeatsRequired] = useState<number | ''>(''); // 初期は空。/users/me から capacity を取得して設定
   const [dropOffRemaining, setDropOffRemaining] = useState(eventData.dropOffCount);
   const [pickUpRemaining, setPickUpRemaining] = useState(eventData.pickUpCount);
   const [registered, setRegistered] = useState<string[]>([]);
@@ -129,6 +129,34 @@ const EventDetailModal: React.FC<ModalProps> = ({ eventData, onClose }) => {
   // ★ コンポーネントマウント時に配車登録データを取得
   React.useEffect(() => {
     fetchDispatchRegistrations();
+  }, [eventData.id]);
+
+  // ユーザーの capacity を /users/me から取得して seatsRequired の初期値にする
+  React.useEffect(() => {
+    const fetchCapacity = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/users/me`, {
+          method: 'GET',
+          headers: authHeaders(),
+          credentials: 'include',
+        });
+        if (res.ok) {
+          const data = await res.json();
+          const cap = parseInt(String(data.capacity || data.cap || data.capacity_number || ''), 10);
+          if (!isNaN(cap) && cap > 0) {
+            setSeatsRequired(cap);
+            // キャッシュしておく
+            try { localStorage.setItem('capacity', String(cap)); } catch (e) { /* ignore */ }
+            return;
+          }
+        }
+      } catch (e) {
+        // ignore
+      }
+      // フォールバック
+      setSeatsRequired(getUserCapacity());
+    };
+    fetchCapacity();
   }, [eventData.id]);
 
     // ★ authHeaders関数を修正
