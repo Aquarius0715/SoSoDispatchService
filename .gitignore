@@ -1,3 +1,4 @@
 services/soso-api/config/.env
 .DS_Store
 node_modules/
+.cursorignore

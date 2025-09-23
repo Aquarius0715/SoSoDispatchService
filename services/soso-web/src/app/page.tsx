@@ -9,12 +9,10 @@ import Cookies from "js-cookie"
 
 export default function Home() {
   const router = useRouter();
-  const [username, setUsername] = useState('');
   const [mailAddress, setMailAddress] = useState('');
   const [password, setPassword] = useState('');
   const [token, setToken] = useState('');
   const [csrfToken, setCsrfToken] = useState('');
-  const [userInfo, setUserInfo] = useState<any>(null);
 
   const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || '';
 
@@ -26,23 +24,42 @@ export default function Home() {
       console.log('localStorageからトークンを復元しました:', storedToken);
     }
   }, []); // 空の配列[]を指定することで、最初の1回だけ実行される
+useEffect(() => {
+  const fetchCsrfToken = async () => {
+    console.log('CSRFトークン取得開始...');
+    const res = await fetch(`${API_BASE}/auth/csrf`, {
+      method: 'GET',
+      credentials: 'include',
+    });
 
-  useEffect(() => {
-    const fetchCsrfToken = async () => {
-      console.log('CSRFトークン取得開始...');
-        const res = await fetch(`${API_BASE}/auth/csrf`, {
-          method: 'GET',
-          credentials: 'include'
-        });
-        if (!res.ok) {
-          throw new Error(`HTTPエラー: ${res.status}`);
-        }
-        const csrfToken = Cookies.get(`csrf_token`)?.toString() ?? ""
-        setCsrfToken(csrfToken);
-    };
+    console.log('status:', res.status);
+    console.log('content-type:', res.headers.get('content-type'));
 
-    fetchCsrfToken();
-  }, [API_BASE]);
+    const raw = await res.text(); // まずは text で読む
+    console.log('raw body:', raw);
+
+    if (!res.ok) {
+      throw new Error(`HTTPエラー: ${res.status} ${raw}`);
+    }
+
+    if (raw) {
+      try {
+        const data = JSON.parse(raw);
+        setCsrfToken(data.csrf_token);
+        console.log('取得したCSRFトークン(JSON):', data.csrf_token);
+        // 必要なら Cookies.set('csrf_token', data.csrf_token);
+      } catch (e) {
+        console.warn('JSONとしてパースできません:', e);
+      }
+    } else {
+      console.warn('ボディが空です。Cookie方式の可能性があります。');
+    }
+  };
+
+  fetchCsrfToken();
+}, [API_BASE]);
+
+
 
 
   const login = async () => {
@@ -73,6 +90,7 @@ export default function Home() {
 
       console.log('✅ ログイン成功');
       console.log('取得したトークン:', data.access_token);
+      console.log('csrfToken:', csrfToken);
       alert('ログイン成功');
       router.push('/calendarList');
     } catch (err: any) {
@@ -81,33 +99,7 @@ export default function Home() {
     }
   };
 
-  const getMe = async () => {
-    console.log('ユーザー情報取得開始...');
-    console.log('使用トークン:', token);
-    try {
-      const res = await fetch(`${API_BASE}/users/me`, {
-        method: 'GET',
-        headers: {
-          // 'token'はuseStateから取得するため、localStorageから復元されていれば値が入っている
-          Authorization: `Bearer ${token}`,
-        },
-        credentials: 'include',
-      });
-
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message);
-      }
-
-      const data = await res.json();
-      setUserInfo(data);
-      console.log('✅ ユーザー情報取得成功:', data);
-      alert('取得成功');
-    } catch (err: any) {
-      console.error('❌ ユーザー情報取得失敗:', err.message);
-      alert('取得失敗: ' + err.message);
-    }
-  };
+  
 
   return (
     <div className="p-4 bg-white items-center flex flex-col justify-center min-h-screen">

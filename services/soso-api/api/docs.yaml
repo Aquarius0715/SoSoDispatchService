@@ -843,4 +843,3 @@ paths:
         "403":
           description: 権限不足
           content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
-        

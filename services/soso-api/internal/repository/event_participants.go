@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"strings"
 
@@ -65,9 +66,32 @@ func (r *EventParticipantRepository) BulkInsert(
 
 	if _, err := tx.ExecContext(ctx, query, args...); err != nil {
 		_ = tx.Rollback()
+		if isDuplicateError(err) {
+			return ErrDuplicateEntry
+		}
 		return fmt.Errorf("exec bulk insert: %w", err)
 	}
 	return tx.Commit()
+}
+
+// sentinel error for duplicate (unique constraint) insert
+var ErrDuplicateEntry = errors.New("duplicate entry")
+
+// isDuplicateError performs a lightweight check for DB unique-violation
+// messages. It uses string matching to remain DB-driver-agnostic.
+func isDuplicateError(err error) bool {
+	if err == nil {
+		return false
+	}
+	l := strings.ToLower(err.Error())
+	if strings.Contains(l, "duplicate") ||
+		strings.Contains(l, "unique constraint") ||
+		strings.Contains(l, "unique_violation") ||
+		strings.Contains(l, "unique constraint failed") ||
+		strings.Contains(l, "duplicate key value") {
+		return true
+	}
+	return false
 }
 
 func (r *EventParticipantRepository) FindByEventIDAndType(
@@ -111,6 +135,29 @@ func (r *EventParticipantRepository) FindByEventIDAndType(
 		return nil, err
 	}
 	return list, nil
+}
+
+// 新規追加
+// ExistsByEventAndUser checks if a participant record exists for the given event and user
+func (r *EventParticipantRepository) ExistsByEventAndUser(
+	ctx context.Context,
+	eventID string,
+	userID string,
+	participantType model.Type,
+) (bool, error) {
+	const q = `
+		SELECT COUNT(*)
+		FROM event_participants
+		WHERE event_id = ? AND user_id = ? AND type = ?
+	`
+
+	var count int
+	err := r.DB.QueryRowContext(ctx, q, eventID, userID, string(participantType)).Scan(&count)
+	if err != nil {
+		return false, fmt.Errorf("check participant existence: %w", err)
+	}
+
+	return count > 0, nil
 }
 
 /* 参加者とユーザー情報をまとめた DTO */

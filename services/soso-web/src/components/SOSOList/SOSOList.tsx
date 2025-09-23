@@ -21,9 +21,20 @@ function SOSOList({ logs, eventName }: SOSOListProps) {
   console.log("🟡 SOSOList受信ログ:", logs);
   console.log("🟡 SOSOList eventName:", eventName);
   
+  // ★ デバッグ: ログの構造を詳しく確認
+  if (logs.length > 0) {
+    console.log("🟡 最初のログの詳細:", logs[0]);
+    console.log("🟡 最初のログのeventName:", logs[0].eventName);
+    console.log("🟡 期待するeventName:", eventName);
+    console.log("🟡 eventName比較結果:", logs[0].eventName === eventName);
+  }
+  
   // eventNameが指定されている場合は、そのイベントに関連するログのみをフィルタリング
   const filteredLogs = eventName 
-    ? logs.filter(log => log.eventName === eventName)
+    ? logs.filter(log => {
+        console.log(`🟡 フィルタリング中: ${log.eventName} === ${eventName} -> ${log.eventName === eventName}`);
+        return log.eventName === eventName;
+      })
     : logs;
 
   console.log("🟡 フィルタリング後のログ:", filteredLogs);

@@ -59,8 +59,8 @@ export default function RegisterPage() {
       const errorData = await response.json().catch(() => ({}));
       throw new Error(errorData.message || `HTTP ${response.status}: Registration failed`);
         }
-        
-        const csrfToken = Cookies.get(`csrf_token`)?.toString ?? ""
+
+        const csrfToken = Cookies.get(`XSRF-TOKEN`)?.toString() ?? "";
         setCsrfToken(csrfToken);
     };
     

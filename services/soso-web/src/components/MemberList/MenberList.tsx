@@ -8,6 +8,7 @@ export interface Member {
   hasCar: boolean;
   seatsRequired?: number; // 車の有無に応じて乗車人数をオプションに
   sosoPoint: number;
+  userUuid?: string; // ★ 実際のユーザーUUID（API連携用）
 }
 
 // MemberListコンポーネントが受け取るProps

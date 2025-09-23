@@ -52,7 +52,7 @@ export default function MyPage() {
   const fetchUserStatus = async (token: string) => {
     if (!API_BASE) return;
     try {
-      const csrfToken = Cookies.get('csrf_token')?.toString() ?? ""
+      const csrfToken = Cookies.get('XSRF-TOKEN')?.toString() ?? ""
       const response = await fetch(`${API_BASE}/users/me`, {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -75,8 +75,7 @@ export default function MyPage() {
   const fetchCalendars = async (token: string) => {
     if (!API_BASE) return;
     try {
-      // const csrfToken = Cookies.get(`csrf_token`)?.toString ?? ""
-      const csrfToken = Cookies.get('csrf_token')?.toString() ?? ""
+      const csrfToken = Cookies.get('XSRF-TOKEN')?.toString() ?? "";
       const response = await fetch(`${API_BASE}/calenders/my`, {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -132,9 +131,22 @@ export default function MyPage() {
     alert('ロゴがクリックされました');
   };
 
-  const onCalendarClick = (name: string) => {
-    router.push('/dashboard/' + name);
-  };
+  // ...existing code...
+
+const onCalendarClick = (id: string) => {
+  // ★ 修正: [id]/[slug] 構造に対応
+  // calendar.name をエンコードして slug として使用
+  const calendar = calendars.find(cal => cal.id.toString() === id);
+  if (calendar) {
+    const encodedName = encodeURIComponent(calendar.name);
+    router.push(`/dashboard/${id}/${encodedName}`);
+  } else {
+    // フォールバック: calendar が見つからない場合はデフォルト名を使用
+    router.push(`/dashboard/${id}/calendar`);
+  }
+};
+
+// ...existing code...
 
   const handleAddCalendar = () => {
     setIsTeamAddModalOpen(true);
@@ -149,7 +161,7 @@ export default function MyPage() {
     if (!API_BASE) return;
 
     try {
-      const csrfToken = Cookies.get('csrf_token')?.toString() ?? "";
+      const csrfToken = Cookies.get('XSRF-TOKEN')?.toString() ?? "";
       // バックエンドのユーザー更新APIエンドポイントを呼び出す (例: PUT /users/me)
       const response = await fetch(`${API_BASE}/users/me`, {
         method: 'PATCH', // ★ 修正: 'PUT'から'PATCH'に変更
@@ -159,6 +171,7 @@ export default function MyPage() {
           'X-CSRF-Token': csrfToken,
         },
         body: JSON.stringify(newStatus),
+        credentials: 'include',
       });
 
       if (!response.ok) {
@@ -192,7 +205,7 @@ export default function MyPage() {
     setIsCreatingCalendar(true);
 
     try {
-      const csrfToken = Cookies.get('csrf_token')?.toString() ?? ""
+      const csrfToken = Cookies.get('XSRF-TOKEN')?.toString() ?? "";
       const response = await fetch(`${API_BASE}/calenders/create`, {
         method: 'POST',
         headers: {
@@ -201,6 +214,7 @@ export default function MyPage() {
           'X-CSRF-Token': csrfToken,
         },
         body: JSON.stringify({ name: newCalendar.calendarName }),
+        credentials: 'include',
       });
 
       if (!response.ok) {
@@ -218,6 +232,7 @@ export default function MyPage() {
           'X-CSRF-Token': csrfToken,
         },
         body: JSON.stringify({ name: newCalendar.calendarName }),
+        credentials: 'include',
       });
 
       if (!join_response.ok) {
@@ -239,6 +254,11 @@ export default function MyPage() {
     }
   };
 
+  // リクエスト前にこれを追加してデバッグ
+  console.log('🔍 デバッグ情報:');
+  // console.log('  - Access Token:', localStorage.getItem('access_token') ? '設定済み' : '未設定');
+  console.log('  - API Base:', API_BASE);
+  console.log('  - csrf Token:', Cookies.get('XSRF-TOKEN') ? '設定済み' : '未設定');
   return (
     <div className="flex flex-col h-screen bg-gray-100">
       <MyPageHeader
@@ -260,7 +280,7 @@ export default function MyPage() {
             {calendars.map((calendar) => (
               <Button
                 key={calendar.id}
-                onClick={() => onCalendarClick(calendar.name)}
+                onClick={() => onCalendarClick(calendar.id.toString())}
                 className="p-4 bg-white rounded-lg shadow-md border border-gray-200 text-gray-800 hover:bg-gray-100"
               >
                 <p className="font-semibold">{calendar.name}</p>

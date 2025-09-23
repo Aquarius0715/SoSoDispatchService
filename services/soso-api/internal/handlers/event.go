@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"errors"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -197,7 +199,26 @@ func (h *EventHandler) registerParticipant(c echo.Context, tp model.Type) error 
 	}
 	userID := claims.Subject
 
-	/* ---- 1 行だけ Insert ---- */
+	/* ---- 重複チェック（UX向上。最終整合はDBで担保）---- */
+	exists, err := h.EventParticipantRepo.ExistsByEventAndUser(
+		c.Request().Context(),
+		eventID,
+		userID,
+		tp,
+	)
+	if err != nil {
+		c.Logger().Errorf("ExistsByEventAndUser failed: %v", err)
+		return echo.NewHTTPError(http.StatusInternalServerError, "internal error")
+	}
+	if exists {
+		typeStr := "pickup"
+		if tp == model.Return {
+			typeStr = "dropoff"
+		}
+		return echo.NewHTTPError(http.StatusConflict, fmt.Sprintf("already registered for %s", typeStr))
+	}
+
+	/* ---- Insert 本体 ---- */
 	ep := model.EventParticipant{
 		EventID:      eventID,
 		UserID:       userID,
@@ -210,10 +231,27 @@ func (h *EventHandler) registerParticipant(c echo.Context, tp model.Type) error 
 		c.Request().Context(),
 		[]model.EventParticipant{ep},
 	); err != nil {
-		return err
+		// ログ（型と詳細）
+		c.Logger().Errorf("BulkInsert failed: %T: %v", err, err)
+
+		// repository sentinel を使って 409 にマップ
+		if errors.Is(err, repository.ErrDuplicateEntry) {
+			typeStr := "pickup"
+			if tp == model.Return {
+				typeStr = "dropoff"
+			}
+			return echo.NewHTTPError(http.StatusConflict, fmt.Sprintf("already registered for %s", typeStr))
+		}
+
+		// それ以外は 500
+		return echo.NewHTTPError(http.StatusInternalServerError, "internal error")
 	}
+
 	return c.NoContent(http.StatusCreated)
 }
+
+/* ---- DB のユニーク違反をざっくり検知（ドライバ非依存の簡易版） ---- */
+// NOTE: duplicate detection is now handled in repository layer (ErrDuplicateEntry).
 
 /*
 GET /events/:event_id/detail

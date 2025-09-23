@@ -8,6 +8,7 @@ interface Props {
   value?: string | number;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   type?: string; // typeを追加して、inputのタイプを指定できるようにする
+  disabled?: boolean; // 追加: 入力を無効化するためのプロパティ
 }
 
 const Input: React.FC<Props> = (props) => {

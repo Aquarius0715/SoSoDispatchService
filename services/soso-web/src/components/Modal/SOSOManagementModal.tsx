@@ -33,6 +33,8 @@ function SOSOManagementModal({ initialData, className, isOpen, onClose, onSave, 
     if (isOpen) {
       console.log("🟢 SOSOManagementModalがオープンされました。");
       console.log("🟢 initialData:", initialData);
+      console.log("🟢 eventLogs数:", initialData.extendedProps?.eventLogs?.length || 0);
+      console.log("🟢 eventLogsの内容:", initialData.extendedProps?.eventLogs);
     } else {
       console.log("🔴 SOSOManagementModalがクローズされました。");
     }
@@ -86,14 +88,23 @@ function SOSOManagementModal({ initialData, className, isOpen, onClose, onSave, 
 
         {/* イベント詳細情報 */}
         <div className="p-4 bg-gray-50 border-b border-gray-200">
-          <div className="grid grid-cols-2 gap-4 text-sm">
-            <p><strong>開始時間:</strong> {new Date(initialData.start).toLocaleString('ja-JP')}</p>
-            <p><strong>終了時間:</strong> {new Date(initialData.end).toLocaleString('ja-JP')}</p>
-            <p><strong>送り時刻:</strong> {initialData.extendedProps?.dropOffTime || '未設定'}</p>
-            <p><strong>迎え時刻:</strong> {initialData.extendedProps?.pickUpTime || '未設定'}</p>
-            <p><strong>出発地:</strong> {initialData.extendedProps?.departurePoint || '未設定'}</p>
-            <p><strong>目的地:</strong> {initialData.extendedProps?.destinationPoint || '未設定'}</p>
-          </div>
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <p><strong>開始時間:</strong> {new Date(initialData.start).toLocaleString('ja-JP')}</p>
+              <p><strong>終了時間:</strong> {new Date(initialData.end).toLocaleString('ja-JP')}</p>
+              {/* ★ 修正: 送り時刻・迎え時刻も同様にJSTに変換 */}
+              <p><strong>送り時刻:</strong> {
+                initialData.extendedProps?.dropOffTime 
+                  ? new Date(initialData.extendedProps.dropOffTime).toLocaleString('ja-JP')
+                  : '未設定'
+              }</p>
+              <p><strong>迎え時刻:</strong> {
+                initialData.extendedProps?.pickUpTime 
+                  ? new Date(initialData.extendedProps.pickUpTime).toLocaleString('ja-JP')
+                  : '未設定'
+              }</p>
+              <p><strong>出発地:</strong> {initialData.extendedProps?.departurePoint || '未設定'}</p>
+              <p><strong>目的地:</strong> {initialData.extendedProps?.destinationPoint || '未設定'}</p>
+            </div>
         </div>
 
         {/* メイン部分 */}
