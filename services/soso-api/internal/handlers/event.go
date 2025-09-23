@@ -1,8 +1,6 @@
 package handlers
 
 import (
-	"errors"
-	"fmt"
 	"net/http"
 	"time"
 
@@ -35,6 +33,29 @@ type EventCreateRequest struct {
 	SeatsRequiredGo     int       `json:"seatsRequiredGo"       validate:"min=0"`
 	SeatsRequiredReturn int       `json:"seatsRequiredReturn"   validate:"min=0"`
 	ParticipantUserIDs  []string  `json:"participantUserIds"    validate:"dive,required"`
+}
+
+type DriverDTO struct {
+	Username string `json:"username"`
+	Capacity int    `json:"capacity"`
+}
+
+type EventDetailResponse struct {
+	Title                string      `json:"title"`
+	StartTime            time.Time   `json:"startTime"`
+	EndTime              time.Time   `json:"endTime"`
+	Description          string      `json:"description"`
+	OriginLocation       string      `json:"originLocation"`
+	DestinationLocation  string      `json:"destinationLocation"`
+	SeatsRequiredGo      int         `json:"seatsRequiredGo"`
+	SeatsRequiredReturn  int         `json:"seatsRequiredReturn"`
+	RemainingGoSeats     int         `json:"remainingGoSeats"`
+	RemainingReturnSeats int         `json:"remainingReturnSeats"`
+	Participants         []string    `json:"participants"`
+	GoDrivers            []DriverDTO `json:"goDrivers"`
+	ReturnDrivers        []DriverDTO `json:"returnDrivers"`
+	GoCapacityTotal      int         `json:"goCapacityTotal"`
+	ReturnCapacityTotal  int         `json:"returnCapacityTotal"`
 }
 
 func baseEventResponse(ev *model.Event) map[string]any {
@@ -199,26 +220,7 @@ func (h *EventHandler) registerParticipant(c echo.Context, tp model.Type) error 
 	}
 	userID := claims.Subject
 
-	/* ---- 重複チェック（UX向上。最終整合はDBで担保）---- */
-	exists, err := h.EventParticipantRepo.ExistsByEventAndUser(
-		c.Request().Context(),
-		eventID,
-		userID,
-		tp,
-	)
-	if err != nil {
-		c.Logger().Errorf("ExistsByEventAndUser failed: %v", err)
-		return echo.NewHTTPError(http.StatusInternalServerError, "internal error")
-	}
-	if exists {
-		typeStr := "pickup"
-		if tp == model.Return {
-			typeStr = "dropoff"
-		}
-		return echo.NewHTTPError(http.StatusConflict, fmt.Sprintf("already registered for %s", typeStr))
-	}
-
-	/* ---- Insert 本体 ---- */
+	/* ---- 1 行だけ Insert ---- */
 	ep := model.EventParticipant{
 		EventID:      eventID,
 		UserID:       userID,
@@ -231,27 +233,10 @@ func (h *EventHandler) registerParticipant(c echo.Context, tp model.Type) error 
 		c.Request().Context(),
 		[]model.EventParticipant{ep},
 	); err != nil {
-		// ログ（型と詳細）
-		c.Logger().Errorf("BulkInsert failed: %T: %v", err, err)
-
-		// repository sentinel を使って 409 にマップ
-		if errors.Is(err, repository.ErrDuplicateEntry) {
-			typeStr := "pickup"
-			if tp == model.Return {
-				typeStr = "dropoff"
-			}
-			return echo.NewHTTPError(http.StatusConflict, fmt.Sprintf("already registered for %s", typeStr))
-		}
-
-		// それ以外は 500
-		return echo.NewHTTPError(http.StatusInternalServerError, "internal error")
+		return err
 	}
-
 	return c.NoContent(http.StatusCreated)
 }
-
-/* ---- DB のユニーク違反をざっくり検知（ドライバ非依存の簡易版） ---- */
-// NOTE: duplicate detection is now handled in repository layer (ErrDuplicateEntry).
 
 /*
 GET /events/:event_id/detail
@@ -289,9 +274,11 @@ func (h *EventHandler) Detail(c echo.Context) error {
 	}
 
 	var (
-		userNames    []string
-		goCapSum     int
-		returnCapSum int
+		userNames     []string
+		goCapSum      int
+		returnCapSum  int
+		goDrivers     []DriverDTO
+		returnDrivers []DriverDTO
 	)
 	for _, inf := range infos {
 		switch inf.Type {
@@ -299,26 +286,34 @@ func (h *EventHandler) Detail(c echo.Context) error {
 			userNames = append(userNames, inf.UserName)
 		case model.Go:
 			goCapSum += inf.Capacity
+			goDrivers = append(goDrivers, DriverDTO{Username: inf.UserName, Capacity: inf.Capacity})
 		case model.Return:
 			returnCapSum += inf.Capacity
+			returnDrivers = append(returnDrivers, DriverDTO{Username: inf.UserName, Capacity: inf.Capacity})
 		}
 	}
 
 	remainGo := max(ev.SeatsRequiredGo-goCapSum, 0)
 	remainReturn := max(ev.SeatsRequiredReturn-returnCapSum, 0)
 
-	resp := map[string]any{
-		"title":                ev.Title,
-		"startTime":            ev.StartTime,
-		"description":          ev.Description,
-		"originLocation":       ev.OriginLocation,
-		"destinationLocation":  ev.DestinationLocation,
-		"seatsRequiredGo":      ev.SeatsRequiredGo,
-		"seatsRequiredReturn":  ev.SeatsRequiredReturn,
-		"remainingGoSeats":     remainGo,
-		"remainingReturnSeats": remainReturn,
-		"participants":         userNames,
+	resp := EventDetailResponse{
+		Title:                ev.Title,
+		StartTime:            ev.StartTime,
+		EndTime:              ev.EndTime,
+		Description:          ev.Description,
+		OriginLocation:       ev.OriginLocation,
+		DestinationLocation:  ev.DestinationLocation,
+		SeatsRequiredGo:      ev.SeatsRequiredGo,
+		SeatsRequiredReturn:  ev.SeatsRequiredReturn,
+		RemainingGoSeats:     remainGo,
+		RemainingReturnSeats: remainReturn,
+		Participants:         userNames,
+		GoDrivers:            goDrivers,
+		ReturnDrivers:        returnDrivers,
+		GoCapacityTotal:      goCapSum,
+		ReturnCapacityTotal:  returnCapSum,
 	}
+
 	return c.JSON(http.StatusOK, resp)
 }
 
