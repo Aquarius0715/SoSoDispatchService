@@ -3,7 +3,7 @@ import clsx from 'clsx';
 
 interface DropdownProps {
   trigger: ReactNode;  // ドロップダウンを開くボタンなど
-  children: ReactNode; // ドロップダウンの中身
+  children: (onClose: () => void) => ReactNode;
   className?: string; // オプションで追加のクラス名
 }
 
@@ -54,7 +54,7 @@ const Dropdown: FC<DropdownProps> = ({ trigger, children, className }) => {
         >
           {/* `py-1` は上下の余白 */}
           <div className="py-1 text-black">
-            {children}
+            {children(() => setIsOpen(false))}
           </div>
         </div>
       )}

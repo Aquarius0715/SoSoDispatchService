@@ -99,11 +99,20 @@ const StatusEditModal: FC<StatusEditModalProps> = ({
           <div>
             <label className="block text-sm font-medium text-black mb-1">最大乗車可能人数（運転手を除く）</label>
             <Dropdown trigger={dropdownTrigger} className="text-black">
-              {capacityOptions.map(num => (
-                <div key={num} className="px-4 py-2 text-black hover:bg-gray-100 cursor-pointer text-center" onClick={() => setCapacity(num)}>
-                  {num}人
-                </div>
-              ))}
+              {onClose => (
+                capacityOptions.map(num => (
+                   <div
+                   key={num}
+                   className="px-4 py-2 text-black hover:bg-gray-100 cursor-pointer text-center"
+                   onClick={() => {
+                    setCapacity(num);
+                    onClose();
+                   }}
+                   >
+                    {num}人
+                   </div>
+                ))
+              )}
             </Dropdown>
           </div>
         </div>
