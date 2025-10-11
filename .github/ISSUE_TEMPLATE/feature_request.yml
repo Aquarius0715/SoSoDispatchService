@@ -1,0 +1,33 @@
+name: "✨ 機能提案"
+description: 新機能や改善の提案
+title: "[Feat] 短い要約"
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: 解決したい課題
+      placeholder: どんなユーザーが何に困っているか
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: 提案内容
+      placeholder: 具体的な挙動、UI、API案
+      render: markdown
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: 受け入れ基準（Acceptance Criteria）
+      placeholder: "例) ○○ページで□□ができる / E2Eテストが通る"
+  - type: checkboxes
+    id: impact
+    attributes:
+      label: 影響範囲
+      options:
+        - label: API 変更を含む（互換性影響あり）
+        - label: DB Migration が必要
+        - label: ドキュメント更新が必要

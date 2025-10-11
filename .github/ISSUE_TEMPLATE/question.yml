@@ -1,0 +1,15 @@
+name: "❓ 質問 / 相談"
+description: 仕様・設計・使い方などの質問
+title: "[Q] 短い要約"
+labels: ["question"]
+body:
+  - type: textarea
+    id: context
+    attributes:
+      label: 背景
+  - type: textarea
+    id: question
+    attributes:
+      label: 質問内容
+    validations:
+      required: true

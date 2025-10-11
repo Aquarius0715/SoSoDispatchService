@@ -1,0 +1,22 @@
+name: "🧰 タスク / 雑務"
+description: 小規模作業（リファクタ、CI設定、依存更新 など）
+title: "[Task] 短い要約"
+labels: ["chore"]
+body:
+  - type: textarea
+    id: goal
+    attributes:
+      label: 目的
+    validations:
+      required: true
+  - type: textarea
+    id: todo
+    attributes:
+      label: ToDo
+      placeholder: "- [ ] A\n- [ ] B\n- [ ] C"
+      render: markdown
+  - type: textarea
+    id: risk
+    attributes:
+      label: リスク / ロールバック
+      placeholder: 想定される不具合や戻し方

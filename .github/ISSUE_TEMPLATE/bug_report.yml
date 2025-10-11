@@ -1,0 +1,73 @@
+name: "🐛 バグ報告"
+description: 再現手順と期待値を含むバグ報告
+title: "[Bug] 短い要約"
+labels: ["bug", "triage"]
+body:
+  - type: checkboxes
+    id: precheck
+    attributes:
+      label: 事前確認
+      options:
+        - label: 既存の Issue/PR を検索した
+          required: true
+        - label: 最小再現手順（MRE）を用意した
+          required: false
+  - type: textarea
+    id: summary
+    attributes:
+      label: 概要
+      placeholder: 何が起きたかを1〜3行で
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: 再現手順
+      description: 1. ... 2. ... の形式で具体的に
+      placeholder: |
+        1. ページXを開く
+        2. ボタンYをクリック
+        3. エラーZが出る
+      render: markdown
+    validations:
+      required: true
+  - type: input
+    id: expected
+    attributes:
+      label: 期待される動作
+    validations:
+      required: true
+  - type: input
+    id: actual
+    attributes:
+      label: 実際の動作
+    validations:
+      required: true
+  - type: dropdown
+    id: severity
+    attributes:
+      label: 影響度
+      options:
+        - blocker
+        - critical
+        - major
+        - minor
+        - trivial
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: 影響バージョン / ブランチ
+      placeholder: "v0.5.0 / develop"
+  - type: textarea
+    id: env
+    attributes:
+      label: 環境
+      description: OS/ブラウザ/デバイス、API/DBのバージョンなど
+      placeholder: "macOS 14 / Chrome 120, API v0.5.0, MySQL 8.0"
+  - type: textarea
+    id: logs
+    attributes:
+      label: ログ / スクリーンショット
+      render: markdown
