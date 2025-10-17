@@ -27,7 +27,6 @@ function MemberListCard({ member, onEditClick, className, children }: Props) {
       <div>
         <p className='text-md text-gray-800'>{member.username}</p>
         <p className='text-sm text-gray-600'>車: {member.hasCar ? `あり(${member.seatsRequired}人)` : 'なし'}</p>
-        <p className='text-sm text-gray-600'>SOSOポイント: {member.sosoPoint}pt</p>
         {children}
       </div>
       <Button 
