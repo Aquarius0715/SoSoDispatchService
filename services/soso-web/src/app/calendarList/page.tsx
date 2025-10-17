@@ -134,14 +134,12 @@ export default function MyPage() {
   // ...existing code...
 
 const onCalendarClick = (id: string) => {
-  // ★ 修正: [id]/[slug] 構造に対応
-  // calendar.name をエンコードして slug として使用
-  const calendar = calendars.find(cal => cal.id.toString() === id);
+  // [id]/[name] 2セグメントルートに遷移
+  const calendar = calendars.find((cal) => cal.id.toString() === id);
   if (calendar) {
     const encodedName = encodeURIComponent(calendar.name);
     router.push(`/dashboard/${id}/${encodedName}`);
   } else {
-    // フォールバック: calendar が見つからない場合はデフォルト名を使用
     router.push(`/dashboard/${id}/calendar`);
   }
 };

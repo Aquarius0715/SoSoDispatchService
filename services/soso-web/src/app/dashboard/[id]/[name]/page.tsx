@@ -11,7 +11,7 @@ import { CalendarReservationProvider, useCalendarReservation } from '@/src/conte
 import { Reservation } from '@/src/types';
 
 function CalendarInner() {
-  const { name } = useParams() as { name: string };
+  const { name } = useParams() as { id: string; name: string };
   const { reservations, members, createReservation, updateReservation, deleteReservation } = useCalendarReservation();
 
   const events: EventInput[] = useMemo(() =>
@@ -110,8 +110,8 @@ function CalendarInner() {
   );
 }
 
-export default function DashboardNamePage() {
-  const { name } = useParams() as { name: string };
+export default function DashboardIdNamePage() {
+  const { name } = useParams() as { id: string; name: string };
   return (
     <CalendarReservationProvider name={name}>
       <CalendarInner />
