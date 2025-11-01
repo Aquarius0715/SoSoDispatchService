@@ -6,7 +6,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     <SidebarProvider className="flex-row-reverse">
       <AppSidebar />
       <main>
-        <SidebarTrigger />
+        <SidebarTrigger/>
         {children}
       </main>
     </SidebarProvider>
