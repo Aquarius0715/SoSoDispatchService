@@ -3,7 +3,7 @@ import { AppSidebar } from "@/components/app-sidebar"
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <SidebarProvider>
+    <SidebarProvider className="flex-row-reverse">
       <AppSidebar />
       <main>
         <SidebarTrigger />
