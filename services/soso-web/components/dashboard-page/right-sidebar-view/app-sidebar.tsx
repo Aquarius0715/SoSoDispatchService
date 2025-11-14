@@ -2,11 +2,22 @@
 
 import * as React from "react"
 import { Sidebar, SidebarHeader, SidebarContent } from "@/components/ui/sidebar"
-import { PointChangeCard } from "@/components/PointChangecard"
+import { PointChangeCard } from "@/components/dashboard-page/right-sidebar-view/PointChangecard"
 import { Button } from "@/components/ui/button"
 
+type PointChange = {
+  // id: string
+  title: string
+  dateTime: string
+  changer: string
+  changee: string
+  pointText: string
+  pointTextColor: string
+  reason: string
+}
+
 export function AppSidebar(): React.ReactElement {
-  const pointChanges = [
+  const pointChanges: PointChange[] = [
     {
       title: "新歓コンパ",
       dateTime: "2024/04/15 22:00",
