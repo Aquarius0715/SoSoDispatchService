@@ -1,13 +1,9 @@
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
-import { AppSidebar } from "@/components/dashboard-page/right-sidebar-view/app-sidebar"
-export default function Layout({ children }: { children: React.ReactNode }) {
-  return (
-    <SidebarProvider className="flex-row-reverse">
-      <AppSidebar />
-      <main>
-        <SidebarTrigger/>
-        {children}
-      </main>
-    </SidebarProvider>
-  )
+import RightSidebarView from "@/components/dashboard-page/right-sidebar-view/right-sidebar-view"
+
+export default function Page() {
+    return (
+    <RightSidebarView>
+        <div></div>
+    </RightSidebarView>
+    )
 }
