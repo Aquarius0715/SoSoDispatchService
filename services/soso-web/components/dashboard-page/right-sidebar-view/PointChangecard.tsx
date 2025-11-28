@@ -1,5 +1,5 @@
 "use client"
-
+// services/soso-web/components/dashboard-page/right-sidebar-view/PointChangecard.tsx
 import * as React from "react"
 import { cn } from "@/lib/utils"
 import {
@@ -20,6 +20,8 @@ type PointChangeCardProps = {
     pointTextColor: string
     reason: string
     className?: string
+    // 追加: クリックイベントを受け取る定義
+    onClick?: () => void
 }
 
 export function PointChangeCard({
@@ -31,9 +33,13 @@ export function PointChangeCard({
     pointTextColor,
     reason,
     className,
+    onClick, // 受け取る
   }: PointChangeCardProps): React.ReactElement {
     return (
-      <Card className={cn("bg-gray-50 shadow-sm p-0 gap-0", className)}>
+      <Card 
+        className={cn("bg-gray-50 shadow-sm p-0 gap-0", className)}
+        onClick={onClick} // ここでセット
+      >
         <CardHeader className="px-3 pt-3 pb-1 gap-1">
           <div className="flex items-center justify-between">
             <CardTitle className="text-sm font-semibold text-gray-800">
@@ -58,14 +64,3 @@ export function PointChangeCard({
       </Card>
     );
   }
-  
-  // 使用例（参考：実際のコードでは削除/コメントアウトしてください）
-  // <PointChangeCard
-  //   title="新歓コンパ"
-  //   dateTime="2024/04/15 22:00"
-  //   changer="佐藤花子"
-  //   changee="田中太郎"
-  //   pointText="-1pt"
-  //   pointTextColor="text-red-600"
-  //   reason="みんなの分のタクシーを手配してくれた"
-  // />

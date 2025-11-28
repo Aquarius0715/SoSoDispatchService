@@ -1,12 +1,12 @@
 "use client"
-
+// services/soso-web/components/dashboard-page/right-sidebar-view/app-sidebar.tsx
 import * as React from "react"
 import { Sidebar, SidebarHeader, SidebarContent } from "@/components/ui/sidebar"
 import { PointChangeCard } from "@/components/dashboard-page/right-sidebar-view/PointChangecard"
 import { Button } from "@/components/ui/button"
 
-type PointChange = {
-  // id: string
+// 親で定義した型と同じ定義、もしくはインポートして使用
+type PointChangeData = {
   title: string
   dateTime: string
   changer: string
@@ -16,8 +16,13 @@ type PointChange = {
   reason: string
 }
 
-export function AppSidebar(): React.ReactElement {
-  const pointChanges: PointChange[] = [
+// Propsの定義：親から関数を受け取る
+type AppSidebarProps = {
+  onCardClick: (data: PointChangeData) => void;
+}
+
+export function AppSidebar({ onCardClick }: AppSidebarProps): React.ReactElement {
+  const pointChanges: PointChangeData[] = [
     {
       title: "新歓コンパ",
       dateTime: "2024/04/15 22:00",
@@ -65,15 +70,14 @@ export function AppSidebar(): React.ReactElement {
       
       <SidebarContent className="p-4 space-y-4">
         {pointChanges.map((change, index) => (
+          // ここでクリックイベントをハンドリング
+          // PointChangeCard自体にonClickを渡す実装にします（後述）
           <PointChangeCard
             key={index}
-            title={change.title}
-            dateTime={change.dateTime}
-            changer={change.changer}
-            changee={change.changee}
-            pointText={change.pointText}
-            pointTextColor={change.pointTextColor}
-            reason={change.reason}
+            {...change}
+            // クリックされたら、そのデータを引数にして親の関数を実行
+            onClick={() => onCardClick(change)}
+            className="cursor-pointer hover:bg-gray-100 transition-colors" // クリックできることを視覚的に伝える
           />
         ))}
       </SidebarContent>

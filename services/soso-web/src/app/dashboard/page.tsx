@@ -1,9 +1,12 @@
+// src/app/dashboard/page.tsx
+
 import RightSidebarView from "@/components/dashboard-page/right-sidebar-view/right-sidebar-view"
 
 export default function Page() {
     return (
-    <RightSidebarView>
-        <div></div>
-    </RightSidebarView>
+      // ここには title や reason は不要です！
+      <RightSidebarView>
+          <div></div>
+      </RightSidebarView>
     )
 }
