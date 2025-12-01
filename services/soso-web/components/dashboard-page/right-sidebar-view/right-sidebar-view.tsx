@@ -19,13 +19,14 @@ export type PointChangeCardProps = {
 
 export default function RightSidebarView({ children }: { children: React.ReactNode }) {
   const [selectedCardData, setSelectedCardData] = useState<PointChangeCardProps | null>(null);
+  // useStateは、「①現在の値(null)」 と 「②値を更新するための関数」 の2つが入った配列を返す．左辺は分割代入
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   // 子コンポーネント(AppSidebar)に渡す関数
   // データを受け取ってモーダルを開く処理
-  const handleCardClick = (data: PointChangeCardProps) => {
-    setSelectedCardData(data);
-    setIsModalOpen(true);
+  const handleCardClick = (data: PointChangeCardProps) => { // 型定義されたdataを受け取る
+    setSelectedCardData(data); // 受け取ったデータをselectedCardDataに代入
+    setIsModalOpen(true); // isModalOpenをtrueに変更
   };
 
   return (

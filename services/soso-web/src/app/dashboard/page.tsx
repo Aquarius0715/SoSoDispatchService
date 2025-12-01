@@ -6,7 +6,7 @@ export default function Page() {
     return (
       // ここには title や reason は不要です！
       <RightSidebarView>
-          <div></div>
+          <h1 className="text-2xl font-bold mb-4">ダッシュボード</h1>
       </RightSidebarView>
     )
 }
