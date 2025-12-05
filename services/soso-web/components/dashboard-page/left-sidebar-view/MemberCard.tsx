@@ -12,6 +12,11 @@ type Props = {
   member: Member;
 };
 
+// 先頭でインポート
+import { Button } from "@/components/ui/button"
+
+// 中略…
+
 export function MemberCard({ member }: Props) {
   return (
     <div className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs shadow-sm">
@@ -35,6 +40,16 @@ export function MemberCard({ member }: Props) {
         </div>
         <div>SOSOポイント: {member.point}pt</div>
       </div>
+
+      <div className="mt-2">
+        <Button
+          variant="outline"
+          size="sm"
+          className="w-full shadow-none hover:shadow-md transition-shadow"
+        >
+          このメンバーを選択
+        </Button>
+      </div>
     </div>
-  );
+  )
 }
