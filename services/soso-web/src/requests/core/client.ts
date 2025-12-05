@@ -55,10 +55,14 @@ apiClient.interceptors.request.use(
     const isMutating = ["POST", "PUT", "PATCH", "DELETE"].includes(method);
 
     // CSRF: 書き込み系のときは Cookie を確実にセットしておく
+    // 書き込み系 or _csrf 指定ありなら CSRF トークンを必ずヘッダーに付与
     const needCsrf = cfg._csrf ?? isMutating;
     if (needCsrf) {
-      await ensureCsrfToken();
-      // axios が xsrfCookieName/xsrfHeaderName を見て自動でヘッダを付与する
+      const token = await ensureCsrfToken(); // cookie を確保しつつ、トークン文字列を受け取る
+      cfg.headers = {
+        ...(cfg.headers ?? {}),
+        "X-CSRF-Token": token, // ← 明示的に付与（クロスオリジンでも確実）
+      } as any;
     }
 
     // AccessToken: _auth=true のときだけ Authorization を付与
