@@ -1,45 +1,41 @@
 // src/requests/userAPI.ts
-import { createEndpoint } from "./core/endpoint";
+import { apiClient } from "./core/client";
 
-/**
- * RegisterRequest (OpenAPI より)
- * - username:    string
- * - mailAddress: string (email)
- * - password:    string
- * - hasCar:      boolean
- * - capacity:    number (0 以上, 任意)
- */
+// --- Types ---
+// 必要に応じて定義を追加してください
+export interface User {
+  id: string;
+  username: string;
+  mailAddress: string;
+  hasCar: boolean;
+  capacity: number;
+}
+
 export interface RegisterUserRequest {
   username: string;
   mailAddress: string;
   password: string;
   hasCar: boolean;
-  capacity?: number; // hasCar=false のときは 0 or 未指定でよさそう
-}
-
-/**
- * User (OpenAPI より)
- */
-export interface User {
-  id: string;          // uuid
-  username: string;
-  mailAddress: string;
-  hasCar: boolean;
   capacity: number;
-  createdAt: string;   // date-time
-  updatedAt: string;   // date-time
+}
+
+// --- API Functions ---
+
+/**
+ * ユーザー登録
+ */
+export async function registerUser(input: RegisterUserRequest): Promise<User> {
+  // _auth: false (デフォルト), POSTなのでCSRFトークンは自動付与
+  const res = await apiClient.post<User>("/users/signup", input); 
+  // ※エンドポイントパス(/users/signup)はバックエンドに合わせて調整してください
+  return res as unknown as User;
 }
 
 /**
- * POST /users/register
- * - CSRF 必須
- * - 認証は不要
+ * 自分の情報を取得
  */
-export const registerUser = createEndpoint<RegisterUserRequest, User>(
-  "POST",
-  "/users/register",
-  {
-    auth: false,
-    csrf: true,
-  },
-);
+export async function getMe(): Promise<User> {
+  // _auth: true でアクセストークン付与
+  const res = await apiClient.get<User>("/users/me", { _auth: true } as any);
+  return res as unknown as User;
+}
