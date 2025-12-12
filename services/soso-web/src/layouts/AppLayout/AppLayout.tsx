@@ -6,7 +6,7 @@ import { SnackbarProvider } from "@/components/ui/snackbar";
 
 const inter = Inter({ subsets: ["latin"] });
 
-export function RootLayout({ children }: PropsWithChildren) {
+export function AppLayout({ children }: PropsWithChildren) {
   return (
     <body className={inter.className}>
       <SnackbarProvider>{children}</SnackbarProvider>

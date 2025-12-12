@@ -1,5 +1,6 @@
 // src/requests/authAPI.ts
 import { createEndpoint } from "./core/endpoint";
+import Cookies from "js-cookie";
 import {
   setAccessToken,
   clearAccessToken,
@@ -81,6 +82,19 @@ export const postLogoutRaw = createEndpoint<void, void>(
   },
 );
 
+/**
+ *　CSRFトークン取得 (GET /auth/csrf)
+ * - 認証不要
+ * - サーバーが Set-Cookie で XSRF-TOKEN をセットすることを期待
+ */
+export const getCsrfTokenRaw = createEndpoint<void, void>(
+  "GET",
+  "/auth/csrf",
+  {
+    auth: false,
+  },
+);
+
 // ==========================
 // フロントで使いやすいラッパー関数
 // ==========================
@@ -124,4 +138,16 @@ export async function logout(): Promise<void> {
   } finally {
     clearAccessToken();
   }
+}
+
+/**
+ * ★CSRFトークンを取得して返す関数
+ * lib/api.ts の fetchCsrfToken をここに移植
+ */
+export async function fetchCsrfToken(): Promise<string> {
+  await getCsrfTokenRaw(undefined as void);
+
+  const csrfToken = Cookies.get("XSRF-TOKEN")?.toString() ?? "";
+  
+  return csrfToken;
 }

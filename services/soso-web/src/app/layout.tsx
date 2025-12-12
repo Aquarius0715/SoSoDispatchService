@@ -2,7 +2,7 @@
 
 import "./globals.css";
 import type { Metadata } from "next";
-import { RootLayout } from "@/layouts/AppLayout/AppLayout"; 
+import { AppLayout } from "@/layouts/AppLayout/AppLayout"; 
 
 export const metadata: Metadata = {
   title: "SOSo",
@@ -16,7 +16,7 @@ export default function AppRouterLayout({
 }) {
   return (
     <html lang="ja">
-      <RootLayout>{children}</RootLayout>
+      <AppLayout>{children}</AppLayout>
     </html>
   );
 }

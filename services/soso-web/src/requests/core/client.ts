@@ -3,8 +3,8 @@ import axios, {
   type AxiosRequestConfig,
   type InternalAxiosRequestConfig,
 } from "axios";
-import { fetchCsrfToken } from "@/lib/csrf";
 import { getAccessToken } from "./tokenStore";
+import { fetchCsrfToken } from "../authAPI";
 
 export type ApiRequestConfig = AxiosRequestConfig & {
   _auth?: boolean;

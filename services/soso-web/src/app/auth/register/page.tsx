@@ -1,8 +1,8 @@
 "use client";
 
 import { AuthLayout } from "@/layouts/AuthLayout/AuthLayout";
-import { useRegisterView } from "@/views/ResisterView/useResisterView";
-import { RegisterView } from "@/views/ResisterView/ResisterView";
+import { useRegisterView } from "@/views/RegisterView/useRegisterView";
+import { RegisterView } from "@/views/RegisterView/RegisterView";
 
 export default function RegisterPage() {
   const viewProps = useRegisterView();
