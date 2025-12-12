@@ -1,16 +1,11 @@
 "use client";
 
 import React from "react";
-import type { UseFormReturn } from "react-hook-form";
-
-import type { RegisterViewValues } from "./schema";
-import type { User } from "@/requests/userAPI";
+import type { UseRegisterViewResult } from "./useRegisterView";
 
 import { CarInfoFields } from "./components/CarInfoInputs";
 import { RegisterButton } from "./components/RegisterButton";
-
 import { Input } from "@/components/ui/input";
-
 import {
   Form,
   FormField,
@@ -20,22 +15,20 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 
-export interface RegisterViewProps {
-  form: UseFormReturn<RegisterViewValues>;
-  onSubmit: (e?: React.BaseSyntheticEvent) => Promise<void>;
-  apiError: string | null;
-  result: User | null;
-}
+// Hookの型定義を再利用
+type RegisterViewProps = UseRegisterViewResult;
 
 export const RegisterView: React.FC<RegisterViewProps> = ({
   form,
   onSubmit,
+  apiError,
 }) => {
   const {
     control,
     formState: { isSubmitting },
   } = form;
 
+  // 動的なフォーム制御のために監視
   const hasCar = form.watch("hasCar");
 
   return (
@@ -47,6 +40,13 @@ export const RegisterView: React.FC<RegisterViewProps> = ({
         <h2 className="mb-2 text-lg font-semibold text-slate-800">
           会員登録
         </h2>
+
+        {/* --- Global Error Message --- */}
+        {apiError && (
+          <div className="rounded-md bg-red-50 p-3 text-sm text-red-600">
+            {apiError}
+          </div>
+        )}
 
         {/* メールアドレス */}
         <FormField
@@ -116,7 +116,9 @@ export const RegisterView: React.FC<RegisterViewProps> = ({
           )}
         />
 
+        {/* 車所有情報のサブコンポーネント */}
         <CarInfoFields control={control} hasCar={hasCar} />
+        
         <RegisterButton isSubmitting={isSubmitting} />
       </form>
     </Form>

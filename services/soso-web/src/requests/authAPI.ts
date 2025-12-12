@@ -1,153 +1,76 @@
 // src/requests/authAPI.ts
-import { createEndpoint } from "./core/endpoint";
-import Cookies from "js-cookie";
-import {
-  setAccessToken,
-  clearAccessToken,
-} from "./core/tokenStore";
+import { client } from "./core/client";
+import { setAccessToken, clearAccessToken } from "./core/tokenStore";
 
-// ==========================
-// 型定義
-// ==========================
+// --- Types ---
 
-/**
- * ログインリクエスト
- * バックエンドの OpenAPI に合わせて mailAddress を使う
- */
 export interface LoginRequest {
   mailAddress: string;
   password: string;
 }
 
-/**
- * バックエンドからの生レスポンス（OpenAPI の TokenResponse）
- * {
- *   "access_token": "...",
- *   "access_expires_at": "2025-11-28T12:34:56Z"
- * }
- */
+// バックエンドのレスポンス型 (Snake Case)
 export interface TokenResponse {
   access_token: string;
   access_expires_at: string;
 }
 
-/**
- * フロントで使う整形済みの型（キャメルケース）
- */
+// フロントエンドの利用型 (Camel Case)
 export interface LoginResult {
   accessToken: string;
   accessExpiresAt: string;
 }
 
-// ==========================
-// Endpoints（生のエンドポイント）
-// ==========================
+// --- API Functions ---
 
 /**
- * ログイン
- * - 認証不要（auth: false）
- * - POST なので CSRF は Axios の interceptor に任せる
+ * ログイン実行
  */
-export const postLoginRaw = createEndpoint<LoginRequest, TokenResponse>(
-  "POST",
-  "/auth/login",
-  {
-    auth: false,
-  },
-);
+export async function login(input: LoginRequest): Promise<LoginResult> {
+  // _auth: false (デフォルト), POSTなので自動で CSRF トークンが付与される
+  const res = await client.post<TokenResponse>("/auth/login", input);
+  
+  // client.interceptors.response で data を返しているので、res は TokenResponse そのもの
+  // ※ TypeScript上は AxiosResponse と推論される場合があるため、キャストが必要な場合あり
+  const data = res as unknown as TokenResponse;
+
+  const result: LoginResult = {
+    accessToken: data.access_token,
+    accessExpiresAt: data.access_expires_at,
+  };
+
+  // メモリに保存
+  setAccessToken(result.accessToken, result.accessExpiresAt);
+
+  return result;
+}
 
 /**
- * リフレッシュ
- * - 認証不要（refreshToken は HttpOnly Cookie）
- * - withCredentials: true なので自動で Cookie が付く
+ * トークンリフレッシュ
  */
-export const postRefreshRaw = createEndpoint<void, TokenResponse>(
-  "POST",
-  "/auth/refresh",
-  {
-    auth: false,
-  },
-);
+export async function refreshAccessToken(): Promise<LoginResult> {
+  // Cookie (RefreshToken) は自動送信される
+  const res = await client.post<TokenResponse>("/auth/refresh");
+  const data = res as unknown as TokenResponse;
+
+  const result: LoginResult = {
+    accessToken: data.access_token,
+    accessExpiresAt: data.access_expires_at,
+  };
+
+  setAccessToken(result.accessToken, result.accessExpiresAt);
+
+  return result;
+}
 
 /**
  * ログアウト
- * - 認証必要（auth: true → AccessToken を付与）
- * - refreshToken は Cookie からサーバ側が消す想定
- */
-export const postLogoutRaw = createEndpoint<void, void>(
-  "POST",
-  "/auth/logout",
-  {
-    auth: true,
-  },
-);
-
-/**
- *　CSRFトークン取得 (GET /auth/csrf)
- * - 認証不要
- * - サーバーが Set-Cookie で XSRF-TOKEN をセットすることを期待
- */
-export const getCsrfTokenRaw = createEndpoint<void, void>(
-  "GET",
-  "/auth/csrf",
-  {
-    auth: false,
-  },
-);
-
-// ==========================
-// フロントで使いやすいラッパー関数
-// ==========================
-
-export async function login(input: LoginRequest): Promise<LoginResult> {
-  const res = await postLoginRaw(input);
-
-  const result: LoginResult = {
-    accessToken: res.access_token,
-    accessExpiresAt: res.access_expires_at,
-  };
-
-  // ★ メモリ上のトークンを更新
-  setAccessToken(result.accessToken, result.accessExpiresAt);
-
-  return result;
-}
-
-export async function refreshAccessToken(): Promise<LoginResult> {
-  const res = await postRefreshRaw(undefined as void);
-
-  const result: LoginResult = {
-    accessToken: res.access_token,
-    accessExpiresAt: res.access_expires_at,
-  };
-
-  // ★ リフレッシュ成功時もメモリ上のトークンを更新
-  setAccessToken(result.accessToken, result.accessExpiresAt);
-
-  return result;
-}
-
-/**
- * ログアウト用の薄いラッパー
- * - サーバ側のセッション / RT Cookie を無効化
- * - フロント側のメモリ上の AT もクリア
  */
 export async function logout(): Promise<void> {
   try {
-    await postLogoutRaw(undefined as void);
+    // _auth: true でアクセストークンを付けてリクエスト
+    await client.post("/auth/logout", {}, { _auth: true } as any);
   } finally {
     clearAccessToken();
   }
-}
-
-/**
- * ★CSRFトークンを取得して返す関数
- * lib/api.ts の fetchCsrfToken をここに移植
- */
-export async function fetchCsrfToken(): Promise<string> {
-  await getCsrfTokenRaw(undefined as void);
-
-  const csrfToken = Cookies.get("XSRF-TOKEN")?.toString() ?? "";
-  
-  return csrfToken;
 }

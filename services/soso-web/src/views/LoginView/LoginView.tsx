@@ -1,16 +1,11 @@
 "use client";
 
 import React from "react";
-import type { UseFormReturn } from "react-hook-form";
-
-import type { LoginViewValues } from "./schema";
-import type { LoginResult } from "@/requests/authAPI";
+import type { UseLoginViewResult } from "./useLoginView";
 
 import { LoginButton } from "./components/LoginButton";
-import { RegisterButton } from "./components/ToRegisterPageButton";
-
+import { RegisterButton } from "./components/RegisterButton";
 import { Input } from "@/components/ui/input";
-
 import {
   Form,
   FormField,
@@ -20,16 +15,14 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 
-export interface LoginViewProps {
-  form: UseFormReturn<LoginViewValues>;
-  onSubmit: (e?: React.BaseSyntheticEvent) => Promise<void>;
-  apiError: string | null;
-  result: LoginResult | null;
-}
+// Hookの戻り値とUIが必要とするPropsを合わせる
+// これにより、Hookの型が変わった時に検知しやすくなります
+type LoginViewProps = UseLoginViewResult;
 
 export const LoginView: React.FC<LoginViewProps> = ({
   form,
   onSubmit,
+  apiError, // 必要であればエラーメッセージをフォーム上部に表示するために使用
 }) => {
   const {
     control,
@@ -46,7 +39,14 @@ export const LoginView: React.FC<LoginViewProps> = ({
           ログイン
         </h2>
 
-        {/* メールアドレス */}
+        {/* --- Global Error Message (Optional) --- */}
+        {apiError && (
+          <div className="rounded-md bg-red-50 p-3 text-sm text-red-600">
+            {apiError}
+          </div>
+        )}
+
+        {/* --- Email Field --- */}
         <FormField
           control={control}
           name="email"
@@ -59,6 +59,7 @@ export const LoginView: React.FC<LoginViewProps> = ({
                 <Input
                   type="email"
                   placeholder="you@example.com"
+                  autoComplete="email"
                   {...field}
                 />
               </FormControl>
@@ -67,7 +68,7 @@ export const LoginView: React.FC<LoginViewProps> = ({
           )}
         />
 
-        {/* パスワード */}
+        {/* --- Password Field --- */}
         <FormField
           control={control}
           name="password"
@@ -77,17 +78,19 @@ export const LoginView: React.FC<LoginViewProps> = ({
                 パスワード
               </FormLabel>
               <FormControl>
-                <Input type="password" {...field} />
+                <Input 
+                  type="password" 
+                  autoComplete="current-password"
+                  {...field} 
+                />
               </FormControl>
               <FormMessage className="text-xs" />
             </FormItem>
           )}
         />
 
-        {/* ログインボタン (抽出) */}
+        {/* --- Actions --- */}
         <LoginButton isSubmitting={isSubmitting} />
-
-        {/* 新規登録ボタン (抽出) */}
         <RegisterButton />
       </form>
     </Form>

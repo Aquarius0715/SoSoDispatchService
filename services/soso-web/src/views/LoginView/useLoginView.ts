@@ -1,157 +1,103 @@
-// src/components/Login/useLoginView.ts
 "use client";
 
-import type React from "react";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, UseFormReturn } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import axios from "axios";
 import { useRouter } from "next/navigation";
+import axios from "axios";
 
 import { loginSchema, type LoginViewValues } from "./schema";
 import { login, type LoginResult } from "@/requests/authAPI";
 import { setAccessToken } from "@/requests/core/tokenStore";
 import { useSnackbar } from "@/components/ui/snackbar";
 
+// --- Types ---
 export interface UseLoginViewResult {
-  form: ReturnType<typeof useForm<LoginViewValues>>;
+  form: UseFormReturn<LoginViewValues>;
   onSubmit: (e?: React.BaseSyntheticEvent) => Promise<void>;
   apiError: string | null;
-  result: LoginResult | null;
 }
 
-// =======================================
-// バックエンドの英語エラーメッセージ → 日本語に変換
-// =======================================
-function mapLoginErrorMessage(backendMessage?: string): string {
-  if (!backendMessage) {
-    return "ログインに失敗しました";
+// --- Helper: エラーハンドリングロジックの分離 ---
+// バックエンドのエラーを解析し、フォームエラー設定またはグローバルエラーメッセージを返す
+const handleLoginError = (
+  error: unknown,
+  form: UseFormReturn<LoginViewValues>
+): string => {
+  if (!axios.isAxiosError(error)) {
+    return "予期せぬエラーが発生しました";
   }
 
-  // ---- AuthHandler で明示的に返しているメッセージ ----
+  const data = error.response?.data as { message?: string } | undefined;
+  const backendMessage = data?.message;
+
+  if (!backendMessage) return "ログインに失敗しました";
+
+  // 1. パスワード/認証不整合
   if (backendMessage === "invalid credentials") {
-    return "メールアドレスまたはパスワードが正しくありません";
+    const msg = "メールアドレスまたはパスワードが正しくありません";
+    form.setError("password", { type: "server", message: msg });
+    return msg; // スナックバー用にも返す
   }
 
-  if (backendMessage === "invalid payload") {
-    return "送信内容が不正です。入力内容を確認してください";
-  }
-
-  if (backendMessage === "missing refresh cookie") {
-    return "ログイン情報が見つかりません。もう一度ログインしてください";
-  }
-
-  if (backendMessage === "invalid refresh token") {
-    return "ログイン情報が無効になりました。もう一度ログインしてください";
-  }
-
-  // ---- go-playground/validator のメッセージをざっくりマッピング ----
-  // 例) Key: 'LoginRequest.MailAddress' Error:Field validation for 'MailAddress' failed on the 'required' tag
+  // 2. バリデーションエラー (Go Playground Validator pattern)
   if (backendMessage.includes("LoginRequest.MailAddress")) {
-    return "メールアドレスの形式が正しくありません";
+    const msg = "メールアドレスの形式が正しくありません";
+    form.setError("email", { type: "server", message: msg });
+    return msg;
   }
 
   if (backendMessage.includes("LoginRequest.Password")) {
-    return "パスワードの形式が正しくありません";
+    const msg = "パスワードの形式が正しくありません";
+    form.setError("password", { type: "server", message: msg });
+    return msg;
   }
 
-  // それ以外は一旦そのまま or 汎用メッセージ
-  return backendMessage || "ログインに失敗しました";
-}
+  // 3. その他サーバーエラーメッセージの翻訳
+  const messageMap: Record<string, string> = {
+    "invalid payload": "送信内容が不正です。入力内容を確認してください",
+    "missing refresh cookie": "ログイン情報が見つかりません。再ログインしてください",
+    "invalid refresh token": "セッションが無効です。再ログインしてください",
+  };
 
-// =======================================
-// メインフック
-// =======================================
+  return messageMap[backendMessage] || "ログインに失敗しました";
+};
+
+// --- Main Hook ---
 export function useLoginView(): UseLoginViewResult {
   const router = useRouter();
   const { showSnackbar } = useSnackbar();
-
   const [apiError, setApiError] = useState<string | null>(null);
-  const [result, setResult] = useState<LoginResult | null>(null);
 
   const form = useForm<LoginViewValues>({
     resolver: zodResolver(loginSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-    },
+    defaultValues: { email: "", password: "" },
   });
 
   const onSubmit = form.handleSubmit(async (values) => {
     setApiError(null);
-    setResult(null);
 
     try {
-      // ---- ログイン API 呼び出し ----
       const res = await login({
         mailAddress: values.email,
         password: values.password,
       });
 
-      setResult(res);
-
-      // ---- AccessToken をメモリに保存（tokenStore）----
+      // 成功処理
       setAccessToken(res.accessToken, res.accessExpiresAt);
-
-      // 成功時のスナックバー（出したければ）
-      // showSnackbar("ログインしました。", "success");
-
-      // ログインしたのでカレンダー一覧へ
+      showSnackbar("ログインしました", "success");
       router.push("/calenderList");
-    } catch (error: unknown) {
-      let message = "ログインに失敗しました";
-      let handledByFieldError = false;
 
-      if (axios.isAxiosError(error)) {
-        const data = error.response?.data as any;
-        const backendMessage: string | undefined =
-          typeof data?.message === "string" ? data.message : undefined;
-
-        const localized = mapLoginErrorMessage(backendMessage);
-        message = localized;
-
-        // ---- フィールド用エラー（フォーム下ではなく各入力欄の下に出す）----
-
-        // 認証失敗 → パスワード欄に出す（メール欄とまとめてもOK）
-        if (backendMessage === "invalid credentials") {
-          form.setError("password", {
-            type: "server",
-            message: localized,
-          });
-          handledByFieldError = true;
-        }
-        // バリデーション系（メールアドレス）
-        else if (backendMessage?.includes("LoginRequest.MailAddress")) {
-          form.setError("email", {
-            type: "server",
-            message: localized,
-          });
-          handledByFieldError = true;
-        }
-        // バリデーション系（パスワード）
-        else if (backendMessage?.includes("LoginRequest.Password")) {
-          form.setError("password", {
-            type: "server",
-            message: localized,
-          });
-          handledByFieldError = true;
-        }
-      }
-
-      // フィールドに乗せられなかったエラーだけフォーム下に表示
-      if (!handledByFieldError) {
-        setApiError(message);
-      }
-
-      // どちらにせよスナックバーには出す
-      showSnackbar(message, "error");
+    } catch (error) {
+      // 失敗処理（詳細はヘルパーに委譲）
+      const errorMessage = handleLoginError(error, form);
+      
+      // フォームエラー(setError)されなかった場合のみ、コンポーネント用のAPIエラー状態を更新
+      // ※ここでは簡易的に「全ての失敗時にスナックバーを出す」方針としています
+      setApiError(errorMessage);
+      showSnackbar(errorMessage, "error");
     }
   });
 
-  return {
-    form,
-    onSubmit,
-    apiError,
-    result,
-  };
+  return { form, onSubmit, apiError };
 }
