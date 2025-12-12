@@ -1,4 +1,4 @@
-// src/components/Login/useLoginForm.ts
+// src/components/Login/useLoginView.ts
 "use client";
 
 import type React from "react";
@@ -8,13 +8,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 
-import { loginSchema, type LoginFormValues } from "./schema";
+import { loginSchema, type LoginViewValues } from "./schema";
 import { login, type LoginResult } from "@/requests/authAPI";
 import { setAccessToken } from "@/requests/core/tokenStore";
 import { useSnackbar } from "@/components/ui/snackbar";
 
-export interface UseLoginFormResult {
-  form: ReturnType<typeof useForm<LoginFormValues>>;
+export interface UseLoginViewResult {
+  form: ReturnType<typeof useForm<LoginViewValues>>;
   onSubmit: (e?: React.BaseSyntheticEvent) => Promise<void>;
   apiError: string | null;
   result: LoginResult | null;
@@ -62,14 +62,14 @@ function mapLoginErrorMessage(backendMessage?: string): string {
 // =======================================
 // メインフック
 // =======================================
-export function useLoginForm(): UseLoginFormResult {
+export function useLoginView(): UseLoginViewResult {
   const router = useRouter();
   const { showSnackbar } = useSnackbar();
 
   const [apiError, setApiError] = useState<string | null>(null);
   const [result, setResult] = useState<LoginResult | null>(null);
 
-  const form = useForm<LoginFormValues>({
+  const form = useForm<LoginViewValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
       email: "",

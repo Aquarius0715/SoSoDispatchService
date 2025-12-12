@@ -1,4 +1,4 @@
-// src/components/Resister/useResisterForm.ts
+// src/components/Resister/useRegisterView.ts
 "use client";
 
 import { useState } from "react";
@@ -7,7 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 
-import { registerSchema, type RegisterFormValues } from "./schema";
+import { registerSchema, type RegisterViewValues } from "./schema";
 import {
   registerUser,
   type User,
@@ -16,8 +16,8 @@ import {
 // スナックバー
 import { useSnackbar } from "@/components/ui/snackbar";
 
-export interface UseRegisterFormResult {
-  form: ReturnType<typeof useForm<RegisterFormValues>>;
+export interface UseRegisterViewResult {
+  form: ReturnType<typeof useForm<RegisterViewValues>>;
   onSubmit: (e?: React.BaseSyntheticEvent) => Promise<void>;
   apiError: string | null;
   result: User | null;
@@ -68,14 +68,14 @@ function mapRegisterErrorMessage(backendMessage?: string): string {
   return backendMessage || "登録に失敗しました";
 }
 
-export function useRegisterForm(): UseRegisterFormResult {
+export function useRegisterView(): UseRegisterViewResult {
   const router = useRouter();
   const { showSnackbar } = useSnackbar();
 
   const [apiError, setApiError] = useState<string | null>(null);
   const [result, setResult] = useState<User | null>(null);
 
-  const form = useForm<RegisterFormValues>({
+  const form = useForm<RegisterViewValues>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
       email: "",

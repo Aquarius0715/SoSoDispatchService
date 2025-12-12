@@ -1,15 +1,15 @@
-// src/components/Login/LoginForm.tsx
 "use client";
 
 import React from "react";
-import Link from "next/link";
 import type { UseFormReturn } from "react-hook-form";
 
-import type { LoginFormValues } from "./schema";
+import type { LoginViewValues } from "./schema";
 import type { LoginResult } from "@/requests/authAPI";
 
+import { LoginButton } from "./components/LoginButton";
+import { RegisterButton } from "./components/ToRegisterPageButton";
+
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 
 import {
   Form,
@@ -20,22 +20,20 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 
-export interface LoginFormProps {
-  form: UseFormReturn<LoginFormValues>;
+export interface LoginViewProps {
+  form: UseFormReturn<LoginViewValues>;
   onSubmit: (e?: React.BaseSyntheticEvent) => Promise<void>;
   apiError: string | null;
   result: LoginResult | null;
 }
 
-export const LoginForm: React.FC<LoginFormProps> = ({
+export const LoginView: React.FC<LoginViewProps> = ({
   form,
   onSubmit,
-  apiError,
-  result,
 }) => {
   const {
     control,
-    formState: { isSubmitting, isSubmitSuccessful },
+    formState: { isSubmitting },
   } = form;
 
   return (
@@ -86,24 +84,11 @@ export const LoginForm: React.FC<LoginFormProps> = ({
           )}
         />
 
-        {/* ログインボタン */}
-        <Button
-          type="submit"
-          disabled={isSubmitting}
-          className="mt-2 w-full"
-        >
-          {isSubmitting ? "送信中..." : "ログイン"}
-        </Button>
+        {/* ログインボタン (抽出) */}
+        <LoginButton isSubmitting={isSubmitting} />
 
-        {/* 新規登録ボタン */}
-        <Button
-          type="button"
-          variant="outline"
-          className="w-full"
-          asChild
-        >
-          <Link href="/resister">新規登録</Link>
-        </Button>
+        {/* 新規登録ボタン (抽出) */}
+        <RegisterButton />
       </form>
     </Form>
   );

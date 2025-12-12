@@ -14,7 +14,7 @@ export async function handleRootRedirect(): Promise<never> {
 
   // 1. RT Cookie が存在しない → ログイン画面へ
   if (!rt) {
-    redirect("/login");
+    redirect("/auth/login");
   }
 
   try {
@@ -29,12 +29,12 @@ export async function handleRootRedirect(): Promise<never> {
 
     // 3. 401/403 など → RT 無効 → /login
     if (!res.ok) {
-      redirect("/login");
+      redirect("/auth/login");
     }
 
     // 4. 有効なら /calenderList へ
     redirect("/calenderList");
   } catch {
-    redirect("/login");
+    redirect("/auth/login");
   }
 }
