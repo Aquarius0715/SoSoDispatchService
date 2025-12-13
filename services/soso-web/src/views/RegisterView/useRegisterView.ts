@@ -113,7 +113,7 @@ export function useRegisterView(): UseRegisterViewResult {
       });
 
       showSnackbar("登録が完了しました。ログインしてください。", "success");
-      router.push("/login");
+      router.push("/auth/login");
       
     } catch (error) {
       const errorMessage = handleRegisterError(error, form);

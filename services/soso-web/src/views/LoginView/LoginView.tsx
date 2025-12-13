@@ -4,7 +4,7 @@ import React from "react";
 import type { UseLoginViewResult } from "./useLoginView";
 
 import { LoginButton } from "./components/LoginButton";
-import { RegisterButton } from "./components/RegisterButton";
+import { GoToRegisterLink } from "./components/GoToRegisterLink";
 import { Input } from "@/components/ui/input";
 import {
   Form,
@@ -91,7 +91,7 @@ export const LoginView: React.FC<LoginViewProps> = ({
 
         {/* --- Actions --- */}
         <LoginButton isSubmitting={isSubmitting} />
-        <RegisterButton />
+        <GoToRegisterLink />
       </form>
     </Form>
   );

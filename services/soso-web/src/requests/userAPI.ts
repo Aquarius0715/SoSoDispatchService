@@ -1,15 +1,7 @@
 // src/requests/userAPI.ts
+import { User } from "@/types/interfaces";
 import { apiClient } from "./core/client";
 
-// --- Types ---
-// 必要に応じて定義を追加してください
-export interface User {
-  id: string;
-  username: string;
-  mailAddress: string;
-  hasCar: boolean;
-  capacity: number;
-}
 
 export interface RegisterUserRequest {
   username: string;
@@ -26,7 +18,7 @@ export interface RegisterUserRequest {
  */
 export async function registerUser(input: RegisterUserRequest): Promise<User> {
   // _auth: false (デフォルト), POSTなのでCSRFトークンは自動付与
-  const res = await apiClient.post<User>("/users/signup", input); 
+  const res = await apiClient.post<User>("/users/register", input); 
   // ※エンドポイントパス(/users/signup)はバックエンドに合わせて調整してください
   return res as unknown as User;
 }
