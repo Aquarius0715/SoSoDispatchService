@@ -26,9 +26,25 @@ export default function DashboardPage() {
   const [events, setEvents] = useState<any[]>([]); // CalendarMainViewに渡す用 (anyは適宜EventInputに修正)
   const [members, setMembers] = useState<Member[]>([]);
   const [logs, setLogs] = useState<SOSOTransaction[]>([]);
+
+  const MOCK_EVENT: EventDetails = {
+    id: 'mock-id-001', // API通信は404になりますがUI確認は可能です
+    title: '【開発用】テスト合宿イベント',
+    date: '2026-01-15',
+    details: 'これはUI確認用のダミーデータです。APIからは取得していません。',
+    dropOffTime: '2026-01-15T09:00:00',
+    pickUpTime: '2026-01-15T18:00:00',
+    dropOffCount: 4,
+    pickUpCount: 4,
+    departurePoint: '大学正門前',
+    destinationPoint: '長岡市合宿センター',
+    members: ['田中太郎', '佐藤花子', '鈴木一郎'],
+    eventURL: 'https://example.com',
+  };
   
   // モーダル制御: 選択されたイベント
-  const [selectedEvent, setSelectedEvent] = useState<EventDetails | null>(null);
+  //const [selectedEvent, setSelectedEvent] = useState<EventDetails | null>(null);
+  const [selectedEvent, setSelectedEvent] = useState<EventDetails | null>(MOCK_EVENT);
 
   // ★ フックの使用 (selectedEvent が null なら内部処理はスキップされる設計)
   const eventDetailLogic = useEventDetail(selectedEvent);
