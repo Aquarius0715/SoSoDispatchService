@@ -1,5 +1,4 @@
 // src/app/dashboard/leftview/page.tsx
-import { MemberSidebar } from "@/components/dashboard-page/left-sidebar-view/MemberSidebar";
 
 export default function LeftViewPage() {
   const members = [
