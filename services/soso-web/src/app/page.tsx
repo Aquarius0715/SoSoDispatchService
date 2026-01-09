@@ -1,4 +1,4 @@
-'use clinent'
+'use client'
 
 export default function Page() {
     const handleCardClick = (cardId: string) => {
