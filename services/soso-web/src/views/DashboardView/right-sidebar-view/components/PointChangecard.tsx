@@ -1,7 +1,7 @@
 "use client"
 // services/soso-web/components/dashboard-page/right-sidebar-view/PointChangecard.tsx
 import * as React from "react"
-import { cn } from "@/lib/utils"
+import { cn } from "@/src/lib/utils"
 import {
     Card,
     CardContent,
@@ -9,7 +9,7 @@ import {
     CardFooter,
     CardHeader,
     CardTitle,
-  } from "@/components/ui/card"
+  } from "@/src/components/ui/card"
 
 type PointChangeCardProps = {
     title: string
