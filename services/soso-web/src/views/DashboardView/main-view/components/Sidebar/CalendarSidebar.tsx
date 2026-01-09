@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Member } from '@/components/MemberList/MenberList';
+import { Member } from '@/views/DashboardView/main-view/components/MemberList/MenberList';
 
 interface CalendarLeftSidebarProps {
   members: Member[];

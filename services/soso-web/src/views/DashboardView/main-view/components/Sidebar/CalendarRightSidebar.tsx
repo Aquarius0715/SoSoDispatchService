@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { SOSOTransaction } from '@/components/SOSOList/SOSOList';
+import { SOSOTransaction } from '@/views/DashboardView/main-view/components/SOSOList/SOSOList';
 
 interface CalendarRightSidebarProps {
   logs: SOSOTransaction[];

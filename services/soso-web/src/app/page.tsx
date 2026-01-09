@@ -5,9 +5,9 @@ import { useRouter, useParams } from 'next/navigation';
 import Cookies from 'js-cookie';
 
 // --- UIコンポーネント (Views) ---
-import CalendarHeader from '@/components/Headers/CalendarHeader';
-import CalendarLeftSidebar from '@/components/Sidebar/CalendarSidebar';
-import CalendarRightSidebar from '@/components/Sidebar/CalendarRightSidebar';
+import CalendarHeader from '@/views/DashboardView/main-view/components/Headers/CalendarHeader';
+import CalendarLeftSidebar from '@/views/DashboardView/main-view/components/Sidebar/CalendarSidebar';
+import CalendarRightSidebar from '@/views/DashboardView/main-view/components/Sidebar/CalendarRightSidebar';
 import CalendarMainView from '@/views/DashboardView/main-view/CalendarMainView'; // カレンダーUI
 import EventDetailView from '@/views/DashboardView/main-view/EventDetailView';   // 詳細モーダルUI
 import EventAddView from '@/views/DashboardView/main-view/EventAddView';         // 新規追加モーダルUI
@@ -18,8 +18,8 @@ import { useEventAdd } from '@/views/DashboardView/main-view/useEventAdd';
 
 // --- 型定義 ---
 import { EventDetails, EventStatus } from '@/types/interfaces';
-import { Member } from '@/components/MemberList/MenberList';
-import { SOSOTransaction } from '@/components/SOSOList/SOSOList';
+import { Member } from '@/views/DashboardView/main-view/components/MemberList/MenberList';
+import { SOSOTransaction } from '@/views/DashboardView/main-view/components/SOSOList/SOSOList';
 import { EventInput } from '@fullcalendar/core';
 
 // APIベースURL
