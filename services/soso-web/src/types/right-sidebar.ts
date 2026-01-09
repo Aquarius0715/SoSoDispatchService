@@ -1,7 +1,7 @@
 // right-sidebar関連の型定義
 
 // ポイント変更データの型定義
-export type PointChangeData = {
+export interface PointChangeData {
   title: string
   dateTime: string
   changer: string
@@ -12,18 +12,18 @@ export type PointChangeData = {
 }
 
 // ポイント変更カードのProps型定義
-export type PointChangeCardProps = PointChangeData & {
+export interface PointChangeCardProps extends PointChangeData {
   className?: string
   onClick?: () => void
 }
 
 // AppSidebarのProps型定義
-export type AppSidebarProps = {
+export interface AppSidebarProps {
   onCardClick: (data: PointChangeData) => void
 }
 
 // ModalのProps型定義
-export type ModalProps = {
+export interface ModalProps {
   onClose: () => void
   title: string
   reason: string
