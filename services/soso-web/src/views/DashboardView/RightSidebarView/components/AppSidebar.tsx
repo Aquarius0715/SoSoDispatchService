@@ -2,9 +2,9 @@
 // services/soso-web/components/dashboard-page/right-sidebar-view/app-sidebar.tsx
 import * as React from "react"
 import { Sidebar, SidebarHeader, SidebarContent } from "@/components/ui/sidebar"
-import { PointChangeCard } from "@/views/DashboardView/right-sidebar-view/components/PointChangecard"
+import { PointChangeCard } from "./PointChangeCard"
 import { Button } from "@/components/ui/button"
-import { AppSidebarProps, PointChangeData } from "@/types/right-sidebar"
+import { AppSidebarProps, PointChangeData } from "@/types/rightsidebar"
 
 export function AppSidebar({ onCardClick }: AppSidebarProps): React.ReactElement {
   const pointChanges: PointChangeData[] = [

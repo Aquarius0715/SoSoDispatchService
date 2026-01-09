@@ -1,11 +1,13 @@
+"use client"
 // src/app/dashboard/page.tsx
 
-import RightSidebarView from "@/views/DashboardView/right-sidebar-view/components/right-sidebar-view"
+import RightSidebarView from "@/views/DashboardView/RightSidebarView/components/RightSidebarView"
 export default function Page() {
     return (
-      // ここには title や reason は不要です！
       <RightSidebarView>
-          <></>
+        <div className="p-8">
+          <h1 className="text-2xl font-bold">ダッシュボード</h1>
+        </div>
       </RightSidebarView>
     )
 }

@@ -1,6 +1,7 @@
+"use client"
 import React from 'react';
 // 型定義のインポート（パスは実際の場所に合わせる）
-import { ModalProps } from "@/types/right-sidebar";
+import { ModalProps } from "@/types/rightsidebar";
 
 // shadcnのDialogコンポーネントをインポート
 import {
