@@ -1,11 +1,6 @@
 import React from 'react';
 // services/soso-web/components/dashboard-page/right-sidebar-view/modal.tsx
-// 1. 親から受け取るデータの型を定義します
-type ModalProps = {
-  onClose: () => void;
-  title: string;
-  reason: string;
-};
+import { ModalProps } from "@/types/right-sidebar";
 
 export default function Modal({ onClose, title, reason }: ModalProps) {
   return (

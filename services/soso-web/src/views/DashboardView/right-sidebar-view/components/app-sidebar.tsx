@@ -4,22 +4,7 @@ import * as React from "react"
 import { Sidebar, SidebarHeader, SidebarContent } from "@/components/ui/sidebar"
 import { PointChangeCard } from "@/views/DashboardView/right-sidebar-view/components/PointChangecard"
 import { Button } from "@/components/ui/button"
-
-// 親で定義した型と同じ定義、もしくはインポートして使用
-type PointChangeData = {
-  title: string
-  dateTime: string
-  changer: string
-  changee: string
-  pointText: string
-  pointTextColor: string
-  reason: string
-}
-
-// Propsの定義：親から関数を受け取る
-type AppSidebarProps = {
-  onCardClick: (data: PointChangeData) => void;
-}
+import { AppSidebarProps, PointChangeData } from "@/types/right-sidebar"
 
 export function AppSidebar({ onCardClick }: AppSidebarProps): React.ReactElement {
   const pointChanges: PointChangeData[] = [

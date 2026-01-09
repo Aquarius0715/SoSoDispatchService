@@ -4,18 +4,7 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { AppSidebar } from "./app-sidebar"
 import Modal from "./modal"
 import { useState } from "react"
-
-// データ型を定義（別ファイルで共有するのがベストですが、ここでは便宜上定義します）
-export type PointChangeCardProps = {
-    title: string
-    dateTime: string
-    changer: string
-    changee: string
-    pointText: string
-    pointTextColor: string
-    reason: string
-    className?: string
-}
+import { PointChangeCardProps } from "@/types/right-sidebar"
 
 export default function RightSidebarView({ children }: { children: React.ReactNode }) {
   const [selectedCardData, setSelectedCardData] = useState<PointChangeCardProps | null>(null);

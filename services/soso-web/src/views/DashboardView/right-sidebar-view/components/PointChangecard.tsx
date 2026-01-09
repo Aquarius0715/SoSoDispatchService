@@ -10,19 +10,7 @@ import {
     CardHeader,
     CardTitle,
   } from "@/components/ui/card"
-
-type PointChangeCardProps = {
-    title: string
-    dateTime: string
-    changer: string
-    changee: string
-    pointText: string
-    pointTextColor: string
-    reason: string
-    className?: string
-    // 追加: クリックイベントを受け取る定義
-    onClick?: () => void
-}
+import { PointChangeCardProps } from "@/types/right-sidebar"
 
 export function PointChangeCard({
     title,
