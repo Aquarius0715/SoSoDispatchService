@@ -2,7 +2,7 @@
 // services/soso-web/components/dashboard-page/right-sidebar-view/app-sidebar.tsx
 import * as React from "react"
 import { Sidebar, SidebarHeader, SidebarContent } from "@/components/ui/sidebar"
-import { PointChangeCard } from "@/components/dashboard-page/right-sidebar-view/PointChangecard"
+import { PointChangeCard } from "@/views/DashboardView/right-sidebar-view/components/PointChangecard"
 import { Button } from "@/components/ui/button"
 
 // 親で定義した型と同じ定義、もしくはインポートして使用

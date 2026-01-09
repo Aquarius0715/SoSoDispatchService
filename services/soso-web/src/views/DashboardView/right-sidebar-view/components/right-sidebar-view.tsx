@@ -1,7 +1,7 @@
 'use client'
 // services/soso-web/components/dashboard-page/right-sidebar-view/right-sidebar-view.tsx
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
-import { AppSidebar } from "@/components/dashboard-page/right-sidebar-view/app-sidebar"
+import { AppSidebar } from "./app-sidebar"
 import Modal from "./modal"
 import { useState } from "react"
 
