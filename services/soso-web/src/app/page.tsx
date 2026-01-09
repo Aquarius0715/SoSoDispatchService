@@ -2,129 +2,215 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
+import Cookies from 'js-cookie';
 
-// UIコンポーネント
+// --- UIコンポーネント (Views) ---
 import CalendarHeader from '@/components/Headers/CalendarHeader';
 import CalendarLeftSidebar from '@/components/Sidebar/CalendarSidebar';
 import CalendarRightSidebar from '@/components/Sidebar/CalendarRightSidebar';
 import CalendarMainView from '@/views/DashboardView/main-view/CalendarMainView'; // カレンダーUI
 import EventDetailView from '@/views/DashboardView/main-view/EventDetailView';   // 詳細モーダルUI
+import EventAddView from '@/views/DashboardView/main-view/EventAddView';         // 新規追加モーダルUI
 
-// フック・型定義
-import { useEventDetail } from '@/views/DashboardView/main-view/useEventDetail';      // ロジック
-import { EventDetails } from '@/types/interfaces';
+// --- ロジック (Hooks) ---
+import { useEventDetail } from '@/views/DashboardView/main-view/useEventDetail';
+import { useEventAdd } from '@/views/DashboardView/main-view/useEventAdd';
+
+// --- 型定義 ---
+import { EventDetails, EventStatus } from '@/types/interfaces';
 import { Member } from '@/components/MemberList/MenberList';
 import { SOSOTransaction } from '@/components/SOSOList/SOSOList';
+import { EventInput } from '@fullcalendar/core';
 
-// ※ その他のモーダル(EventAddModalなど)も必要に応じてインポートしてください
+// APIベースURL
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || '';
+
+// 新規追加時のデフォルト値
+const DEFAULT_EVENT_STATUS: EventStatus = {
+  date: '',
+  title: '',
+  details: '',
+  dropOffTime: '09:00',
+  pickUpTime: '18:00',
+  dropOffCount: 0,
+  pickUpCount: 0,
+  departurePoint: '',
+  destinationPoint: '',
+  members: [],
+};
 
 export default function DashboardPage() {
   const router = useRouter();
   const { id, slug } = useParams() as { id: string; slug: string };
-  
-  // --- State ---
-  const [events, setEvents] = useState<any[]>([]); // CalendarMainViewに渡す用 (anyは適宜EventInputに修正)
+
+  // --- 1. グローバルState (ページ全体で共有するデータ) ---
+  const [events, setEvents] = useState<EventInput[]>([]);
   const [members, setMembers] = useState<Member[]>([]);
   const [logs, setLogs] = useState<SOSOTransaction[]>([]);
+  const [decodedTitle, setDecodedTitle] = useState<string>('');
 
-  const MOCK_EVENT: EventDetails = {
-    id: 'mock-id-001', // API通信は404になりますがUI確認は可能です
-    title: '【開発用】テスト合宿イベント',
-    date: '2026-01-15',
-    details: 'これはUI確認用のダミーデータです。APIからは取得していません。',
-    dropOffTime: '2026-01-15T09:00:00',
-    pickUpTime: '2026-01-15T18:00:00',
-    dropOffCount: 4,
-    pickUpCount: 4,
-    departurePoint: '大学正門前',
-    destinationPoint: '長岡市合宿センター',
-    members: ['田中太郎', '佐藤花子', '鈴木一郎'],
-    eventURL: 'https://example.com',
-  };
+  // --- 2. モーダル制御用State ---
+  // 詳細モーダル用
+  const [selectedEvent, setSelectedEvent] = useState<EventDetails | null>(null);
   
-  // モーダル制御: 選択されたイベント
-  //const [selectedEvent, setSelectedEvent] = useState<EventDetails | null>(null);
-  const [selectedEvent, setSelectedEvent] = useState<EventDetails | null>(MOCK_EVENT);
+  // 新規追加モーダル用
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [addInitialStatus, setAddInitialStatus] = useState<EventStatus>(DEFAULT_EVENT_STATUS);
 
-  // ★ フックの使用 (selectedEvent が null なら内部処理はスキップされる設計)
+  // --- 3. ロジックフックの呼び出し ---
+  
+  // 詳細モーダルのロジック (selectedEventがnullの時は何もしない)
   const eventDetailLogic = useEventDetail(selectedEvent);
 
-  // --- ハンドラ ---
-  
-  // カレンダーのイベントクリック時の処理
+  // 新規追加モーダルの保存処理
+  const handleSaveNewEvent = async (status: EventStatus) => {
+    console.log("🔵 新規イベント保存:", status);
+    
+    // ここにAPI送信ロジックを実装
+    // (例: fetch(`${API_BASE}/events`, { method: 'POST', body: ... }) )
+    
+    // 成功したらモーダルを閉じてイベントを再取得するなどの処理
+    // setIsAddModalOpen(false); // Hook内でonSave後に閉じるか、ここで閉じるか設計による
+    alert('イベントを作成しました(コンソールを確認してください)');
+    
+    // イベント再取得 (fetchEventsの実装が必要)
+    // await fetchEvents(id);
+  };
+
+  // 新規追加モーダルのロジック
+  const eventAddLogic = useEventAdd(
+    addInitialStatus, 
+    handleSaveNewEvent, 
+    isAddModalOpen
+  );
+
+  // --- 4. イベントハンドラ ---
+
+  // カレンダーの「既存イベント」クリック時
   const handleEventClick = (clickInfo: any) => {
     const event = clickInfo.event;
-    
-    // FullCalendarのイベントオブジェクトを EventDetails 型に変換してセット
-    // (extendedPropsなどに必要なデータが入っている前提)
+    const props = event.extendedProps;
+
+    // FullCalendarのデータを EventDetails 型に変換
     const eventData: EventDetails = {
       id: event.id,
       title: event.title,
-      date: event.startStr,
-      details: event.extendedProps?.details || '',
-      dropOffTime: event.startStr,
-      pickUpTime: event.endStr,
-      dropOffCount: event.extendedProps?.dropOffCount || 0,
-      pickUpCount: event.extendedProps?.pickUpCount || 0,
-      departurePoint: event.extendedProps?.departurePoint || '',
-      destinationPoint: event.extendedProps?.destinationPoint || '',
-      members: event.extendedProps?.members || [],
-      eventURL: event.extendedProps?.eventURL,
-      // ... 他の必要なプロパティ
+      date: event.startStr, // 必要に応じてフォーマット調整
+      details: props?.details || '',
+      dropOffTime: props?.dropOffTime || event.startStr,
+      pickUpTime: props?.pickUpTime || event.endStr,
+      dropOffCount: props?.dropOffCount || 0,
+      pickUpCount: props?.pickUpCount || 0,
+      departurePoint: props?.departurePoint || '',
+      destinationPoint: props?.destinationPoint || '',
+      members: props?.members || [],
+      eventURL: props?.eventURL,
+      dispatchRegistered: props?.dispatchRegistered || [],
     };
 
-    setSelectedEvent(eventData);
+    setSelectedEvent(eventData); // これにより詳細モーダルが開く
   };
 
-  // カレンダーの「+」ボタンクリック時
+  // カレンダーの「＋」ボタンクリック時
   const handleAddEventClick = (e: React.MouseEvent, arg: any) => {
     e.stopPropagation();
-    console.log('日付クリック:', arg.dateStr);
-    // TODO: EventAddModal を開く処理などをここに書く
+    
+    // クリックされた日付を取得
+    const clickedDate = arg.dateStr; // "2026-01-10"
+    console.log("🔵 新規追加クリック:", clickedDate);
+
+    // 初期値をセットしてモーダルを開く
+    setAddInitialStatus({
+      ...DEFAULT_EVENT_STATUS,
+      date: clickedDate,
+      // メンバーリストの初期値として全メンバー名を入れる場合
+      members: members.map(m => m.username), 
+    });
+    setIsAddModalOpen(true);
   };
 
-  // ログアウトなど
-  const handleLogout = () => { /* ... */ };
+  const handleLogout = () => {
+    localStorage.removeItem('access_token');
+    router.push('/');
+  };
 
-  // --- データ取得などのuseEffectは省略 (元のコードから移植してください) ---
-  // useEffect(() => { fetchEvents... }, []);
+  const handleLogoClick = () => {
+    router.push('/calendarList');
+  };
+
+  // --- 5. データ取得 (useEffect) ---
+  useEffect(() => {
+    if (slug) setDecodedTitle(decodeURIComponent(slug));
+  }, [slug]);
+
+  // ★ ここに fetchEvents や fetchMembers などのデータ取得ロジックが入ります
+  // (元のコードにあった useEffect をそのまま利用してください)
+  useEffect(() => {
+    // ダミーデータのセット例 (API実装までのつなぎ)
+    if (events.length === 0) {
+      setEvents([
+        { id: '1', title: 'ダミー会議', start: '2026-01-15' }
+      ]);
+      setMembers([
+        { id: '1', name: '田中太郎', hasCar: true, seatsRequired: 4, sosoPoint: 10 },
+        { id: '2', name: '佐藤花子', hasCar: false, seatsRequired: 1, sosoPoint: 5 },
+      ]);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); 
 
 
+  // --- 6. レンダリング ---
   return (
     <div className="flex flex-col h-screen bg-gray-100">
       <CalendarHeader
-        pageTitle={slug ? decodeURIComponent(slug) : 'Dashboard'}
+        pageTitle={decodedTitle}
         onLogout={handleLogout}
-        onClickLogo={() => router.push('/calendarList')}
-        calendarUrl=""
+        onClickLogo={handleLogoClick}
+        calendarUrl={`https://example.com/share/${id}`}
       />
       
       <div className="flex flex-grow overflow-hidden">
-        <CalendarLeftSidebar members={members} className="h-full" />
+        {/* 左サイドバー */}
+        <CalendarLeftSidebar 
+          members={members} 
+          className="h-full" 
+        />
         
-        {/* ▼ カレンダー表示 (Presentation Component) */}
+        {/* メインビュー: カレンダー (View) */}
         <CalendarMainView 
           events={events}
           onEventClick={handleEventClick}
           onAddEventClick={handleAddEventClick}
         />
 
-        <CalendarRightSidebar logs={logs} className="h-full" />
+        {/* 右サイドバー */}
+        <CalendarRightSidebar 
+          logs={logs} 
+          className="h-full" 
+        />
       </div>
 
-      {/* ▼ イベント詳細モーダル (Presentation Component) */}
+      {/* --- モーダル領域 --- */}
+
+      {/* 1. イベント詳細モーダル (View + Hook) */}
       {selectedEvent && (
         <EventDetailView
-          // 1. 親(Page)が制御するProps
           onClose={() => setSelectedEvent(null)}
           eventData={selectedEvent}
-          
-          // 2. フックから返ってきたロジック系Propsをすべて渡す
-          {...eventDetailLogic}
+          {...eventDetailLogic} // Hookから返されたロジック・状態を全て渡す
         />
       )}
 
-      {/* その他のモーダル (AddModalなど) */}
+      {/* 2. イベント追加モーダル (View + Hook) */}
+      {isAddModalOpen && (
+        <EventAddView 
+          isOpen={isAddModalOpen}
+          onClose={() => setIsAddModalOpen(false)}
+          {...eventAddLogic} // Hookから返されたフォーム状態・ハンドラを全て渡す
+        />
+      )}
+
     </div>
   );
 }
