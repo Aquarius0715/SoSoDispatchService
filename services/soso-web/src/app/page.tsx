@@ -3,8 +3,8 @@
 
 // レフトビューの表示確認用に一時的にコメントアウト
 // import { handleRootRedirect } from "@/lib/server/rootRedirect";
-import { MemberSidebar } from "@/components/dashboard-page/left-sidebar-view/MemberSidebar";
-import type { Member } from "@/components/dashboard-page/left-sidebar-view/MemberCard";
+import { MemberSidebar } from "@/views/DashboardView/LeftSidebarView/components/MemberSidebar";
+import type { Member } from "@/views/DashboardView/LeftSidebarView/components/MemberCard";
 
 // export const dynamic = "force-dynamic"; // 毎回評価させる
 

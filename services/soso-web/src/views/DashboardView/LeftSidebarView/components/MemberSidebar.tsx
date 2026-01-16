@@ -1,5 +1,6 @@
-// components/dashboard-page/left-sidebar-view/member-sidebar.tsx
-import { MemberCard, Member } from "./MemberCard";
+import { MemberCard } from "./MemberCard";
+import { Member } from "./MemberCard";
+
 
 type Props = {
   members: Member[];
