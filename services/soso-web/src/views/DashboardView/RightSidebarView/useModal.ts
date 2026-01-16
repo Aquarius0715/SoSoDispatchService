@@ -1,5 +1,13 @@
 import { useCallback } from "react";
 
 export function useModal(onClose: () => void) {
-    const
+    const handleOpenChange = useCallback((open: boolean) => {
+        if (!open) {
+            onClose();
+        }
+    }, [onClose]);
+
+    return {
+        handleOpenChange,
+    }
 }

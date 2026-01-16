@@ -1,6 +1,6 @@
 "use client"
 import React from 'react';
-// 型定義のインポート（パスは実際の場所に合わせる）
+import { useModal } from '../useModal';
 import { ModalProps } from "@/types/rightsidebar";
 
 // shadcnのDialogコンポーネントをインポート
@@ -13,15 +13,8 @@ import {
 } from "@/components/ui/dialog";
 
 export default function Modal({ onClose, title, reason }: ModalProps) {
-  // モーダルの開閉状態が変わった時の処理
-
-  // フックスを使ってください
-  // Modal.tsなど
-  const handleOpenChange = (open: boolean) => {
-    if (!open) {
-      onClose();
-    }
-  };
+  // カスタムフックの使用
+  const { handleOpenChange } = useModal(onClose);
 
   return (
     // open={true} で強制的に開き、onOpenChange で閉じる動作を検知します
