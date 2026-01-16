@@ -2,10 +2,11 @@
 
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { logout } from "@/requests/authAPI";
+import { useAuthActions } from "@/contexts/AuthContext";
 
 export default function LogoutButton() {
   const router = useRouter();
+  const { logout } = useAuthActions();
 
   const onLogout = async () => {
     await logout();

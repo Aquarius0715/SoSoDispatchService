@@ -10,6 +10,7 @@ import { loginSchema, type LoginViewValues } from "./schema";
 import { login, type LoginResult } from "@/requests/authAPI";
 import { setAccessToken } from "@/requests/core/tokenStore";
 import { useSnackbar } from "@/components/ui/snackbar";
+import { useAuthActions } from "@/contexts/AuthContext";
 
 // --- Types ---
 export interface UseLoginViewResult {
@@ -66,6 +67,7 @@ const handleLoginError = (
 // --- Main Hook ---
 export function useLoginView(): UseLoginViewResult {
   const router = useRouter();
+  const { fetchMe } = useAuthActions();
   const { showSnackbar } = useSnackbar();
   const [apiError, setApiError] = useState<string | null>(null);
 
@@ -82,6 +84,8 @@ export function useLoginView(): UseLoginViewResult {
         mailAddress: values.email,
         password: values.password,
       });
+
+      await fetchMe();
 
       // 成功処理
       setAccessToken(res.accessToken, res.accessExpiresAt);
