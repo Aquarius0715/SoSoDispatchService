@@ -108,7 +108,7 @@ func SetupRouter(cfg *Config) *echo.Echo {
 	authG := e.Group("/auth", csrfMW)
 	authG.POST("/login", authH.Login)
 	authG.POST("/refresh", authH.Refresh)
-	authG.POST("/logout", authH.Logout, echojwt.WithConfig(jwtCfg))
+	authG.POST("/logout", authH.Logout)
 
 	// /users 公開
 	usersG := e.Group("/users", csrfMW)

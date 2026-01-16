@@ -86,7 +86,7 @@ export function useLoginView(): UseLoginViewResult {
       // 成功処理
       setAccessToken(res.accessToken, res.accessExpiresAt);
       showSnackbar("ログインしました", "success");
-      router.push("/calenderList");
+      router.push("/calenders");
 
     } catch (error) {
       // 失敗処理（詳細はヘルパーに委譲）
