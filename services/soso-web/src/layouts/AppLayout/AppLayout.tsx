@@ -1,15 +1,7 @@
-// src/layouts/RootLayout/RootLayout.tsx
-
+// src/layouts/AppLayout/AppLayout.tsx
 import { PropsWithChildren } from "react";
-import { Inter } from "next/font/google";
-import { SnackbarProvider } from "@/components/ui/snackbar"; 
-
-const inter = Inter({ subsets: ["latin"] });
+import { SnackbarProvider } from "@/components/ui/snackbar";
 
 export function AppLayout({ children }: PropsWithChildren) {
-  return (
-    <body className={inter.className}>
-      <SnackbarProvider>{children}</SnackbarProvider>
-    </body>
-  );
+  return <SnackbarProvider>{children}</SnackbarProvider>;
 }

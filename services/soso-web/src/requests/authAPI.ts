@@ -49,7 +49,7 @@ export async function refreshAccessToken(): Promise<LoginResult> {
 export async function logout(): Promise<void> {
   try {
     // _auth: true オプションを使用
-    await apiClient.post("/auth/logout", {}, { _auth: true } as any);
+    await apiClient.post("/auth/logout");
   } finally {
     clearAccessToken();
   }

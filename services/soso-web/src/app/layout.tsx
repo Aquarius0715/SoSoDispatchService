@@ -1,8 +1,10 @@
 // src/app/layout.tsx
-
 import "./globals.css";
 import type { Metadata } from "next";
-import { AppLayout } from "@/layouts/AppLayout/AppLayout"; 
+import { Inter } from "next/font/google";
+import { AppLayout } from "@/layouts/AppLayout/AppLayout";
+
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "SOSo",
@@ -16,7 +18,9 @@ export default function AppRouterLayout({
 }) {
   return (
     <html lang="ja">
-      <AppLayout>{children}</AppLayout>
+      <body className={inter.className}>
+        <AppLayout>{children}</AppLayout>
+      </body>
     </html>
   );
 }
