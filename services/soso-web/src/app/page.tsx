@@ -1,13 +1,12 @@
-'use client'
+// src/app/page.tsx
+import { handleRootRedirect } from "@/lib/server/rootRedirect";
 
-export default function Page() {
-    const handleCardClick = (cardId: string) => {
-        console.log('Card clicked:', cardId);
-        // カードクリック時の処理をここに実装
-    };
+export const dynamic = "force-dynamic"; // 毎回評価させる
 
-    return (
-      <div>Hi</div>
+export default async function RootPage() {
+  // 認証状態に応じて /login または /calenderList に飛ばす
+  await handleRootRedirect();
 
-    )
+  // redirect() は例外として投げられるので、ここには基本到達しない
+  return null;
 }
