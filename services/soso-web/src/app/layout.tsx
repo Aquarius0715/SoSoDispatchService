@@ -1,5 +1,6 @@
 import "./globals.css";
 import type { Metadata } from "next";
+import { SnackbarProvider } from "@/components/ui/snackbar";
 
 export const metadata: Metadata = {
   title: "SOSO",
@@ -13,7 +14,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ja">
-      <body>{children}</body>
+      <body>
+        <SnackbarProvider>{children}</SnackbarProvider>
+      </body>
     </html>
   );
 }
