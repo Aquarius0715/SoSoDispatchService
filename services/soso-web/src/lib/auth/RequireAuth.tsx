@@ -1,14 +1,14 @@
 "use client";
 
 import { PropsWithChildren } from "react";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuthState } from "@/contexts/AuthContext";
 
-type RequireAuthProps = PropsWithChildren & {
+type Props = PropsWithChildren & {
   fallback?: React.ReactNode;
 };
 
-export function RequireAuth({ children, fallback = null }: RequireAuthProps) {
-  const { user, isLoading } = useAuth();
+export function RequireAuth({ children, fallback = null }: Props) {
+  const { user, isLoading } = useAuthState();
 
   if (isLoading) return <>{fallback}</>;
   if (!user) return null;
