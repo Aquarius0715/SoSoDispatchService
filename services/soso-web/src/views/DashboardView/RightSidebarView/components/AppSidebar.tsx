@@ -59,7 +59,7 @@ export function AppSidebar({ onCardClick }: AppSidebarProps): React.ReactElement
           // PointChangeCard自体にonClickを渡す実装にします（後述）
           <PointChangeCard
             key={index}
-            {...change}
+            pointChangeData={ change }
             // クリックされたら、そのデータを引数にして親の関数を実行
             onClick={() => onCardClick(change)}
             className="cursor-pointer hover:bg-gray-100 transition-colors" // クリックできることを視覚的に伝える

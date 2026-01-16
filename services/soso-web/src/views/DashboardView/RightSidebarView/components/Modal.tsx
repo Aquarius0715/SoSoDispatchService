@@ -14,6 +14,9 @@ import {
 
 export default function Modal({ onClose, title, reason }: ModalProps) {
   // モーダルの開閉状態が変わった時の処理
+
+  // フックスを使ってください
+  // Modal.tsなど
   const handleOpenChange = (open: boolean) => {
     if (!open) {
       onClose();

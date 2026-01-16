@@ -4,23 +4,31 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { AppSidebar } from "./AppSidebar"
 import Modal from "./Modal"
 import { useState } from "react"
-import { PointChangeCardProps } from "@/types/rightsidebar"
+import { PointChangeData } from "@/types/rightsidebar"
 
 export default function RightSidebarView({ children }: { children: React.ReactNode }) {
-  const [selectedCardData, setSelectedCardData] = useState<PointChangeCardProps | null>(null);
-  // useStateは、「①現在の値(null)」 と 「②値を更新するための関数」 の2つが入った配列を返す．左辺は分割代入
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  // 選択されたカードのデータを保持する
+  // null = 何も選択されてない = モーダルが閉じている
+  // データあり = そのデータでモーダルが開いている状態
+  const [selectedCardData, setSelectedCardData] = useState<PointChangeData | null>(null);
+ 
 
-  // 子コンポーネント(AppSidebar)に渡す関数
-  // データを受け取ってモーダルを開く処理
-  const handleCardClick = (data: PointChangeCardProps) => { // 型定義されたdataを受け取る
+  // イベントハンドラ（開く処理）
+  // handleCardClick関数はAppSidebarで実行される
+  const handleCardClick = (data: PointChangeData) => { // 型定義されたdataを受け取る
     setSelectedCardData(data); // 受け取ったデータをselectedCardDataに代入
-    setIsModalOpen(true); // isModalOpenをtrueに変更
   };
+
+  // 背景クリック，，閉じる処理のとき
+  // nullに戻してモーダルを非表示にする
+  const handleCloseModal = () =>  {
+    setSelectedCardData(null);
+  }
+ 
 
   return (
     <SidebarProvider className="flex-row-reverse">
-      {/* バケツリレー：関数をPropsとして渡す */}
+      {/* バケツリレー：関数をPropsとして渡す，コールバック関数の受け渡し */}
       <AppSidebar onCardClick={handleCardClick} />
       
       <main>
@@ -29,11 +37,11 @@ export default function RightSidebarView({ children }: { children: React.ReactNo
       </main>
 
       {/* モーダル表示制御はここ（親）で行う */}
-      {isModalOpen && selectedCardData && (
+      {selectedCardData && (
         <Modal 
           title={selectedCardData.title}
           reason={selectedCardData.reason}
-          onClose={() => setIsModalOpen(false)} 
+          onClose={handleCloseModal} 
         />
       )}
     </SidebarProvider>

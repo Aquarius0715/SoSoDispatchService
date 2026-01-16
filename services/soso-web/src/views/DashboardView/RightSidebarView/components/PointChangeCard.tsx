@@ -13,13 +13,15 @@ import {
 import { PointChangeCardProps } from "@/types/rightsidebar"
 
 export function PointChangeCard({
-    title,
-    dateTime,
-    changer,
-    changee,
-    pointText,
-    pointTextColor,
-    reason,
+    pointChangeData: {
+      title,
+      dateTime,
+      changer,
+      changee,
+      pointText,
+      pointTextColor,
+      reason,
+    },
     className,
     onClick, // 受け取る
   }: PointChangeCardProps): React.ReactElement {

@@ -12,9 +12,11 @@ export interface PointChangeData {
 }
 
 // ポイント変更カードのProps型定義
-export interface PointChangeCardProps extends PointChangeData {
+// extends使わないで
+export interface PointChangeCardProps {
   className?: string
   onClick?: () => void
+  pointChangeData : PointChangeData
 }
 
 // AppSidebarのProps型定義
