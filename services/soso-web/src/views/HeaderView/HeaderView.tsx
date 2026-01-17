@@ -1,6 +1,7 @@
 import { Menubar } from "@/components/ui/menubar";
 import { cn } from "@/lib/utils";
 import { AccountMenu } from "./components/AccountMenu";
+import { HeaderLogo } from "./components/HeaderLogo";
 
 export default function HeaderView() {
   return (
@@ -13,14 +14,9 @@ export default function HeaderView() {
           "flex items-center gap-4"
         )}
       >
-        {/* Left */}
         <div className="flex items-center gap-4">
-          <span className="text-2xl font-semibold tracking-tight">
-            SOSo
-          </span>
+          <HeaderLogo />
         </div>
-
-        {/* Right */}
         <div className="ml-auto flex items-center gap-4">
           <AccountMenu />
         </div>
