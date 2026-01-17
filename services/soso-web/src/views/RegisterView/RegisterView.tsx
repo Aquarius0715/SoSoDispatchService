@@ -15,20 +15,19 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 
-// Hookの型定義を再利用
 type RegisterViewProps = UseRegisterViewResult;
 
 export const RegisterView: React.FC<RegisterViewProps> = ({
   form,
   onSubmit,
-  apiError,
 }) => {
   const {
     control,
-    formState: { isSubmitting },
+    formState: { isSubmitting, errors },
   } = form;
 
-  // 動的なフォーム制御のために監視
+  const rootMessage = errors.root?.server?.message;
+
   const hasCar = form.watch("hasCar");
 
   return (
@@ -37,14 +36,11 @@ export const RegisterView: React.FC<RegisterViewProps> = ({
         onSubmit={onSubmit}
         className="mx-auto w-full max-w-md space-y-6 rounded-2xl border border-slate-200 bg-slate-50 px-8 py-10 shadow-sm"
       >
-        <h2 className="mb-2 text-lg font-semibold text-slate-800">
-          会員登録
-        </h2>
+        <h2 className="mb-2 text-lg font-semibold text-slate-800">会員登録</h2>
 
-        {/* --- Global Error Message --- */}
-        {apiError && (
+        {rootMessage && (
           <div className="rounded-md bg-red-50 p-3 text-sm text-red-600">
-            {apiError}
+            {rootMessage}
           </div>
         )}
 
@@ -92,7 +88,7 @@ export const RegisterView: React.FC<RegisterViewProps> = ({
                 パスワード
               </FormLabel>
               <FormControl>
-                <Input type="password" {...field} />
+                <Input type="password" autoComplete="new-password" {...field} />
               </FormControl>
               <FormMessage className="text-xs" />
             </FormItem>
@@ -109,16 +105,15 @@ export const RegisterView: React.FC<RegisterViewProps> = ({
                 パスワード（確認）
               </FormLabel>
               <FormControl>
-                <Input type="password" {...field} />
+                <Input type="password" autoComplete="new-password" {...field} />
               </FormControl>
               <FormMessage className="text-xs" />
             </FormItem>
           )}
         />
 
-        {/* 車所有情報のサブコンポーネント */}
         <CarInfoFields control={control} hasCar={hasCar} />
-        
+
         <RegisterButton isSubmitting={isSubmitting} />
       </form>
     </Form>

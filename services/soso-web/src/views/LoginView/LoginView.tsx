@@ -22,12 +22,15 @@ type LoginViewProps = UseLoginViewResult;
 export const LoginView: React.FC<LoginViewProps> = ({
   form,
   onSubmit,
-  apiError, // 必要であればエラーメッセージをフォーム上部に表示するために使用
 }) => {
   const {
     control,
-    formState: { isSubmitting },
+    formState: { isSubmitting, errors },
   } = form;
+
+  const rootMessage =
+    (errors.root as { message?: string } | undefined)?.message
+    ?? undefined;
 
   return (
     <Form {...form}>
@@ -39,10 +42,9 @@ export const LoginView: React.FC<LoginViewProps> = ({
           ログイン
         </h2>
 
-        {/* --- Global Error Message (Optional) --- */}
-        {apiError && (
+        {rootMessage && (
           <div className="rounded-md bg-red-50 p-3 text-sm text-red-600">
-            {apiError}
+            {rootMessage}
           </div>
         )}
 
