@@ -111,14 +111,16 @@ func (h *UserHandler) Me(c echo.Context) error {
 		"updatedAt":   u.UpdatedAt,
 	})
 }
+
 // ★★★ この構造体の定義を追加してください ★★★
 // ユーザー情報更新リクエストの入力DTO
 type UpdateMeRequest struct {
 	Username    string `json:"username" validate:"required,username"`
 	MailAddress string `json:"mailAddress" validate:"required,mailAddress"`
 	HasCar      bool   `json:"hasCar"`
-	Capacity    int    `json:"capacity" validate:"required,capacity"`
+	Capacity    int    `json:"capacity" validate:"omitempty,capacity"`
 }
+
 // 新しく追加
 func (h *UserHandler) UpdateMe(c echo.Context) error {
 	// --- ステップ1: リクエストのバリデーション ---
@@ -131,6 +133,9 @@ func (h *UserHandler) UpdateMe(c echo.Context) error {
 	}
 	if req.HasCar && req.Capacity <= 0 {
 		return echo.NewHTTPError(http.StatusBadRequest, "capacity required when has_car is true")
+	}
+	if !req.HasCar {
+		req.Capacity = 0
 	}
 
 	// --- ステップ2: ユーザーIDの取得 (Me関数から流用) ---
