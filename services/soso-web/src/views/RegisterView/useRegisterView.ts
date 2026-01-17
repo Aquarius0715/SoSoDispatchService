@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { useForm, UseFormReturn } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
@@ -14,8 +13,15 @@ import { useSnackbar } from "@/components/ui/snackbar";
 export interface UseRegisterViewResult {
   form: UseFormReturn<RegisterViewValues>;
   onSubmit: (e?: React.BaseSyntheticEvent) => Promise<void>;
-  apiError: string | null;
 }
+
+const setRootError = (
+  form: UseFormReturn<RegisterViewValues>,
+  message: string
+) => {
+  form.setError("root.server", { type: "server", message });
+  return message;
+};
 
 // --- Helper: エラーハンドリングロジックの分離 ---
 const handleRegisterError = (
@@ -23,13 +29,13 @@ const handleRegisterError = (
   form: UseFormReturn<RegisterViewValues>
 ): string => {
   if (!axios.isAxiosError(error)) {
-    return "予期せぬエラーが発生しました";
+    return setRootError(form, "予期せぬエラーが発生しました");
   }
 
   const data = error.response?.data as { message?: string } | undefined;
   const backendMessage = data?.message;
 
-  if (!backendMessage) return "登録に失敗しました";
+  if (!backendMessage) return setRootError(form, "登録に失敗しました");
 
   // 1. ユーザー名重複 / バリデーション
   if (
@@ -73,14 +79,13 @@ const handleRegisterError = (
     "invalid payload": "送信内容が不正です。入力内容を確認してください",
   };
 
-  return messageMap[backendMessage] || "登録に失敗しました";
+  return setRootError(form, messageMap[backendMessage] || "登録に失敗しました");
 };
 
 // --- Main Hook ---
 export function useRegisterView(): UseRegisterViewResult {
   const router = useRouter();
   const { showSnackbar } = useSnackbar();
-  const [apiError, setApiError] = useState<string | null>(null);
 
   const form = useForm<RegisterViewValues>({
     resolver: zodResolver(registerSchema),
@@ -95,10 +100,10 @@ export function useRegisterView(): UseRegisterViewResult {
   });
 
   const onSubmit = form.handleSubmit(async (values) => {
-    setApiError(null);
+    // 前回のエラーをクリア（root + fields）
+    form.clearErrors();
 
     try {
-      // 数値型への変換はここで行う
       const capacity =
         values.hasCar && values.maxPassengers
           ? Number(values.maxPassengers)
@@ -114,13 +119,11 @@ export function useRegisterView(): UseRegisterViewResult {
 
       showSnackbar("登録が完了しました。ログインしてください。", "success");
       router.push("/auth/login");
-      
     } catch (error) {
       const errorMessage = handleRegisterError(error, form);
-      setApiError(errorMessage);
       showSnackbar(errorMessage, "error");
     }
   });
 
-  return { form, onSubmit, apiError };
+  return { form, onSubmit };
 }
