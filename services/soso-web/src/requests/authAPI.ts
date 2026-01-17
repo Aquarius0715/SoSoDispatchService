@@ -1,5 +1,5 @@
 // src/requests/authAPI.ts
-import { apiClient } from "./core/client"; // ← ここを修正
+import { apiPost } from "./core/client";
 import { setAccessToken, clearAccessToken } from "./core/tokenStore";
 
 // --- Types ---
@@ -19,10 +19,12 @@ export interface LoginResult {
 }
 
 // --- API Functions ---
+
 export async function login(input: LoginRequest): Promise<LoginResult> {
-  // client -> apiClient に変更
-  const res = await apiClient.post<TokenResponse>("/auth/login", input);
-  const data = res as unknown as TokenResponse;
+  const data = await apiPost<TokenResponse, LoginRequest>(
+    "/auth/login",
+    input
+  );
 
   const result: LoginResult = {
     accessToken: data.access_token,
@@ -34,8 +36,9 @@ export async function login(input: LoginRequest): Promise<LoginResult> {
 }
 
 export async function refreshAccessToken(): Promise<LoginResult> {
-  const res = await apiClient.post<TokenResponse>("/auth/refresh");
-  const data = res as unknown as TokenResponse;
+  const data = await apiPost<TokenResponse>(
+    "/auth/refresh"
+  );
 
   const result: LoginResult = {
     accessToken: data.access_token,
@@ -48,8 +51,7 @@ export async function refreshAccessToken(): Promise<LoginResult> {
 
 export async function logout(): Promise<void> {
   try {
-    // _auth: true オプションを使用
-    await apiClient.post("/auth/logout");
+    await apiPost<void>("/auth/logout");
   } finally {
     clearAccessToken();
   }
