@@ -8,9 +8,10 @@ import React, {
   useMemo,
   useState,
 } from "react";
+import { usePathname } from "next/navigation";
 import type { User } from "@/types/interfaces";
 import { getMe } from "@/requests/userAPI";
-import { refreshAccessToken, logout as apiLogout } from "@/requests/authAPI";
+import { logout as apiLogout } from "@/requests/authAPI";
 
 // --------------------
 // State Context
@@ -26,21 +27,8 @@ const AuthStateContext = createContext<AuthState | null>(null);
 // Actions Context
 // --------------------
 type AuthActions = {
-  /**
-   * access token が既に有効な前提で /users/me を叩いて user を更新する
-   * (ログイン直後に使う想定)
-   */
   fetchMe: () => Promise<User>;
-
-  /**
-   * rt cookie -> /auth/refresh で access token 再発行してから /users/me
-   * (リロード直後に使う想定)
-   */
   reloadMe: () => Promise<User>;
-
-  /**
-   * /auth/logout して tokenStore を消し、user も null にする
-   */
   logout: () => Promise<void>;
 };
 
@@ -50,44 +38,50 @@ const AuthActionsContext = createContext<AuthActions | null>(null);
 // Provider
 // --------------------
 export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // access token がある前提で me を取得
+  // access token が有効（または interceptor により refresh 済み）な前提で me を取得
   const fetchMe = useCallback(async (): Promise<User> => {
-    const me = await getMe();
+    const me = await getMe(); // 401/403なら client.ts interceptor が refresh→retry する
     setUser(me);
     return me;
   }, []);
 
-  // refresh -> me
+  // 「明示的に再取得したい」用途に残す（中身は fetchMe で十分）
   const reloadMe = useCallback(async (): Promise<User> => {
-    await refreshAccessToken(); // authAPI側で setAccessToken 済み
     return await fetchMe();
   }, [fetchMe]);
 
   // logout（API + tokenStoreクリア）-> userクリア
   const logout = useCallback(async () => {
     try {
-      await apiLogout(); // authAPI側で clearAccessToken 済み
+      await apiLogout();
     } finally {
       setUser(null);
     }
   }, []);
 
-  // 初回マウント時に復元を試みる
+  // 初回マウント時：authページでは復元しない（tokenexpired で無限に叩くのを防ぐ）
   useEffect(() => {
+    // /auth 配下（login/register/tokenexpired 等）は何もしない
+    if (pathname.startsWith("/auth")) {
+      setIsLoading(false);
+      return;
+    }
+
     (async () => {
       try {
-        await reloadMe();
+        await fetchMe();
       } catch {
-        // rt が無い / refresh失敗 / me失敗 → 未ログイン扱い
         setUser(null);
       } finally {
         setIsLoading(false);
       }
     })();
-  }, [reloadMe]);
+  }, [pathname, fetchMe]);
 
   const stateValue = useMemo<AuthState>(
     () => ({ user, isLoading }),

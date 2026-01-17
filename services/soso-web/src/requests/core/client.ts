@@ -2,13 +2,12 @@
 import axios, {
   type AxiosRequestConfig,
   type InternalAxiosRequestConfig,
-  type AxiosResponse,
   AxiosHeaders,
 } from "axios";
 import Cookies from "js-cookie";
 import { getAccessToken, clearAccessToken } from "./tokenStore";
 
-// _auth/_csrf を AxiosRequestConfig に追加
+// 型定義
 export type ApiRequestConfig<D = any> = AxiosRequestConfig<D> & {
   _auth?: boolean;
   _csrf?: boolean;
@@ -76,9 +75,8 @@ apiClient.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// ✅ response は標準の AxiosResponse のまま返す
 apiClient.interceptors.response.use(
-  (response: AxiosResponse) => response,
+  (response) => response.data,
   (error) => {
     if (axios.isAxiosError(error) && error.response?.status === 401) {
       clearAccessToken();
@@ -87,14 +85,9 @@ apiClient.interceptors.response.use(
   }
 );
 
-// ===== 型安全な API 関数（ここが「data を返す」）=====
-
-export async function apiGet<T>(
-  url: string,
-  config?: ApiRequestConfig
-): Promise<T> {
-  const res = await apiClient.get<T>(url, config);
-  return res.data;
+// ✅ ここから追加：typed wrapper
+export async function apiGet<T>(url: string, config?: ApiRequestConfig): Promise<T> {
+  return apiClient.get(url, config) as unknown as T;
 }
 
 export async function apiPost<T, D = unknown>(
@@ -102,8 +95,7 @@ export async function apiPost<T, D = unknown>(
   data?: D,
   config?: ApiRequestConfig<D>
 ): Promise<T> {
-  const res = await apiClient.post<T>(url, data, config);
-  return res.data;
+  return apiClient.post(url, data, config) as unknown as T;
 }
 
 export async function apiPut<T, D = unknown>(
@@ -111,8 +103,7 @@ export async function apiPut<T, D = unknown>(
   data?: D,
   config?: ApiRequestConfig<D>
 ): Promise<T> {
-  const res = await apiClient.put<T>(url, data, config);
-  return res.data;
+  return apiClient.put(url, data, config) as unknown as T;
 }
 
 export async function apiPatch<T, D = unknown>(
@@ -120,14 +111,9 @@ export async function apiPatch<T, D = unknown>(
   data?: D,
   config?: ApiRequestConfig<D>
 ): Promise<T> {
-  const res = await apiClient.patch<T>(url, data, config);
-  return res.data;
+  return apiClient.patch(url, data, config) as unknown as T;
 }
 
-export async function apiDelete<T>(
-  url: string,
-  config?: ApiRequestConfig
-): Promise<T> {
-  const res = await apiClient.delete<T>(url, config);
-  return res.data;
+export async function apiDelete<T>(url: string, config?: ApiRequestConfig): Promise<T> {
+  return apiClient.delete(url, config) as unknown as T;
 }
