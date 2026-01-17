@@ -1,9 +1,7 @@
-import { CalendersLayout } from "@/layouts/CalendersLayout/CalendersLayout";
-
 export default function Page() {
   return (
-    <CalendersLayout>
+    <div>
       calenderList
-    </CalendersLayout>
+    </div>
   );
 }
