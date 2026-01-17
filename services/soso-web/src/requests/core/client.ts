@@ -1,4 +1,3 @@
-// src/requests/core/client.ts
 import axios, {
   type AxiosRequestConfig,
   type InternalAxiosRequestConfig,
@@ -6,7 +5,11 @@ import axios, {
   AxiosHeaders,
 } from "axios";
 import Cookies from "js-cookie";
-import { getAccessToken, clearAccessToken } from "./tokenStore";
+import {
+  getAccessToken,
+  setAccessToken,
+  clearAccessToken,
+} from "./tokenStore";
 
 // _auth/_csrf を AxiosRequestConfig に追加
 export type ApiRequestConfig<D = any> = AxiosRequestConfig<D> & {
@@ -17,9 +20,11 @@ export type ApiRequestConfig<D = any> = AxiosRequestConfig<D> & {
 type InternalApiConfig = InternalAxiosRequestConfig & {
   _auth?: boolean;
   _csrf?: boolean;
+  _retry?: boolean; // retry 制御（内部用）
 };
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
+const BASE_URL =
+  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
 
 export const apiClient = axios.create({
   baseURL: BASE_URL,
@@ -27,7 +32,9 @@ export const apiClient = axios.create({
   withCredentials: true,
 });
 
-// ==== CSRFトークン管理 ====
+// ==============================
+// CSRF token
+// ==============================
 let csrfTokenPromise: Promise<string> | null = null;
 
 async function ensureCsrfToken(): Promise<string> {
@@ -50,7 +57,65 @@ async function ensureCsrfToken(): Promise<string> {
   return csrfTokenPromise;
 }
 
-// ==== Interceptors ====
+// ==============================
+// tokenexpired redirect
+// ==============================
+let redirected = false;
+
+function shouldSkipRedirect() {
+  if (typeof window === "undefined") return true;
+  return window.location.pathname.startsWith("/auth");
+}
+
+function redirectToTokenExpiredOnce() {
+  if (typeof window === "undefined") return;
+  if (redirected) return;
+  if (shouldSkipRedirect()) return;
+
+  redirected = true;
+  clearAccessToken();
+
+  const next = window.location.pathname + window.location.search;
+  window.location.assign(
+    `/auth/tokenexpired?next=${encodeURIComponent(next)}`
+  );
+}
+
+// auth系 endpoint は refresh で救わない（ループ源になりやすい）
+function isAuthEndpoint(url?: string): boolean {
+  if (!url) return false;
+  return (
+    url.includes("/auth/login") ||
+    url.includes("/auth/logout") ||
+    url.includes("/auth/csrf") ||
+    url.includes("/auth/refresh")
+  );
+}
+
+// ==============================
+// refresh (bypass apiClient interceptors)
+// ==============================
+type TokenResponse = {
+  access_token: string;
+  access_expires_at: string;
+};
+
+const refreshClient = axios.create({
+  baseURL: BASE_URL,
+  timeout: 10_000,
+  withCredentials: true,
+});
+
+async function refreshOnce(): Promise<void> {
+  const res = await refreshClient.post<TokenResponse>("/auth/refresh");
+  setAccessToken(res.data.access_token, res.data.access_expires_at);
+}
+
+let refreshPromise: Promise<void> | null = null;
+
+// ==============================
+// Interceptors: request
+// ==============================
 apiClient.interceptors.request.use(
   async (config: InternalAxiosRequestConfig) => {
     const cfg = config as InternalApiConfig;
@@ -59,11 +124,13 @@ apiClient.interceptors.request.use(
     const method = (cfg.method ?? "get").toUpperCase();
     const isMutating = ["POST", "PUT", "PATCH", "DELETE"].includes(method);
 
+    // CSRF
     if (isMutating || cfg._csrf) {
       const token = await ensureCsrfToken();
       if (token) cfg.headers.set("X-CSRF-Token", token);
     }
 
+    // Authorization
     if (cfg._auth) {
       const token = getAccessToken();
       if (token) cfg.headers.set("Authorization", `Bearer ${token}`);
@@ -76,19 +143,65 @@ apiClient.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// ✅ response は標準の AxiosResponse のまま返す
+// ==============================
+// Interceptors: response
+// 401/403 -> refresh(1回) -> retry(1回)
+// refresh 失敗 -> tokenexpired
+// ==============================
 apiClient.interceptors.response.use(
   (response: AxiosResponse) => response,
-  (error) => {
-    if (axios.isAxiosError(error) && error.response?.status === 401) {
-      clearAccessToken();
+  async (error) => {
+    if (!axios.isAxiosError(error)) return Promise.reject(error);
+
+    const status = error.response?.status;
+    const cfg = error.config as InternalApiConfig | undefined;
+    if (!cfg) return Promise.reject(error);
+
+    if (status !== 401 && status !== 403) {
+      return Promise.reject(error);
     }
-    return Promise.reject(error);
+
+    // auth系は refresh 対象外（ここで tokenexpired に寄せる）
+    if (isAuthEndpoint(cfg.url)) {
+      // /auth 配下ではリダイレクト抑制してある
+      redirectToTokenExpiredOnce();
+      return Promise.reject(error);
+    }
+
+    // 既にリトライ済み
+    if (cfg._retry) {
+      redirectToTokenExpiredOnce();
+      return Promise.reject(error);
+    }
+
+    cfg._retry = true;
+
+    try {
+      if (!refreshPromise) {
+        refreshPromise = refreshOnce().finally(() => {
+          refreshPromise = null;
+        });
+      }
+      await refreshPromise;
+
+      // refresh 後に token が無いなら retry しても無理
+      const token = getAccessToken();
+      if (!token) {
+        redirectToTokenExpiredOnce();
+        return Promise.reject(error);
+      }
+
+      return apiClient.request(cfg);
+    } catch (e) {
+      redirectToTokenExpiredOnce();
+      return Promise.reject(e);
+    }
   }
 );
 
-// ===== 型安全な API 関数（ここが「data を返す」）=====
-
+// ==============================
+// Typed API helpers (return data)
+// ==============================
 export async function apiGet<T>(
   url: string,
   config?: ApiRequestConfig
