@@ -62,7 +62,6 @@ export const UserStatusInputs: React.FC<Props> = ({
   const hasCarError = formState.errors.hasCar?.message;
   const capacityError = formState.errors.capacity?.message;
 
-  // --- logic (return の外へ) ---
   const normalizeCapacityByHasCar = useCallback(
     (nextHasCar: boolean) => {
       if (!nextHasCar) {
