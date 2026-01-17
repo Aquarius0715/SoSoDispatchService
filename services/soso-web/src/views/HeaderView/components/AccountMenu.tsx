@@ -32,13 +32,6 @@ export function AccountMenu() {
         sideOffset={8}
         className="flex w-44 flex-col gap-1.5 p-2"
         >
-        <Button
-            size="sm"
-            className="h-8 px-2 text-xs"
-            onClick={() => router.push("/settings")}
-        >
-            アカウント設定
-        </Button>
         <LogoutButton />
         </DropdownMenuContent>
     </DropdownMenu>

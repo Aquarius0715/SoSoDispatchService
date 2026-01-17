@@ -118,7 +118,7 @@ export const SnackbarProvider: React.FC<{
       {children}
 
       {/* 右上固定・下方向に積み上がるレイアウト */}
-      <div className="pointer-events-none fixed top-4 right-4 z-50 flex flex-col items-end gap-2">
+      <div className="pointer-events-none fixed top-[72px] right-4 z-50 flex flex-col items-end gap-2">
         {items.map((item) => (
           <SnackbarItemView
             key={item.id}
