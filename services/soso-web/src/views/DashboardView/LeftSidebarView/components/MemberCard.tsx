@@ -1,4 +1,13 @@
 // components/dashboard-page/left-sidebar-view/member-card.tsx
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge" 
 export type Member = {
   id: number;
   name: string;
@@ -12,44 +21,54 @@ type Props = {
   member: Member;
 };
 
-// 先頭でインポート
-import { Button } from "@/components/ui/button"
-
-// 中略…
-
 export function MemberCard({ member }: Props) {
   return (
-    <div className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs shadow-sm">
-      <div className="font-semibold text-slate-800">
-        {member.name}
-        {member.isMe && (
-          <span className="ml-1 text-[10px] font-normal text-slate-500">
-            （あなた）
-          </span>
-        )}
-      </div>
-
-      <div className="mt-1 text-slate-600">
-        <div>
-          車：{member.hasCar ? "あり" : "なし"}
-          {member.hasCar && (
-            <span className="ml-1 text-slate-500">
-              （{member.carCapacity}人）
-            </span>
+    <Card className="shadow-sm">
+      {/* ヘッダー部分：名前と自分ラベル */}
+      <CardHeader className="p-3 pb-1">
+        <CardTitle className="flex items-center justify-between text-sm font-semibold text-slate-800">
+          <span>{member.name}</span>
+          {member.isMe && (
+            <Badge variant="secondary" className="text-[10px] h-5 px-1.5 font-normal">
+              あなた
+            </Badge>
           )}
-        </div>
-        <div>SOSOポイント: {member.point}pt</div>
-      </div>
+        </CardTitle>
+      </CardHeader>
 
-      <div className="mt-2">
+      {/* コンテンツ部分：車情報とポイント */}
+      <CardContent className="p-3 pt-1 text-xs text-slate-600">
+        <div className="flex flex-col gap-1">
+          <div className="flex items-center">
+            <span className="font-medium mr-1">車:</span>
+            {member.hasCar ? (
+              <span>
+                あり
+                <span className="ml-1 text-slate-500">
+                  ({member.carCapacity}人)
+                </span>
+              </span>
+            ) : (
+              "なし"
+            )}
+          </div>
+          <div className="flex items-center">
+             <span className="font-medium mr-1">SOSOポイント:</span>
+             {member.point}pt
+          </div>
+        </div>
+      </CardContent>
+
+      {/* フッター部分：アクションボタン */}
+      <CardFooter className="p-3 pt-0">
         <Button
           variant="outline"
           size="sm"
-          className="w-full shadow-none hover:shadow-md transition-shadow"
+          className="w-full text-xs shadow-none hover:shadow-md transition-shadow h-8"
         >
           このメンバーを選択
         </Button>
-      </div>
-    </div>
+      </CardFooter>
+    </Card>
   )
 }

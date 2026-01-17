@@ -42,6 +42,7 @@ export default function RootPage() {
 
   return (
     <div className="flex h-screen w-full">
+      <Member_Card member={members[0]} />
       <MemberSidebar members={members} />
       <main className="flex-1 rounded-xl bg-white p-4 shadow-sm">
         <h1 className="text-2xl font-semibold text-slate-800">ダッシュボード</h1>
