@@ -1,5 +1,7 @@
 import { MemberCard } from "./MemberCard";
 import { Member } from "./MemberCard";
+import { Sidebar } from "@/components/ui/sidebar";
+
 
 
 
@@ -7,7 +9,7 @@ import { Member } from "./MemberCard";
 type Props = {
   members: Member[];
 };
-
+ 
 export function MemberSidebar({ members }: Props) {
   return (
     <aside className="flex h-full w-72 flex-col gap-4 rounded-xl bg-slate-50 p-4">
