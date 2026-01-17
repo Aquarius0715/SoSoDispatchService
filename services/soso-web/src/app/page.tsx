@@ -3,9 +3,9 @@
 
 // レフトビューの表示確認用に一時的にコメントアウト
 // import { handleRootRedirect } from "@/lib/server/rootRedirect";
-import { MemberSidebar } from "@/views/DashboardView/LeftSidebarView/components/MemberSidebar";
 import type { Member } from "@/views/DashboardView/LeftSidebarView/components/MemberCard";
 import { Member_Sidebar } from "@/views/DashboardView/LeftSidebarView/components/Member_Sidebar";
+import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar";
 // export const dynamic = "force-dynamic"; // 毎回評価させる
 
 export default function RootPage() {
@@ -41,15 +41,18 @@ export default function RootPage() {
   ];
 
   return (
-    <div className="flex h-screen w-full">
+      <SidebarProvider>
       <Member_Sidebar members={members} />
-      <MemberSidebar members={members} />
-      <main className="flex-1 rounded-xl bg-white p-4 shadow-sm">
-        <h1 className="text-2xl font-semibold text-slate-800">ダッシュボード</h1>
-        <p className="mt-4 text-slate-600">
-          レフトビューの表示確認用ページです。レフトサイドバーが正しく表示されているか確認してください。
-        </p>
-      </main>
-    </div>
+      
+      <SidebarInset>
+        <main className="flex-1 rounded-xl bg-white p-4 shadow-sm">
+          <SidebarTrigger />
+          <h1 className="text-2xl font-semibold text-slate-800">ダッシュボード</h1>
+          <p className="mt-4 text-slate-600">
+            レフトビューの表示確認用ページです。レフトサイドバーが正しく表示されているか確認してください。
+          </p>
+        </main>
+      </SidebarInset>
+      </SidebarProvider>
   );
 }
