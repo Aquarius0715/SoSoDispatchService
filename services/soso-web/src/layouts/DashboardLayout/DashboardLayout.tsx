@@ -6,11 +6,11 @@ type Props = PropsWithChildren & {
   calendarName?: string;
 };
 
-export function DashboardLayout({ children, calendarName = "テニスサークル" }: Props) {
+export function DashboardLayout({ children, calendarName }: Props) {
   return (
     <RequireAuth>
       <>
-        <HeaderView calendarName={calendarName} showShare />
+        <HeaderView/>
         <main className="px-4 py-4 md:px-6">{children}</main>
       </>
     </RequireAuth>
