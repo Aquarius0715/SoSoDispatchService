@@ -42,6 +42,7 @@ const handleLoginError = (
   // 1. 認証不整合
   if (backendMessage === "invalid credentials") {
     const msg = "メールアドレスまたはパスワードが正しくありません";
+    form.setError("email", { type: "server" });
     form.setError("password", { type: "server", message: msg });
     return msg;
   }
