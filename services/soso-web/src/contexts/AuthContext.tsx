@@ -9,10 +9,12 @@ import React, {
   useState,
 } from "react";
 import { usePathname } from "next/navigation";
-import { usePathname } from "next/navigation";
 import type { User } from "@/types/interfaces";
 import { getMe } from "@/requests/userAPI";
-import { logout as apiLogout, refreshAccessToken } from "@/requests/authAPI";
+import {
+  logout as apiLogout,
+  refreshAccessToken,
+} from "@/requests/authAPI";
 import { getAccessToken } from "@/requests/core/tokenStore";
 
 // --------------------
@@ -29,8 +31,19 @@ const AuthStateContext = createContext<AuthState | null>(null);
 // Actions Context
 // --------------------
 type AuthActions = {
+  /**
+   * access token が有効（または interceptor により refresh 済み）な前提で /users/me を叩く
+   */
   fetchMe: () => Promise<User>;
+
+  /**
+   * 明示的に「復元」を行う：tokenが無ければ refresh → /users/me
+   */
   reloadMe: () => Promise<User>;
+
+  /**
+   * /auth/logout + ローカル削除
+   */
   logout: () => Promise<void>;
 };
 
@@ -42,25 +55,21 @@ const AuthActionsContext = createContext<AuthActions | null>(null);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
-  const pathname = usePathname();
-
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   // access token が有効（または interceptor により refresh 済み）な前提で me を取得
-  // access token が有効（または interceptor により refresh 済み）な前提で me を取得
   const fetchMe = useCallback(async (): Promise<User> => {
-    const me = await getMe(); // getMe は { _auth: true } 前提で Bearer 付きになる想定
+    const me = await getMe(); // 401なら client.ts interceptor が refresh→retry する想定
     setUser(me);
     return me;
   }, []);
 
-  // 明示的に「復元」する：refresh -> me
+  // 明示的に「復元」：token が無ければ refresh を試してから me
   const reloadMe = useCallback(async (): Promise<User> => {
-    // token が無いときだけ refresh を試す（無駄打ち防止）
-    const token = getAccessToken();
-    if (!token) {
-      await refreshAccessToken(); // 失敗したら throw
+    // token が無いときだけ refresh（無駄打ち防止）
+    if (!getAccessToken()) {
+      await refreshAccessToken(); // 未ログインなら 401 で落ちる（正常）
     }
     return await fetchMe();
   }, [fetchMe]);
@@ -68,12 +77,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = useCallback(async () => {
     try {
       await apiLogout();
-      await apiLogout();
     } finally {
       setUser(null);
     }
   }, []);
 
+  // 初回マウント時：authページでは復元しない（tokenexpired で無限に叩くのを防ぐ）
   useEffect(() => {
     if (pathname.startsWith("/auth")) {
       setIsLoading(false);
@@ -82,7 +91,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     (async () => {
       try {
-        await fetchMe();
+        await reloadMe();
       } catch {
         setUser(null);
       } finally {
