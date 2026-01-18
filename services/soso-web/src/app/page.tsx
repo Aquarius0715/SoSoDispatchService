@@ -4,7 +4,7 @@
 // レフトビューの表示確認用に一時的にコメントアウト
 // import { handleRootRedirect } from "@/lib/server/rootRedirect";
 import type { Member } from "@/views/DashboardView/LeftSidebarView/components/MemberCard";
-import { Member_Sidebar } from "@/views/DashboardView/LeftSidebarView/components/Member_Sidebar";
+import { MemberSidebar } from "@/views/DashboardView/LeftSidebarView/components/MemberSidebar";
 import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar";
 // export const dynamic = "force-dynamic"; // 毎回評価させる
 
@@ -42,7 +42,7 @@ export default function RootPage() {
 
   return (
       <SidebarProvider>
-      <Member_Sidebar members={members} />
+      <MemberSidebar members={members} />
       
       <SidebarInset>
         <main className="flex-1 rounded-xl bg-white p-4 shadow-sm">
