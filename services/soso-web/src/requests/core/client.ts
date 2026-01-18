@@ -10,6 +10,11 @@ import {
   setAccessToken,
   clearAccessToken,
 } from "./tokenStore";
+import {
+  getAccessToken,
+  setAccessToken,
+  clearAccessToken,
+} from "./tokenStore";
 
 // _auth/_csrf を AxiosRequestConfig に追加
 export type ApiRequestConfig<D = any> = AxiosRequestConfig<D> & {
@@ -21,8 +26,11 @@ type InternalApiConfig = InternalAxiosRequestConfig & {
   _auth?: boolean;
   _csrf?: boolean;
   _retry?: boolean; // retry 制御（内部用）
+  _retry?: boolean; // retry 制御（内部用）
 };
 
+const BASE_URL =
+  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
 const BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
 
@@ -32,6 +40,9 @@ export const apiClient = axios.create({
   withCredentials: true,
 });
 
+// ==============================
+// CSRF token
+// ==============================
 // ==============================
 // CSRF token
 // ==============================
@@ -116,6 +127,65 @@ let refreshPromise: Promise<void> | null = null;
 // ==============================
 // Interceptors: request
 // ==============================
+// ==============================
+// tokenexpired redirect
+// ==============================
+let redirected = false;
+
+function shouldSkipRedirect() {
+  if (typeof window === "undefined") return true;
+  return window.location.pathname.startsWith("/auth");
+}
+
+function redirectToTokenExpiredOnce() {
+  if (typeof window === "undefined") return;
+  if (redirected) return;
+  if (shouldSkipRedirect()) return;
+
+  redirected = true;
+  clearAccessToken();
+
+  const next = window.location.pathname + window.location.search;
+  window.location.assign(
+    `/auth/tokenexpired?next=${encodeURIComponent(next)}`
+  );
+}
+
+// auth系 endpoint は refresh で救わない（ループ源になりやすい）
+function isAuthEndpoint(url?: string): boolean {
+  if (!url) return false;
+  return (
+    url.includes("/auth/login") ||
+    url.includes("/auth/logout") ||
+    url.includes("/auth/csrf") ||
+    url.includes("/auth/refresh")
+  );
+}
+
+// ==============================
+// refresh (bypass apiClient interceptors)
+// ==============================
+type TokenResponse = {
+  access_token: string;
+  access_expires_at: string;
+};
+
+const refreshClient = axios.create({
+  baseURL: BASE_URL,
+  timeout: 10_000,
+  withCredentials: true,
+});
+
+async function refreshOnce(): Promise<void> {
+  const res = await refreshClient.post<TokenResponse>("/auth/refresh");
+  setAccessToken(res.data.access_token, res.data.access_expires_at);
+}
+
+let refreshPromise: Promise<void> | null = null;
+
+// ==============================
+// Interceptors: request
+// ==============================
 apiClient.interceptors.request.use(
   async (config: InternalAxiosRequestConfig) => {
     const cfg = config as InternalApiConfig;
@@ -125,11 +195,13 @@ apiClient.interceptors.request.use(
     const isMutating = ["POST", "PUT", "PATCH", "DELETE"].includes(method);
 
     // CSRF
+    // CSRF
     if (isMutating || cfg._csrf) {
       const token = await ensureCsrfToken();
       if (token) cfg.headers.set("X-CSRF-Token", token);
     }
 
+    // Authorization
     // Authorization
     if (cfg._auth) {
       const token = getAccessToken();
@@ -148,6 +220,7 @@ apiClient.interceptors.request.use(
 // 401/403 -> refresh(1回) -> retry(1回)
 // refresh 失敗 -> tokenexpired
 // ==============================
+// Interceptors: response
 apiClient.interceptors.response.use(
   (response: AxiosResponse) => response,
   async (error) => {
@@ -157,18 +230,16 @@ apiClient.interceptors.response.use(
     const cfg = error.config as InternalApiConfig | undefined;
     if (!cfg) return Promise.reject(error);
 
-    if (status !== 401 && status !== 403) {
+    // ★ 401 のみ refresh 対象
+    if (status !== 401) {
       return Promise.reject(error);
     }
 
-    // auth系は refresh 対象外（ここで tokenexpired に寄せる）
     if (isAuthEndpoint(cfg.url)) {
-      // /auth 配下ではリダイレクト抑制してある
       redirectToTokenExpiredOnce();
       return Promise.reject(error);
     }
 
-    // 既にリトライ済み
     if (cfg._retry) {
       redirectToTokenExpiredOnce();
       return Promise.reject(error);
@@ -184,7 +255,6 @@ apiClient.interceptors.response.use(
       }
       await refreshPromise;
 
-      // refresh 後に token が無いなら retry しても無理
       const token = getAccessToken();
       if (!token) {
         redirectToTokenExpiredOnce();
@@ -198,6 +268,8 @@ apiClient.interceptors.response.use(
     }
   }
 );
+
+
 
 // ==============================
 // Typed API helpers (return data)

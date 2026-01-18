@@ -1,6 +1,10 @@
 // src/requests/authAPI.ts
+import axios from "axios";
 import { apiPost } from "./core/client";
 import { setAccessToken, clearAccessToken } from "./core/tokenStore";
+
+const BASE_URL =
+  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
 
 // --- Types ---
 export interface LoginRequest {
@@ -18,13 +22,15 @@ export interface LoginResult {
   accessExpiresAt: string;
 }
 
-// --- API Functions ---
+// refresh は interceptor を通さない（重要）
+const refreshClient = axios.create({
+  baseURL: BASE_URL,
+  timeout: 10_000,
+  withCredentials: true,
+});
 
 export async function login(input: LoginRequest): Promise<LoginResult> {
-  const data = await apiPost<TokenResponse, LoginRequest>(
-    "/auth/login",
-    input
-  );
+  const data = await apiPost<TokenResponse, LoginRequest>("/auth/login", input);
 
   const result: LoginResult = {
     accessToken: data.access_token,
@@ -36,9 +42,8 @@ export async function login(input: LoginRequest): Promise<LoginResult> {
 }
 
 export async function refreshAccessToken(): Promise<LoginResult> {
-  const data = await apiPost<TokenResponse>(
-    "/auth/refresh"
-  );
+  const res = await refreshClient.post<TokenResponse>("/auth/refresh");
+  const data = res.data;
 
   const result: LoginResult = {
     accessToken: data.access_token,

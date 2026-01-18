@@ -9,9 +9,11 @@ import React, {
   useState,
 } from "react";
 import { usePathname } from "next/navigation";
+import { usePathname } from "next/navigation";
 import type { User } from "@/types/interfaces";
 import { getMe } from "@/requests/userAPI";
-import { logout as apiLogout } from "@/requests/authAPI";
+import { logout as apiLogout, refreshAccessToken } from "@/requests/authAPI";
+import { getAccessToken } from "@/requests/core/tokenStore";
 
 // --------------------
 // State Context
@@ -40,33 +42,39 @@ const AuthActionsContext = createContext<AuthActions | null>(null);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
+  const pathname = usePathname();
+
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   // access token が有効（または interceptor により refresh 済み）な前提で me を取得
+  // access token が有効（または interceptor により refresh 済み）な前提で me を取得
   const fetchMe = useCallback(async (): Promise<User> => {
-    const me = await getMe(); // 401/403なら client.ts interceptor が refresh→retry する
+    const me = await getMe(); // getMe は { _auth: true } 前提で Bearer 付きになる想定
     setUser(me);
     return me;
   }, []);
 
-  // 「明示的に再取得したい」用途に残す（中身は fetchMe で十分）
+  // 明示的に「復元」する：refresh -> me
   const reloadMe = useCallback(async (): Promise<User> => {
+    // token が無いときだけ refresh を試す（無駄打ち防止）
+    const token = getAccessToken();
+    if (!token) {
+      await refreshAccessToken(); // 失敗したら throw
+    }
     return await fetchMe();
   }, [fetchMe]);
 
-  // logout（API + tokenStoreクリア）-> userクリア
   const logout = useCallback(async () => {
     try {
+      await apiLogout();
       await apiLogout();
     } finally {
       setUser(null);
     }
   }, []);
 
-  // 初回マウント時：authページでは復元しない（tokenexpired で無限に叩くのを防ぐ）
   useEffect(() => {
-    // /auth 配下（login/register/tokenexpired 等）は何もしない
     if (pathname.startsWith("/auth")) {
       setIsLoading(false);
       return;
@@ -81,7 +89,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setIsLoading(false);
       }
     })();
-  }, [pathname, fetchMe]);
+  }, [pathname, reloadMe]);
 
   const stateValue = useMemo<AuthState>(
     () => ({ user, isLoading }),
