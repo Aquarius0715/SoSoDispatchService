@@ -2,7 +2,7 @@
 import type { ReactNode } from "react";
 import HeaderView from "@/views/HeaderView/HeaderView";
 import { RequireAuth } from "@/lib/auth/RequireAuth";
-import CalendersSidebarView from "@/views/CalendersSidebarView/CalendersSidebarView";
+import CalendersSidebarView from "@/views/CalendersSidebarVIew/CalendersSidebarView";
 import { SidebarProvider } from "@/components/ui/sidebar";
 
 export default function Layout({ children }: { children: ReactNode }) {
