@@ -1,28 +1,17 @@
+// src/views/CalendersSidebarVIew/CalendersSidebarView.tsx
 "use client";
 
 import React from "react";
-import {
-  Sidebar,
-  SidebarContent,
-} from "@/components/ui/sidebar";
-
-import { UserStatusCard } from "./components/UserStatusCard";
-import { RegisteredEventsCard } from "./components/RegisteredEventsCard";
+import { Sidebar } from "@/components/ui/sidebar";
+import { CalendersSidebarBody } from "./components/CalenderSidebarBody";
 
 export default function CalendersSidebarView() {
   return (
     <Sidebar
       collapsible="none"
-      className="h-full border-r"
+      className="hidden h-full border-r md:flex"
     >
-      <div className="flex h-full flex-col">
-        <SidebarContent className="flex-1 p-3">
-          <div className="space-y-3">
-            <UserStatusCard />
-            <RegisteredEventsCard />
-          </div>
-        </SidebarContent>
-      </div>
+      <CalendersSidebarBody />
     </Sidebar>
   );
 }
