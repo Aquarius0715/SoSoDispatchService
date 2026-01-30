@@ -39,3 +39,32 @@ export type SosoPointHistory = {
   pointDelta?: number;
   reason?: string;
 };
+
+export interface EventDetails {
+  id: string;
+  date: string;
+  title: string;
+  details: string;
+  dropOffTime: string;
+  pickUpTime: string;
+  dropOffCount: number;
+  pickUpCount: number;
+  departurePoint: string;
+  destinationPoint: string;
+  members: string[];
+  eventURL?: string;
+  dispatchRegistered?: string[];
+}
+
+export interface EventStatus {
+  date: string;
+  title: string;
+  details: string;
+  dropOffTime: string;
+  pickUpTime: string;
+  dropOffCount: number;
+  pickUpCount: number;
+  departurePoint: string;
+  destinationPoint: string;
+  members: string[];
+}
