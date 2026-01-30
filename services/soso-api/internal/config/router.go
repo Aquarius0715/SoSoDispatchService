@@ -47,7 +47,7 @@ func SetupRouter(cfg *Config) *echo.Echo {
 	}
 	authH := handlers.NewAuthHandler(userRepo, rtRepo, cfg.JWTSigningKey, cfg.AccessTokenTTLMin, cfg.RefreshTokenTTLH, cookieCfg)
 	userH := handlers.NewUserHandler(userRepo)
-	calenderH := handlers.NewCalenderHandler(calRepo)
+	calenderH := handlers.NewCalenderHandler(calRepo, calMRepo)
 	calenderMembershipH := handlers.NewCalenderMembershipHandler(calMRepo)
 	eventH := handlers.NewEventHandler(eveRepo, evePRepo)
 	sosoPH := handlers.NewSosoPointHandler(sosoPRepo)

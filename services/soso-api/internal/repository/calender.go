@@ -88,6 +88,15 @@ func (r *CalenderRepository) Create(ctx context.Context, c *model.Calender) erro
 	return err
 }
 
+func (r *CalenderRepository) CreateTx(ctx context.Context, tx *sql.Tx, c *model.Calender) error {
+	_, err := tx.ExecContext(ctx, `
+		INSERT INTO calenders (
+			id, name, description, owner_id
+		) VALUES (?, ?, ?, ?)
+	`, c.ID, c.Name, c.Description, c.OwnerId)
+	return err
+}
+
 func (r *CalenderRepository) FindMyTransportEvents(ctx context.Context, userID string) ([]*model.MyTransportEvent, error) {
 	rows, err := r.DB.QueryContext(ctx, `
 		SELECT

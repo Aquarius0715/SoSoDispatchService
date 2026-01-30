@@ -445,7 +445,7 @@ paths:
             schema: { $ref: '#/components/schemas/CalenderCreateRequest' }
       responses:
         "201":
-          description: 作成成功
+          description: 作成成功（作成者は自動的に参加者(admin)として登録）
           content:
             application/json:
               schema: { $ref: '#/components/schemas/Calender' }

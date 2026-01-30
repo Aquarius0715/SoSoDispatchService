@@ -79,8 +79,8 @@ watch:
 
 # --- project dump settings ---
 DUMP_OUT ?= project_dump.txt
-MAX_LINES ?= 400
-MAX_BYTES ?= 200000
+MAX_LINES ?= 5000
+MAX_BYTES ?= 2000000000
 
 TREE_IGNORE := node_modules|.git|dist|build|.next|.turbo|vendor|__pycache__|.venv
 

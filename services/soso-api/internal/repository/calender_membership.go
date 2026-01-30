@@ -109,3 +109,12 @@ func (r *CalenderMembershipRepository) Create(ctx context.Context, cm *model.Cal
 	`, cm.CalenderID, cm.UserID, cm.Role)
 	return err
 }
+
+func (r *CalenderMembershipRepository) CreateTx(ctx context.Context, tx *sql.Tx, cm *model.CalenderMembership) error {
+	_, err := tx.ExecContext(ctx, `
+		INSERT INTO calender_memberships (
+			calender_id, user_id, role
+		) VALUES (?, ?, ?)
+	`, cm.CalenderID, cm.UserID, cm.Role)
+	return err
+}

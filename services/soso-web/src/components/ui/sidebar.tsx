@@ -229,10 +229,13 @@ function Sidebar({
       <div
         data-slot="sidebar-container"
         className={cn(
-          // ★ fixed/inset-y-0/h-svh をやめる
-          "relative z-10 hidden h-full w-(--sidebar-width) transition-[width] duration-200 ease-linear md:flex",
-          // ★ left/right は “通常フロー” では不要なので削除（offcanvas を使いたいなら別途対応）
-          // side === "left" ? "..." : "...",
+          // fixed で “gap” のみが幅を取る（= メインが細くならない）
+          "fixed z-10 hidden w-(--sidebar-width) transition-[width] duration-200 ease-linear md:flex",
+          // header の下に配置（layout 側で --app-header-height を設定）
+          "bottom-0 top-[var(--app-header-height,0px)]",
+          side === "left"
+            ? "left-0 group-data-[collapsible=offcanvas]:-translate-x-full"
+            : "right-0 group-data-[collapsible=offcanvas]:translate-x-full",
           variant === "floating" || variant === "inset"
             ? "p-2 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+(--spacing(4))+2px)]"
             : "group-data-[collapsible=icon]:w-(--sidebar-width-icon) border-r",
