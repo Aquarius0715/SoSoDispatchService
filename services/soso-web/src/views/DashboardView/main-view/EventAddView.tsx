@@ -47,8 +47,8 @@ const EventAddView: React.FC<EventAddViewProps> = ({
   } = formState;
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-hidden flex flex-col">
+    <Dialog open={isOpen} onOpenChange={(open : boolean) => !open && onClose()}>
+      <DialogContent className="sm:max-w-lg max-h-[90vh]  flex flex-col overflow-hidden">
         <DialogHeader>
           <DialogTitle className="text-xl font-bold flex items-center gap-2">
             <CalendarIcon className="h-5 w-5" />
@@ -56,7 +56,7 @@ const EventAddView: React.FC<EventAddViewProps> = ({
           </DialogTitle>
         </DialogHeader>
 
-        <ScrollArea className="flex-1 pr-4 -mr-4">
+        <ScrollArea className="pr-4 -mr-4 flex-1 min-h-0">
           <div className="grid gap-4 py-4 px-1">
             
             {/* タイトル */}
@@ -189,7 +189,7 @@ const EventAddView: React.FC<EventAddViewProps> = ({
           </div>
         </ScrollArea>
 
-        <DialogFooter className="mt-4">
+        <DialogFooter className="p-6 pt-4 border-t bg-white">
           <Button variant="outline" onClick={onClose}>キャンセル</Button>
           <Button onClick={() => {
             handleSubmit();
