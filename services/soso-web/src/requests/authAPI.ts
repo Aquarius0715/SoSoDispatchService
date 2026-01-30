@@ -70,8 +70,9 @@ export async function login(input: LoginRequest): Promise<LoginResult> {
  * - interceptor をバイパスして確実に叩く（refreshループ防止）
  */
 export async function refreshAccessToken(): Promise<LoginResult> {
-  const res = await refreshClient.post<TokenResponse>("/auth/refresh");
-  const result = toLoginResult(res.data);
+  //const res = await refreshClient.post<TokenResponse>("/auth/refresh");
+  const res = await apiPost<TokenResponse>("/auth/refresh", { _csrf: true });
+  const result = toLoginResult(res);
   persist(result);
   return result;
 }
