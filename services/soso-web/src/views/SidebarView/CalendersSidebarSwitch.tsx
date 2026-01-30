@@ -3,8 +3,8 @@
 import React from "react";
 import { useParams } from "next/navigation";
 
-import CalendersSidebarView from "./CalendersSidebarView";
-import { CalenderDetailSidebarView } from "../CalenderDetailSidebarView/CalenderDetailSidebar/CalenderDetailSidebarView";
+import CalendersSidebarView from "./CalenderListSidebarView/CalendersSidebarView";
+import { CalenderDetailSidebarView } from "./CalenderDetailSidebarView/CalenderDetailSidebarView";
 
 export default function CalendersSidebarSwitch() {
   const params = useParams();

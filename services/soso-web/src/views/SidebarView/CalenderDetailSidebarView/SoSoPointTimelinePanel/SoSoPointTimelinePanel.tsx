@@ -5,7 +5,7 @@ import React from "react";
 
 import { Skeleton } from "@/components/ui/skeleton";
 
-import { useSosoPointTimelinePanel } from "./useSosoPointTimelinePanel";
+import { useSoSoPointTimelinePanel } from "./useSoSoPointTimelinePanel";
 import { TimelineCard } from "./components/TimelineCard";
 
 type Props = {
@@ -32,8 +32,8 @@ function formatEventLabel(eventId?: string) {
   return `イベント: ${short}`;
 }
 
-export function SosoPointTimelinePanel({ calenderId }: Props) {
-  const { members, histories, isLoading, error } = useSosoPointTimelinePanel(
+export function SoSoPointTimelinePanel({ calenderId }: Props) {
+  const { members, histories, isLoading, error } = useSoSoPointTimelinePanel(
     calenderId
   );
 

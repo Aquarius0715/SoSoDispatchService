@@ -8,8 +8,8 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 
-import { CalendersSidebarBody } from "../../CalendersSidebarVIew/components/CalenderSidebarBody";
-import { CalenderDetailSidebarView } from "@/views/CalenderDetailSidebarView/CalenderDetailSidebar/CalenderDetailSidebarView";
+import { CalendersSidebar } from "../../SidebarView/CalenderListSidebarView/components/CalenderSidebar";
+import { CalenderDetailSidebar } from "@/views/SidebarView/CalenderDetailSidebarView/CalenderDetailSidebar";
 
 export type MobileSidebarSheetProps = {
   calenderId: string | null;
@@ -36,11 +36,11 @@ export function MobileSidebarSheet({ calenderId }: MobileSidebarSheetProps) {
           </VisuallyHidden>
         </DialogHeader>
 
-        <div className="h-full border-r bg-background">
+        <div className="h-full bg-sidebar text-sidebar-foreground">
           {calenderId ? (
-            <CalenderDetailSidebarView calenderId={calenderId} />
+            <CalenderDetailSidebar calenderId={calenderId} />
           ) : (
-            <CalendersSidebarBody />
+            <CalendersSidebar />
           )}
         </div>
       </SheetContent>

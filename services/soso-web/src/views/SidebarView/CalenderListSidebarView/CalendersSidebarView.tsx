@@ -3,15 +3,15 @@
 
 import React from "react";
 import { Sidebar } from "@/components/ui/sidebar";
-import { CalendersSidebarBody } from "./components/CalenderSidebarBody";
+import { CalendersSidebar } from "./components/CalenderSidebar";
 
 export default function CalendersSidebarView() {
   return (
     <Sidebar
       collapsible="none"
-      className="hidden h-full border-r md:flex"
+      className="hidden h-full border-r lg:flex"
     >
-      <CalendersSidebarBody />
+      <CalendersSidebar />
     </Sidebar>
   );
 }

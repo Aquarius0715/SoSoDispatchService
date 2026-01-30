@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 
 import { RequireAuth } from "@/lib/auth/RequireAuth";
 import HeaderView from "@/views/HeaderView/HeaderView";
-import CalendersSidebarSwitch from "@/views/CalendersSidebarVIew/CalendersSidebarSwitch";
+import CalendersSidebarSwitch from "@/views/SidebarView/CalendersSidebarSwitch";
 import { SidebarProvider } from "@/components/ui/sidebar";
 
 type Props = {

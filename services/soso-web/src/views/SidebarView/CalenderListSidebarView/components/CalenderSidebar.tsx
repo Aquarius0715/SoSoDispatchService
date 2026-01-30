@@ -4,10 +4,10 @@
 import React from "react";
 import { SidebarContent } from "@/components/ui/sidebar";
 
-import { UserStatusCard } from "../components/UserStatusCard";
-import { RegisteredEventsCard } from "../components/RegisteredEventsCard";
+import { UserStatusCard } from "./UserStatusCard";
+import { RegisteredEventsCard } from "./RegisteredEventsCard";
 
-export function CalendersSidebarBody() {
+export function CalendersSidebar() {
   return (
     <div className="flex h-full flex-col">
       <SidebarContent className="flex-1 p-3">

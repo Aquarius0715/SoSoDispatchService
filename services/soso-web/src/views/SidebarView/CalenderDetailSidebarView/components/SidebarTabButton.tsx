@@ -2,7 +2,6 @@
 "use client";
 
 import React from "react";
-import Link from "next/link";
 import { type LucideIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -14,31 +13,31 @@ import {
 } from "@/components/ui/tooltip";
 
 type Props = {
-  href: string;
   label: string;
   tooltip: string;
   icon: LucideIcon;
   active: boolean;
+  onClick: () => void;
 };
 
 export function SidebarTabButton({
-  href,
   label,
   tooltip,
   icon: Icon,
   active,
+  onClick,
 }: Props) {
   return (
     <Tooltip>
       <TooltipTrigger asChild>
         <Button
-          asChild
+          type="button"
           variant={active ? "outline" : "ghost"}
           className={cn("h-10 w-full")}
+          onClick={onClick}
+          aria-label={label}
         >
-          <Link href={href} aria-label={label}>
-            <Icon className="h-5 w-5" />
-          </Link>
+          <Icon className="h-5 w-5" />
         </Button>
       </TooltipTrigger>
       <TooltipContent>{tooltip}</TooltipContent>

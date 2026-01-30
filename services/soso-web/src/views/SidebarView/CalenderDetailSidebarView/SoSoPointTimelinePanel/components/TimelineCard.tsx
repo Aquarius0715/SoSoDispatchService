@@ -26,8 +26,12 @@ export function TimelineCard({
     <Card>
       <CardContent className="p-3">
         <div className="flex items-start justify-between gap-3">
-          <div className="text-sm font-medium">{eventLabel}</div>
-          <div className="text-xs text-muted-foreground">{changedAtText}</div>
+          <div className="min-w-0 flex-1 truncate text-sm font-medium">
+            {eventLabel}
+          </div>
+          <div className="shrink-0 text-xs text-muted-foreground">
+            {changedAtText}
+          </div>
         </div>
 
         <div className="mt-2 text-sm leading-relaxed">

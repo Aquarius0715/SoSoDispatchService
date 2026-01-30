@@ -10,26 +10,26 @@ import { SidebarTabButton } from "./SidebarTabButton";
 
 type Props = {
   tab: SidebarTab;
-  makeHref: (next: SidebarTab) => string;
+  onTabChange: (next: SidebarTab) => void;
 };
 
-export function SidebarTabFooter({ tab, makeHref }: Props) {
+export function SidebarTabFooter({ tab, onTabChange }: Props) {
   return (
     <SidebarFooter className="p-2">
       <div className="grid grid-cols-2 gap-2">
         <SidebarTabButton
-          href={makeHref("members")}
           label="メンバー一覧"
           tooltip="メンバー一覧"
           icon={Users}
           active={tab === "members"}
+          onClick={() => onTabChange("members")}
         />
         <SidebarTabButton
-          href={makeHref("timeline")}
           label="SOSoポイント履歴"
           tooltip="SOSoポイント履歴"
           icon={History}
           active={tab === "timeline"}
+          onClick={() => onTabChange("timeline")}
         />
       </div>
     </SidebarFooter>
