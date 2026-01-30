@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import type { UseRegisterViewResult } from "./useRegisterView";
+import { useRegisterView } from "./useRegisterView";
 
 import { CarInfoFields } from "./components/CarInfoInputs";
 import { RegisterButton } from "./components/RegisterButton";
@@ -15,12 +15,9 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 
-type RegisterViewProps = UseRegisterViewResult;
+export function RegisterView() {
+  const { form, onSubmit } = useRegisterView();
 
-export const RegisterView: React.FC<RegisterViewProps> = ({
-  form,
-  onSubmit,
-}) => {
   const {
     control,
     formState: { isSubmitting, errors },
@@ -118,4 +115,4 @@ export const RegisterView: React.FC<RegisterViewProps> = ({
       </form>
     </Form>
   );
-};
+}

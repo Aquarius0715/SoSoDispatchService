@@ -5,17 +5,25 @@ import (
 	"soso/internal/model"
 	"soso/internal/repository"
 
+	"github.com/go-sql-driver/mysql"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 )
 
 type CalenderHandler struct {
-	CalenderRepo *repository.CalenderRepository
+	CalenderRepo           *repository.CalenderRepository
+	CalenderMembershipRepo *repository.CalenderMembershipRepository
 }
 
-func NewCalenderHandler(r *repository.CalenderRepository) *CalenderHandler {
-	return &CalenderHandler{CalenderRepo: r}
+func NewCalenderHandler(
+	calRepo *repository.CalenderRepository,
+	calMRepo *repository.CalenderMembershipRepository,
+) *CalenderHandler {
+	return &CalenderHandler{
+		CalenderRepo:           calRepo,
+		CalenderMembershipRepo: calMRepo,
+	}
 }
 
 type CalenderCreateRequest struct {
@@ -55,6 +63,7 @@ func (h *CalenderHandler) FindMyCalenders(c echo.Context) error {
 func (h *CalenderHandler) Create(c echo.Context) error {
 	var req CalenderCreateRequest
 
+	// --- 認証 -------------------------------------------------------------
 	tok, ok := c.Get("user").(*jwt.Token)
 	if !ok {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized")
@@ -65,13 +74,17 @@ func (h *CalenderHandler) Create(c echo.Context) error {
 	}
 	ownerId := claims.Subject
 
+	// --- 入力 -------------------------------------------------------------
 	if err := c.Bind(&req); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid payload")
 	}
 	if err := c.Validate(&req); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
+
 	ctx := c.Request().Context()
+
+	// 事前チェック（競合は INSERT 側でも最終的に検出される）
 	if exist, err := h.CalenderRepo.FindByName(ctx, req.Name); err != nil {
 		return err
 	} else if exist != nil {
@@ -85,9 +98,40 @@ func (h *CalenderHandler) Create(c echo.Context) error {
 		OwnerId:     ownerId,
 	}
 
-	if err := h.CalenderRepo.Create(ctx, ca); err != nil {
+	// --- トランザクション：calenders 作成 + 作成者を admin として参加 --------
+	tx, err := h.CalenderRepo.DB.BeginTx(ctx, nil)
+	if err != nil {
 		return err
 	}
+	committed := false
+	defer func() {
+		if !committed {
+			_ = tx.Rollback()
+		}
+	}()
+
+	if err := h.CalenderRepo.CreateTx(ctx, tx, ca); err != nil {
+		// UNIQUE(name) 競合
+		if me, ok := err.(*mysql.MySQLError); ok && me.Number == 1062 {
+			return echo.NewHTTPError(http.StatusConflict, "Calender name already exists")
+		}
+		return err
+	}
+
+	cm := &model.CalenderMembership{
+		CalenderID: ca.ID,
+		UserID:     ownerId,
+		Role:       model.ADMIN,
+	}
+	if err := h.CalenderMembershipRepo.CreateTx(ctx, tx, cm); err != nil {
+		return err
+	}
+
+	if err := tx.Commit(); err != nil {
+		return err
+	}
+	committed = true
+
 	return c.JSON(http.StatusCreated, map[string]any{
 		"id":          ca.ID,
 		"name":        ca.Name,
