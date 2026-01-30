@@ -94,7 +94,7 @@ const EventDetailView: React.FC<EventDetailViewProps> = ({
     }) : '--';
 
   return (
-    <Dialog open={true} onOpenChange={(open) => !open && onClose()}>
+    <Dialog open={true} onOpenChange={(open : boolean) => !open && onClose()}>
       <DialogContent className="sm:max-w-lg max-h-[90vh] p-0 gap-0 overflow-hidden bg-white">
         
         {/* ヘッダー */}

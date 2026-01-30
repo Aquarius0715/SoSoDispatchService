@@ -48,7 +48,7 @@ const EventAddView: React.FC<EventAddViewProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open : boolean) => !open && onClose()}>
-      <DialogContent className="sm:max-w-lg max-h-[90vh]  flex flex-col overflow-hidden">
+      <DialogContent className="sm:max-w-lg h-[80vh]  flex flex-col overflow-hidden">
         <DialogHeader>
           <DialogTitle className="text-xl font-bold flex items-center gap-2">
             <CalendarIcon className="h-5 w-5" />
