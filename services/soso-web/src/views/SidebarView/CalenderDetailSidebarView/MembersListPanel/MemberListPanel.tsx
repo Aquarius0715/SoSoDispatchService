@@ -17,16 +17,15 @@ export function MemberListPanel({ calenderId }: Props) {
 
   if (isLoading) {
     return (
-      <div className="space-y-2">
+      <div className="w-full min-w-0 space-y-2">
         {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} className="rounded-xl border bg-card p-3">
-            <div className="flex items-center gap-3">
-              <Skeleton className="h-9 w-9 rounded-full" />
-              <div className="min-w-0 flex-1 space-y-2">
+          <div key={i} className="w-full min-w-0 rounded-xl border bg-card p-3 overflow-hidden">
+            <div className="flex w-full min-w-0 items-center gap-3">
+              <Skeleton className="h-9 w-9 shrink-0 rounded-full" />
+              <div className="min-w-0 w-0 flex-1 space-y-2">
                 <Skeleton className="h-4 w-24" />
                 <Skeleton className="h-3 w-40" />
               </div>
-              <Skeleton className="h-4 w-10" />
             </div>
           </div>
         ))}
@@ -45,7 +44,7 @@ export function MemberListPanel({ calenderId }: Props) {
   }
 
   return (
-    <div className="space-y-2">
+    <div className="w-full min-w-0 space-y-2">
       {members.map((m) => (
         <MemberCard key={m.id} member={m} />
       ))}

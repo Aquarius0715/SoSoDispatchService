@@ -100,8 +100,6 @@
 │       ├── .env
 │       ├── .env.example
 │       ├── .gitignore
-│       ├── Dockerfile.nextjs
-│       ├── Dockerfile.storybook
 │       ├── README.md
 │       ├── components.json
 │       ├── lib
@@ -264,7 +262,7 @@
 │       └── vitest.shims.d.ts
 └── サイドバー作成ガイド.patch
 
-68 directories, 196 files
+68 directories, 194 files
 
 ===== FILE CONTENTS =====
 
@@ -504,7 +502,7 @@ localhost	FALSE	/	TRUE	1757026822	XSRF-TOKEN	ytGPddzNPkCRfuCRvGVgBlMQxbELGvog
 
 [TRUNCATED] MAX_LINES=5000
 
------ FILE: docker-compose.yml (size=2355) -----
+----- FILE: docker-compose.yml (size=1390) -----
 version: '3.8'
 
 services:
@@ -559,36 +557,7 @@ services:
       - ./services/soso-api/api/swagger.yaml:/swagger.yaml:ro
     depends_on:
       - soso-api
-
-  soso-web:
-    build:
-      context: services/soso-web
-      dockerfile: Dockerfile.nextjs  # Next.js用Dockerfileを指定
-      args:
-        NEXT_PUBLIC_API_BASE_URL: http://localhost:8080
-    container_name: soso-web
-    volumes:
-      - ./services/soso-web:/app # ホストとコンテナ間でソースコードを同期
-      - /app/node_modules # node_modulesは同期対象から除外
-    ports:
-      - "3000:3000"
-    depends_on:
-      - soso-api
-
-  soso-web-storybook:
-    profiles: ["storybook"]
-    build:
-      context: services/soso-web
-      dockerfile: Dockerfile.storybook  # Storybook用Dockerfileを指定
-    container_name: soso-web-storybook
-    ports:
-      - "6006:6006" # ホスト側の6006ポートとコンテナをマッピング
-    volumes:
-      - ./services/soso-web:/app # ホストとコンテナ間でソースコードを同期
-      - /app/node_modules # node_modulesは同期対象から除外
-    depends_on:
-      - soso-api
-
+      
 volumes:
   db_data:
 
@@ -651,7 +620,7 @@ volumes:
 
 [TRUNCATED] MAX_LINES=5000
 
------ FILE: project_dump.txt (size=24056) -----
+----- FILE: project_dump.txt (size=23008) -----
 ===== DIRECTORY TREE =====
 .
 ├── .DS_Store
@@ -754,8 +723,6 @@ volumes:
 │       ├── .env
 │       ├── .env.example
 │       ├── .gitignore
-│       ├── Dockerfile.nextjs
-│       ├── Dockerfile.storybook
 │       ├── README.md
 │       ├── components.json
 │       ├── lib
@@ -918,7 +885,7 @@ volumes:
 │       └── vitest.shims.d.ts
 └── サイドバー作成ガイド.patch
 
-68 directories, 196 files
+68 directories, 194 files
 
 ===== FILE CONTENTS =====
 
@@ -1158,7 +1125,7 @@ localhost	FALSE	/	TRUE	1757026822	XSRF-TOKEN	ytGPddzNPkCRfuCRvGVgBlMQxbELGvog
 
 [TRUNCATED] MAX_LINES=5000
 
------ FILE: docker-compose.yml (size=2355) -----
+----- FILE: docker-compose.yml (size=1390) -----
 version: '3.8'
 
 services:
@@ -1213,36 +1180,7 @@ services:
       - ./services/soso-api/api/swagger.yaml:/swagger.yaml:ro
     depends_on:
       - soso-api
-
-  soso-web:
-    build:
-      context: services/soso-web
-      dockerfile: Dockerfile.nextjs  # Next.js用Dockerfileを指定
-      args:
-        NEXT_PUBLIC_API_BASE_URL: http://localhost:8080
-    container_name: soso-web
-    volumes:
-      - ./services/soso-web:/app # ホストとコンテナ間でソースコードを同期
-      - /app/node_modules # node_modulesは同期対象から除外
-    ports:
-      - "3000:3000"
-    depends_on:
-      - soso-api
-
-  soso-web-storybook:
-    profiles: ["storybook"]
-    build:
-      context: services/soso-web
-      dockerfile: Dockerfile.storybook  # Storybook用Dockerfileを指定
-    container_name: soso-web-storybook
-    ports:
-      - "6006:6006" # ホスト側の6006ポートとコンテナをマッピング
-    volumes:
-      - ./services/soso-web:/app # ホストとコンテナ間でソースコードを同期
-      - /app/node_modules # node_modulesは同期対象から除外
-    depends_on:
-      - soso-api
-
+      
 volumes:
   db_data:
 
@@ -1305,7 +1243,7 @@ volumes:
 
 [TRUNCATED] MAX_LINES=5000
 
------ FILE: project_dump.txt (size=24056) -----
+----- FILE: project_dump.txt (size=23008) -----
 ===== DIRECTORY TREE =====
 .
 ├── .DS_Store
@@ -1408,8 +1346,6 @@ volumes:
 │       ├── .env
 │       ├── .env.example
 │       ├── .gitignore
-│       ├── Dockerfile.nextjs
-│       ├── Dockerfile.storybook
 │       ├── README.md
 │       ├── components.json
 │       ├── lib
@@ -1572,7 +1508,7 @@ volumes:
 │       └── vitest.shims.d.ts
 └── サイドバー作成ガイド.patch
 
-68 directories, 196 files
+68 directories, 194 files
 
 ===== FILE CONTENTS =====
 
@@ -1812,7 +1748,7 @@ localhost	FALSE	/	TRUE	1757026822	XSRF-TOKEN	ytGPddzNPkCRfuCRvGVgBlMQxbELGvog
 
 [TRUNCATED] MAX_LINES=5000
 
------ FILE: docker-compose.yml (size=2355) -----
+----- FILE: docker-compose.yml (size=1390) -----
 version: '3.8'
 
 services:
@@ -1867,36 +1803,7 @@ services:
       - ./services/soso-api/api/swagger.yaml:/swagger.yaml:ro
     depends_on:
       - soso-api
-
-  soso-web:
-    build:
-      context: services/soso-web
-      dockerfile: Dockerfile.nextjs  # Next.js用Dockerfileを指定
-      args:
-        NEXT_PUBLIC_API_BASE_URL: http://localhost:8080
-    container_name: soso-web
-    volumes:
-      - ./services/soso-web:/app # ホストとコンテナ間でソースコードを同期
-      - /app/node_modules # node_modulesは同期対象から除外
-    ports:
-      - "3000:3000"
-    depends_on:
-      - soso-api
-
-  soso-web-storybook:
-    profiles: ["storybook"]
-    build:
-      context: services/soso-web
-      dockerfile: Dockerfile.storybook  # Storybook用Dockerfileを指定
-    container_name: soso-web-storybook
-    ports:
-      - "6006:6006" # ホスト側の6006ポートとコンテナをマッピング
-    volumes:
-      - ./services/soso-web:/app # ホストとコンテナ間でソースコードを同期
-      - /app/node_modules # node_modulesは同期対象から除外
-    depends_on:
-      - soso-api
-
+      
 volumes:
   db_data:
 
@@ -1959,7 +1866,7 @@ volumes:
 
 [TRUNCATED] MAX_LINES=5000
 
------ FILE: project_dump.txt (size=24056) -----
+----- FILE: project_dump.txt (size=23008) -----
 ===== DIRECTORY TREE =====
 .
 ├── .DS_Store
@@ -2062,8 +1969,6 @@ volumes:
 │       ├── .env
 │       ├── .env.example
 │       ├── .gitignore
-│       ├── Dockerfile.nextjs
-│       ├── Dockerfile.storybook
 │       ├── README.md
 │       ├── components.json
 │       ├── lib
@@ -2226,7 +2131,7 @@ volumes:
 │       └── vitest.shims.d.ts
 └── サイドバー作成ガイド.patch
 
-68 directories, 196 files
+68 directories, 194 files
 
 ===== FILE CONTENTS =====
 
@@ -2466,7 +2371,7 @@ localhost	FALSE	/	TRUE	1757026822	XSRF-TOKEN	ytGPddzNPkCRfuCRvGVgBlMQxbELGvog
 
 [TRUNCATED] MAX_LINES=5000
 
------ FILE: docker-compose.yml (size=2355) -----
+----- FILE: docker-compose.yml (size=1390) -----
 version: '3.8'
 
 services:
@@ -2521,36 +2426,7 @@ services:
       - ./services/soso-api/api/swagger.yaml:/swagger.yaml:ro
     depends_on:
       - soso-api
-
-  soso-web:
-    build:
-      context: services/soso-web
-      dockerfile: Dockerfile.nextjs  # Next.js用Dockerfileを指定
-      args:
-        NEXT_PUBLIC_API_BASE_URL: http://localhost:8080
-    container_name: soso-web
-    volumes:
-      - ./services/soso-web:/app # ホストとコンテナ間でソースコードを同期
-      - /app/node_modules # node_modulesは同期対象から除外
-    ports:
-      - "3000:3000"
-    depends_on:
-      - soso-api
-
-  soso-web-storybook:
-    profiles: ["storybook"]
-    build:
-      context: services/soso-web
-      dockerfile: Dockerfile.storybook  # Storybook用Dockerfileを指定
-    container_name: soso-web-storybook
-    ports:
-      - "6006:6006" # ホスト側の6006ポートとコンテナをマッピング
-    volumes:
-      - ./services/soso-web:/app # ホストとコンテナ間でソースコードを同期
-      - /app/node_modules # node_modulesは同期対象から除外
-    depends_on:
-      - soso-api
-
+      
 volumes:
   db_data:
 
@@ -2613,7 +2489,7 @@ volumes:
 
 [TRUNCATED] MAX_LINES=5000
 
------ FILE: project_dump.txt (size=24056) -----
+----- FILE: project_dump.txt (size=23008) -----
 ===== DIRECTORY TREE =====
 .
 ├── .DS_Store
@@ -2716,8 +2592,6 @@ volumes:
 │       ├── .env
 │       ├── .env.example
 │       ├── .gitignore
-│       ├── Dockerfile.nextjs
-│       ├── Dockerfile.storybook
 │       ├── README.md
 │       ├── components.json
 │       ├── lib
@@ -2880,7 +2754,7 @@ volumes:
 │       └── vitest.shims.d.ts
 └── サイドバー作成ガイド.patch
 
-68 directories, 196 files
+68 directories, 194 files
 
 ===== FILE CONTENTS =====
 
@@ -3120,7 +2994,7 @@ localhost	FALSE	/	TRUE	1757026822	XSRF-TOKEN	ytGPddzNPkCRfuCRvGVgBlMQxbELGvog
 
 [TRUNCATED] MAX_LINES=5000
 
------ FILE: docker-compose.yml (size=2355) -----
+----- FILE: docker-compose.yml (size=1390) -----
 version: '3.8'
 
 services:
@@ -3175,36 +3049,7 @@ services:
       - ./services/soso-api/api/swagger.yaml:/swagger.yaml:ro
     depends_on:
       - soso-api
-
-  soso-web:
-    build:
-      context: services/soso-web
-      dockerfile: Dockerfile.nextjs  # Next.js用Dockerfileを指定
-      args:
-        NEXT_PUBLIC_API_BASE_URL: http://localhost:8080
-    container_name: soso-web
-    volumes:
-      - ./services/soso-web:/app # ホストとコンテナ間でソースコードを同期
-      - /app/node_modules # node_modulesは同期対象から除外
-    ports:
-      - "3000:3000"
-    depends_on:
-      - soso-api
-
-  soso-web-storybook:
-    profiles: ["storybook"]
-    build:
-      context: services/soso-web
-      dockerfile: Dockerfile.storybook  # Storybook用Dockerfileを指定
-    container_name: soso-web-storybook
-    ports:
-      - "6006:6006" # ホスト側の6006ポートとコンテナをマッピング
-    volumes:
-      - ./services/soso-web:/app # ホストとコンテナ間でソースコードを同期
-      - /app/node_modules # node_modulesは同期対象から除外
-    depends_on:
-      - soso-api
-
+      
 volumes:
   db_data:
 
@@ -3267,7 +3112,7 @@ volumes:
 
 [TRUNCATED] MAX_LINES=5000
 
------ FILE: project_dump.txt (size=24056) -----
+----- FILE: project_dump.txt (size=23008) -----
 ===== DIRECTORY TREE =====
 .
 ├── .DS_Store
@@ -3370,8 +3215,6 @@ volumes:
 │       ├── .env
 │       ├── .env.example
 │       ├── .gitignore
-│       ├── Dockerfile.nextjs
-│       ├── Dockerfile.storybook
 │       ├── README.md
 │       ├── components.json
 │       ├── lib
@@ -3534,7 +3377,7 @@ volumes:
 │       └── vitest.shims.d.ts
 └── サイドバー作成ガイド.patch
 
-68 directories, 196 files
+68 directories, 194 files
 
 ===== FILE CONTENTS =====
 
@@ -3774,7 +3617,7 @@ localhost	FALSE	/	TRUE	1757026822	XSRF-TOKEN	ytGPddzNPkCRfuCRvGVgBlMQxbELGvog
 
 [TRUNCATED] MAX_LINES=5000
 
------ FILE: docker-compose.yml (size=2355) -----
+----- FILE: docker-compose.yml (size=1390) -----
 version: '3.8'
 
 services:
@@ -3829,36 +3672,7 @@ services:
       - ./services/soso-api/api/swagger.yaml:/swagger.yaml:ro
     depends_on:
       - soso-api
-
-  soso-web:
-    build:
-      context: services/soso-web
-      dockerfile: Dockerfile.nextjs  # Next.js用Dockerfileを指定
-      args:
-        NEXT_PUBLIC_API_BASE_URL: http://localhost:8080
-    container_name: soso-web
-    volumes:
-      - ./services/soso-web:/app # ホストとコンテナ間でソースコードを同期
-      - /app/node_modules # node_modulesは同期対象から除外
-    ports:
-      - "3000:3000"
-    depends_on:
-      - soso-api
-
-  soso-web-storybook:
-    profiles: ["storybook"]
-    build:
-      context: services/soso-web
-      dockerfile: Dockerfile.storybook  # Storybook用Dockerfileを指定
-    container_name: soso-web-storybook
-    ports:
-      - "6006:6006" # ホスト側の6006ポートとコンテナをマッピング
-    volumes:
-      - ./services/soso-web:/app # ホストとコンテナ間でソースコードを同期
-      - /app/node_modules # node_modulesは同期対象から除外
-    depends_on:
-      - soso-api
-
+      
 volumes:
   db_data:
 
@@ -3921,7 +3735,7 @@ volumes:
 
 [TRUNCATED] MAX_LINES=5000
 
------ FILE: project_dump.txt (size=24056) -----
+----- FILE: project_dump.txt (size=23008) -----
 ===== DIRECTORY TREE =====
 .
 ├── .DS_Store
@@ -4024,8 +3838,6 @@ volumes:
 │       ├── .env
 │       ├── .env.example
 │       ├── .gitignore
-│       ├── Dockerfile.nextjs
-│       ├── Dockerfile.storybook
 │       ├── README.md
 │       ├── components.json
 │       ├── lib
@@ -4188,7 +4000,7 @@ volumes:
 │       └── vitest.shims.d.ts
 └── サイドバー作成ガイド.patch
 
-68 directories, 196 files
+68 directories, 194 files
 
 ===== FILE CONTENTS =====
 
@@ -4428,7 +4240,7 @@ localhost	FALSE	/	TRUE	1757026822	XSRF-TOKEN	ytGPddzNPkCRfuCRvGVgBlMQxbELGvog
 
 [TRUNCATED] MAX_LINES=5000
 
------ FILE: docker-compose.yml (size=2355) -----
+----- FILE: docker-compose.yml (size=1390) -----
 version: '3.8'
 
 services:
@@ -4483,36 +4295,7 @@ services:
       - ./services/soso-api/api/swagger.yaml:/swagger.yaml:ro
     depends_on:
       - soso-api
-
-  soso-web:
-    build:
-      context: services/soso-web
-      dockerfile: Dockerfile.nextjs  # Next.js用Dockerfileを指定
-      args:
-        NEXT_PUBLIC_API_BASE_URL: http://localhost:8080
-    container_name: soso-web
-    volumes:
-      - ./services/soso-web:/app # ホストとコンテナ間でソースコードを同期
-      - /app/node_modules # node_modulesは同期対象から除外
-    ports:
-      - "3000:3000"
-    depends_on:
-      - soso-api
-
-  soso-web-storybook:
-    profiles: ["storybook"]
-    build:
-      context: services/soso-web
-      dockerfile: Dockerfile.storybook  # Storybook用Dockerfileを指定
-    container_name: soso-web-storybook
-    ports:
-      - "6006:6006" # ホスト側の6006ポートとコンテナをマッピング
-    volumes:
-      - ./services/soso-web:/app # ホストとコンテナ間でソースコードを同期
-      - /app/node_modules # node_modulesは同期対象から除外
-    depends_on:
-      - soso-api
-
+      
 volumes:
   db_data:
 
@@ -4575,7 +4358,7 @@ volumes:
 
 [TRUNCATED] MAX_LINES=5000
 
------ FILE: project_dump.txt (size=24056) -----
+----- FILE: project_dump.txt (size=23008) -----
 ===== DIRECTORY TREE =====
 .
 ├── .DS_Store
@@ -4678,8 +4461,6 @@ volumes:
 │       ├── .env
 │       ├── .env.example
 │       ├── .gitignore
-│       ├── Dockerfile.nextjs
-│       ├── Dockerfile.storybook
 │       ├── README.md
 │       ├── components.json
 │       ├── lib
@@ -4842,7 +4623,7 @@ volumes:
 │       └── vitest.shims.d.ts
 └── サイドバー作成ガイド.patch
 
-68 directories, 196 files
+68 directories, 194 files
 
 ===== FILE CONTENTS =====
 
@@ -5082,7 +4863,7 @@ localhost	FALSE	/	TRUE	1757026822	XSRF-TOKEN	ytGPddzNPkCRfuCRvGVgBlMQxbELGvog
 
 [TRUNCATED] MAX_LINES=5000
 
------ FILE: docker-compose.yml (size=2355) -----
+----- FILE: docker-compose.yml (size=1390) -----
 version: '3.8'
 
 services:
@@ -5137,36 +4918,7 @@ services:
       - ./services/soso-api/api/swagger.yaml:/swagger.yaml:ro
     depends_on:
       - soso-api
-
-  soso-web:
-    build:
-      context: services/soso-web
-      dockerfile: Dockerfile.nextjs  # Next.js用Dockerfileを指定
-      args:
-        NEXT_PUBLIC_API_BASE_URL: http://localhost:8080
-    container_name: soso-web
-    volumes:
-      - ./services/soso-web:/app # ホストとコンテナ間でソースコードを同期
-      - /app/node_modules # node_modulesは同期対象から除外
-    ports:
-      - "3000:3000"
-    depends_on:
-      - soso-api
-
-  soso-web-storybook:
-    profiles: ["storybook"]
-    build:
-      context: services/soso-web
-      dockerfile: Dockerfile.storybook  # Storybook用Dockerfileを指定
-    container_name: soso-web-storybook
-    ports:
-      - "6006:6006" # ホスト側の6006ポートとコンテナをマッピング
-    volumes:
-      - ./services/soso-web:/app # ホストとコンテナ間でソースコードを同期
-      - /app/node_modules # node_modulesは同期対象から除外
-    depends_on:
-      - soso-api
-
+      
 volumes:
   db_data:
 
@@ -5229,7 +4981,7 @@ volumes:
 
 [TRUNCATED] MAX_LINES=5000
 
------ FILE: project_dump.txt (size=24056) -----
+----- FILE: project_dump.txt (size=23008) -----
 ===== DIRECTORY TREE =====
 .
 ├── .DS_Store
@@ -5332,8 +5084,6 @@ volumes:
 │       ├── .env
 │       ├── .env.example
 │       ├── .gitignore
-│       ├── Dockerfile.nextjs
-│       ├── Dockerfile.storybook
 │       ├── README.md
 │       ├── components.json
 │       ├── lib
@@ -5496,7 +5246,7 @@ volumes:
 │       └── vitest.shims.d.ts
 └── サイドバー作成ガイド.patch
 
-68 directories, 196 files
+68 directories, 194 files
 
 ===== FILE CONTENTS =====
 
@@ -5652,6 +5402,225 @@ body:
       label: 目的
     validations:
       required: true
+  - type: textarea
+    id: todo
+    attributes:
+      label: ToDo
+      placeholder: "- [ ] A\n- [ ] B\n- [ ] C"
+      render: markdown
+  - type: textarea
+    id: risk
+    attributes:
+      label: リスク / ロールバック
+      placeholder: 想定される不具合や戻し方
+[TRUNCATED] MAX_LINES=5000
+
+----- FILE: .github/PULL_REQUEST_TEMPLATE.md (size=984) -----
+## 目的 / 背景
+<!-- なぜこの変更が必要か。関連Issueがあれば #番号 を記載 -->
+
+## 変更点
+<!-- 主要なコード/設定の変更を列挙 -->
+- 
+
+## 動作確認
+<!-- 再現/確認手順、期待結果、スクショ/動画 -->
+1. 
+2. 
+
+## 影響範囲
+- フロント / API / DB / インフラ
+
+## 互換性・移行
+- 破壊的変更: あり / なし
+- Migration / 環境変数の変更: あり / なし
+
+## セキュリティ / パフォーマンス
+- 権限・認可の確認ポイント:
+- 重い処理の有無・計測:
+
+## チェックリスト
+- [ ] 単体/結合/E2E テストを追加/更新した
+- [ ] Lint/Format が通る
+- [ ] ドキュメント・OpenAPI を更新した
+- [ ] リリースノートに追記した
+
+## 関連
+- Close #
+
+# .github/PULL_REQUEST_TEMPLATE/feature.md
+## 種別
+- [x] Feature
+- [ ] Breaking
+
+（以下は共通テンプレと同様）
+
+# .github/PULL_REQUEST_TEMPLATE/bugfix.md
+## 種別
+- [x] Bugfix
+- [ ] Hotfix
+[TRUNCATED] MAX_LINES=5000
+
+----- FILE: .github/copilot-instructions.md (size=469) -----
+> **目的**: Copilot へのリポジトリ共通インストラクション
+- 可能な限り **日本語（丁寧語）** で回答すること
+- レビューでは「指摘 → 根拠 → 修正例」の順に簡潔に述べること
+- 本リポジトリのコーディング規約 / Lint 設定 / テスト方針に従うこと
+- PR ではリスクとロールバック手順も提案すること
+- 重大度判定: blocker/critical/major/minor/trivial の 5 段階
+[TRUNCATED] MAX_LINES=5000
+
+----- FILE: README.md (size=32) -----
+# 概要
+SoSo配車サービス
+
+[TRUNCATED] MAX_LINES=5000
+
+----- FILE: cookie.txt (size=322) -----
+# Netscape HTTP Cookie File
+# https://curl.se/docs/http-cookies.html
+# This file was generated by libcurl! Edit at your own risk.
+
+#HttpOnly_localhost	FALSE	/	FALSE	1757545214	rt	yx4yc4RbTRCEzGPdUr5udnUAx4Rn6fUF1FJ_AC-C8_njELU5Lsp5c2sXJw-oyX-u
+localhost	FALSE	/	TRUE	1757026822	XSRF-TOKEN	ytGPddzNPkCRfuCRvGVgBlMQxbELGvog
+
+[TRUNCATED] MAX_LINES=5000
+
+----- FILE: docker-compose.yml (size=1390) -----
+version: '3.8'
+
+services:
+  soso-api:
+    build:
+      context: .
+      dockerfile: services/soso-api/build/Dockerfile
+    container_name: soso-api
+    env_file: services/soso-api/config/.env
+    ports:
+      - "8080:8080"
+    depends_on:
+      soso-database:
+        condition: service_healthy
+
+  soso-database:
+    image: mysql:8.0
+    container_name: soso-database
+    env_file: services/soso-api/config/.env
+    command: --default-authentication-plugin=mysql_native_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./services/soso-api/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u root -p$MYSQL_ROOT_PASSWORD"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  soso-api-document:
+    image: swaggerapi/swagger-ui:latest
+    container_name: soso-api-document
+    ports:
+      - "9419:8080"
+    environment:
+      SWAGGER_JSON: /docs.yaml
+    volumes:
+      - ./services/soso-api/api/docs.yaml:/docs.yaml:ro
+    depends_on:
+      - soso-api
+
+  soso-api-document-deploy:
+    image: swaggerapi/swagger-ui:latest
+    container_name: soso-api-document-deploy
+    ports:
+      - "9418:8080"
+    environment:
+      SWAGGER_JSON: /swagger.yaml
+    volumes:
+      - ./services/soso-api/api/swagger.yaml:/swagger.yaml:ro
+    depends_on:
+      - soso-api
+      
+volumes:
+  db_data:
+
+[TRUNCATED] MAX_LINES=5000
+
+----- FILE: package-lock.json (size=1255) -----
+{
+  "name": "SoSoDispatchService",
+  "lockfileVersion": 3,
+  "requires": true,
+  "packages": {
+    "": {
+      "dependencies": {
+        "js-cookie": "^3.0.5"
+      },
+      "devDependencies": {
+        "@types/react": "^19.1.9"
+      }
+    },
+    "node_modules/@types/react": {
+      "version": "19.1.9",
+      "resolved": "https://registry.npmjs.org/@types/react/-/react-19.1.9.tgz",
+      "integrity": "sha512-WmdoynAX8Stew/36uTSVMcLJJ1KRh6L3IZRx1PZ7qJtBqT3dYTgyDTx8H1qoRghErydW7xw9mSJ3wS//tCRpFA==",
+      "dev": true,
+      "license": "MIT",
+      "dependencies": {
+        "csstype": "^3.0.2"
+      }
+    },
+    "node_modules/csstype": {
+      "version": "3.1.3",
+      "resolved": "https://registry.npmjs.org/csstype/-/csstype-3.1.3.tgz",
+      "integrity": "sha512-M1uQkMl8rQK/szD0LNhtqxIPLpimGm8sOBwU7lLnCpSbTyY3yeU1Vc7l4KT5zT4s/yOxHH5O7tIuuLOCnLADRw==",
+      "dev": true,
+      "license": "MIT"
+    },
+    "node_modules/js-cookie": {
+      "version": "3.0.5",
+      "resolved": "https://registry.npmjs.org/js-cookie/-/js-cookie-3.0.5.tgz",
+      "integrity": "sha512-cEiJEAEoIbWfCZYKWhVwFuvPX1gETRYPw6LlaTKoxD3s2AkXzkCjnp6h0V77ozyqj0jakteJ4YqDJT830+lVGw==",
+      "license": "MIT",
+      "engines": {
+        "node": ">=14"
+      }
+    }
+  }
+}
+
+[TRUNCATED] MAX_LINES=5000
+
+----- FILE: package.json (size=112) -----
+{
+  "devDependencies": {
+    "@types/react": "^19.1.9"
+  },
+  "dependencies": {
+    "js-cookie": "^3.0.5"
+  }
+}
+
+[TRUNCATED] MAX_LINES=5000
+
+----- FILE: project_dump.txt (size=23008) -----
+===== DIRECTORY TREE =====
+.
+├── .DS_Store
+├── .github
+│   ├── ISSUE_TEMPLATE
+│   │   ├── bug_report.yml
+│   │   ├── config.yml
+│   │   ├── feature_request.yml
+│   │   ├── question.yml
+│   │   └── task.yml
+│   ├── PULL_REQUEST_TEMPLATE.md
+│   └── copilot-instructions.md
+├── .gitignore
+├── Makefile
+├── README.md
+├── cookie.txt
 
 [TRUNCATED] MAX_LINES=5000
 
@@ -21689,9 +21658,9 @@ import {
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state"
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
-const SIDEBAR_WIDTH = "16rem"
-const SIDEBAR_WIDTH_MOBILE = "18rem"
-const SIDEBAR_WIDTH_ICON = "3rem"
+const SIDEBAR_WIDTH = "20rem"
+const SIDEBAR_WIDTH_MOBILE = "20rem"
+const SIDEBAR_WIDTH_ICON = "4rem"
 const SIDEBAR_KEYBOARD_SHORTCUT = "b"
 
 type SidebarContextProps = {
