@@ -1,23 +1,25 @@
 'use client';
 
 import React from 'react';
-import { useMainView }  from '@/views/DashboardView/main-view/components/useMainView';
+import { useMainView } from '@/views/DashboardView/main-view/components/useMainView';
 import CalendarMainView from '@/views/DashboardView/main-view/components/CalendarMainView';
-// ↓これから作る、あるいは既存のモーダルコンポーネント
 import EventAddView from '@/views/DashboardView/main-view/components/EventAddView'; 
 import EventDetailView from '@/views/DashboardView/main-view/components/EventDetail';
 
 export default function CalendarPage() {
-  // カスタムフックから必要な状態と関数をすべて取り出す
+  // useMainView に詳細表示用の状態（selectedEventなど）が含まれている前提です
   const {
     events,
     isAddModalOpen,
+    isDetailModalOpen,
+    selectedEvent,
     formState,
     handleAddEventClick,
     handleEventClick,
     handleCloseAddModal,
+    handleCloseDetailModal,
     handleSubmit,
-    toggleParticipant
+    toggleParticipant,
   } = useMainView();
 
   return (
@@ -25,14 +27,11 @@ export default function CalendarPage() {
       {/* カレンダー本体 */}
       <CalendarMainView
         events={events}
-        onEventClick={handleEventClick}
+        onEventClick={handleEventClick} // ここで selectedEvent がセットされる想定
         onAddEventClick={handleAddEventClick}
       />
 
-      {/* イベント追加モーダル
-         handleSubmit が呼ばれると、フック内の events 状態が更新され、
-         その結果 CalendarMainView の表示も自動で更新されます。
-      */}
+      {/* イベント追加モーダル */}
       <EventAddView
         isOpen={isAddModalOpen}
         onClose={handleCloseAddModal}
@@ -40,6 +39,38 @@ export default function CalendarPage() {
         toggleParticipant={toggleParticipant}
         handleSubmit={handleSubmit}
       />
-    </main>
-  );
+
+      {/* isDetailModalOpen が true かつ selectedEvent がある場合のみ表示 */}
+      {isDetailModalOpen && selectedEvent && (
+        <EventDetailView 
+          // 基本データ
+          eventData={selectedEvent} 
+          onClose={handleCloseDetailModal}
+          
+          // 詳細データ（APIから取得したデータなど）
+          detailData={null} 
+          
+          // 配車の空き状況 (extendedPropsから取得)
+          dropOffRemaining={selectedEvent.extendedProps?.dropOffCount ?? 0}
+          pickUpRemaining={selectedEvent.extendedProps?.pickUpCount ?? 0}
+          
+          // 登録済みメンバー
+          registered={selectedEvent.extendedProps?.participants ?? []}
+          
+          // ユーザーの状態
+          isLoadingRegistrations={false}
+          userDropOffRegistered={false}
+          userPickUpRegistered={false}
+          isRegistering={false}
+          seatsRequired={1}
+          
+          // 登録ボタンが押された時の処理
+          onRegister={(type) => {
+            // TODO: 登録処理の実装 (type は 'dropOff' または 'pickUp')
+            console.log('Register clicked:', type);
+          }}
+        />
+      )}
+      </main>
+  )
 }
