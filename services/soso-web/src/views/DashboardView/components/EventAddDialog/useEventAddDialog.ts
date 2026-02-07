@@ -40,12 +40,11 @@ export const useEventAddDialog = ({
   const onSubmit = form.handleSubmit(async (values) => {
     try {
       // 1. APIが求める EventCreateRequest 形式にデータを加工
-      // 日付(selectedDate) と 時刻(09:00) を結合して ISO 8601 (startTime) を作成
       const payload: EventCreateRequest = {
         title: values.title,
         description: values.description,
-        startTime: `${selectedDate}T${values.dropOffTime}:00Z`,
-        endTime: `${selectedDate}T${values.pickUpTime}:00Z`,
+        startTime: `${selectedDate}T${values.dropOffTime}:00+09:00`,
+        endTime: `${selectedDate}T${values.pickUpTime}:00+09:00`,
         originLocation: values.originLocation,
         destinationLocation: values.destinationLocation,
         seatsRequiredGo: Number(values.dropOffCount),
@@ -53,7 +52,7 @@ export const useEventAddDialog = ({
         participantUserIds: values.participantUserIds,
       };
 
-      // 2. API窓口を呼び出し (インフラ層 createEndpoint を経由)
+      // 2. API窓口を呼び出し
       const poster = createEvent(calendarId);
       await poster(payload);
 
@@ -64,7 +63,7 @@ export const useEventAddDialog = ({
       form.reset();
 
     } catch (error) {
-      // 4. エラーハンドリング (RegisterView と同様のパターン)
+      // 4. エラーハンドリング
       let message = "イベントの作成に失敗しました";
       if (axios.isAxiosError(error)) {
         message = error.response?.data?.message || message;
