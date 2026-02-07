@@ -1,66 +1,93 @@
-// src/views/DashboardView/components/EventDetailDialog/useEventDetailDialog.ts
-import { useState } from 'react';
+'use client';
+
+import { useState, useEffect, useCallback } from 'react';
+import { 
+  getEventDetail, 
+  registerPickupDriver, 
+  registerReturnDriver, 
+  EventDetail 
+} from "@/requests/eventAPI";
 import { useSnackbar } from "@/components/ui/snackbar";
-import type { EventData } from "@/types/interfaces";
-// import { registerEvent } from "@/requests/eventAPI"; // ※API実装後にコメントアウト解除
+import axios from "axios";
 
 interface UseEventDetailDialogProps {
-  eventData: EventData;
-  onClose: () => void;
-  onSuccess: () => void; // 登録成功時のリロード用
+  eventId: string;
+  isOpen: boolean;
+  onEventUpdated: () => void; // 登録成功時にカレンダーを更新するためのコールバック
 }
 
-export const useEventDetailDialog = ({ eventData, onClose, onSuccess }: UseEventDetailDialogProps) => {
+export const useEventDetailDialog = ({
+  eventId,
+  isOpen,
+  onEventUpdated,
+}: UseEventDetailDialogProps) => {
   const { showSnackbar } = useSnackbar();
-  const [isRegistering, setIsRegistering] = useState(false);
+  
+  const [eventData, setEventData] = useState<EventDetail | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isActionLoading, setIsActionLoading] = useState(false);
 
-  // ユーザーの登録状況（仮実装：本来はAPIやContextから自分のIDと比較して判定）
-  const [userDropOffRegistered, setUserDropOffRegistered] = useState(false);
-  const [userPickUpRegistered, setUserPickUpRegistered] = useState(false);
-
-  // 配車登録処理
-  const handleRegister = async (type: 'dropOff' | 'pickUp') => {
-    setIsRegistering(true);
+  // 1. イベント詳細情報の取得
+  const loadEventDetail = useCallback(async () => {
+    if (!eventId) return;
+    
+    setIsLoading(true);
     try {
-      // API呼び出し（仮）
-      console.log(`Registering for ${type} on event ${eventData.id}`);
-      // await registerEvent(eventData.id, type);
-      
-      // 成功時
-      if (type === 'dropOff') setUserDropOffRegistered(true);
-      else setUserPickUpRegistered(true);
-      
-      showSnackbar("登録しました", "success");
-      onSuccess();
+      const fetcher = getEventDetail(eventId);
+      const data = await fetcher();
+      setEventData(data);
     } catch (error) {
       console.error(error);
-      showSnackbar("登録に失敗しました", "error");
+      showSnackbar("イベント情報の取得に失敗しました", "error");
     } finally {
-      setIsRegistering(false);
+      setIsLoading(false);
+    }
+  }, [eventId, showSnackbar]);
+
+  // モーダルが開いた時にデータをロード
+  useEffect(() => {
+    if (isOpen) {
+      loadEventDetail();
+    }
+  }, [isOpen, loadEventDetail]);
+
+  // 2. 配車登録アクション (行き/帰り)
+  const handleRegisterDriver = async (type: 'pickup' | 'return') => {
+    if (!eventId) return;
+
+    setIsActionLoading(true);
+    try {
+      if (type === 'pickup') {
+        const poster = registerPickupDriver(eventId);
+        await poster();
+      } else {
+        const poster = registerReturnDriver(eventId);
+        await poster();
+      }
+
+      showSnackbar(`${type === 'pickup' ? '迎え' : '送り'}ドライバーとして登録しました`, "success");
+      
+      // 登録成功後、最新の残席数を反映するために詳細を再読み込み
+      await loadEventDetail();
+      // 親（カレンダー）の表示も更新させる
+      onEventUpdated();
+
+    } catch (error) {
+      let message = "登録に失敗しました。既に満席か、権限がない可能性があります。";
+      if (axios.isAxiosError(error)) {
+        message = error.response?.data?.message || message;
+      }
+      showSnackbar(message, "error");
+    } finally {
+      setIsActionLoading(false);
     }
   };
 
   return {
-    isRegistering,
-    userDropOffRegistered,
-    userPickUpRegistered,
-    handleRegister,
-    // 表示用に整形したデータを返す
-    displayData: {
-      title: eventData.title,
-      date: eventData.start,
-      startTime: eventData.start,
-      endTime: eventData.end,
-      description: eventData.extendedProps.description,
-      participants: eventData.extendedProps.participants || [],
-      seatsReturnTotal: eventData.extendedProps.seatsRequiredReturn || 0,
-      seatsGoTotal: eventData.extendedProps.seatsRequiredGo || 0,
-      origin: eventData.extendedProps.originLocation,
-      destination: eventData.extendedProps.destinationLocation,
-      url: eventData.url,
-      // 残り席数計算（仮：定員 - 現在の参加人数 などのロジックを入れる）
-      dropOffRemaining: eventData.extendedProps.dropOffCount, 
-      pickUpRemaining: eventData.extendedProps.pickUpCount
-    }
+    eventData,
+    isLoading,
+    isActionLoading,
+    handleRegisterDriver,
+    refresh: loadEventDetail,
   };
 };
