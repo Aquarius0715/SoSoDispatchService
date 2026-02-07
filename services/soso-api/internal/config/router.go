@@ -120,8 +120,8 @@ func SetupRouter(cfg *Config) *echo.Echo {
 	// usersPriv.GET("/me", userH.Me) の下に追加
 	usersPriv.PATCH("/me", userH.UpdateMe) // userH.UpdateMeは新しく作る関数
 
-	// Calenders
-	calG := e.Group("/calenders", csrfMW, echojwt.WithConfig(jwtCfg))
+	// Calendars
+	calG := e.Group("/calendars", csrfMW, echojwt.WithConfig(jwtCfg))
 	calG.POST("/create", calenderH.Create)
 	calG.POST("/:calender_id/join", calenderMembershipH.Create)
 	calG.GET("/my", calenderH.FindMyCalenders)

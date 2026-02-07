@@ -1,5 +1,7 @@
 // src/types/interfaces.ts
 
+// --- 基本エンティティ (APIレスポンスに近い形) ---
+
 export interface User {
   id: string;
   username: string;
@@ -40,81 +42,61 @@ export type SosoPointHistory = {
   reason?: string;
 };
 
-export interface EventDetails {
-  id: string;
-  date: string;
-  title: string;
-  details: string;
-  dropOffTime: string;
-  pickUpTime: string;
-  dropOffCount: number;
-  pickUpCount: number;
-  departurePoint: string;
-  destinationPoint: string;
-  members: string[];
-  eventURL?: string;
-  dispatchRegistered?: string[];
-}
+// --- アプリケーション内での表示用データ構造 ---
 
-export interface EventStatus {
-  date: string;
-  title: string;
-  details: string;
-  dropOffTime: string;
-  pickUpTime: string;
-  dropOffCount: number;
-  pickUpCount: number;
-  departurePoint: string;
-  destinationPoint: string;
-  members: string[];
-}
-
-/** カレンダーイベント詳細用（FullCalendar 連携） */
+/** * カレンダーイベント詳細用（FullCalendar 連携） 
+ * useDashboardView で API からのデータをこれに変換して保持します。
+ */
 export interface EventData {
   id: string;
   title: string;
   start: Date;
   end: Date;
-  description?: string;
-  location?: string;
-  url?: string;
+  url?: string; // 任意: クリック時のリンクなど
+  
+  // FullCalendar の標準フィールド以外はここに詰めます
   extendedProps: {
-    dropOffCount: number;
-    pickUpCount: number;
+    // 必須項目 (APIの Event 型にあるもの)
     seatsRequiredGo: number;
     seatsRequiredReturn: number;
-    participants: string[];
+    originLocation: string;
+    destinationLocation: string;
     description?: string;
-    originLocation?: string;
-    destinationLocation?: string;
+    participants: string[]; // 参加者名の配列 または ID配列
+
+    // 詳細API取得後に追加される可能性のある項目 (Optional)
+    remainingGoSeats?: number;     // 行きの残席
+    remainingReturnSeats?: number; // 帰りの残席
+    dropOffCount?: number;         // (互換性用)
+    pickUpCount?: number;          // (互換性用)
   };
 }
 
-/** イベント参加者（フォーム用） */
-export interface Participant {
-  id: number;
-  name: string;
-  isChecked: boolean;
+/** * イベント詳細ダイアログ表示用
+ * EventData よりもリッチな情報（詳細APIのレスポンスなど）を扱う場合に使用
+ */
+export interface EventDetails {
+  id: string;
+  title: string;
+  date: Date;        // string ではなく Date オブジェクトで統一したほうが扱いやすい
+  startTime: Date;
+  endTime: Date;
+  description: string;
+  origin: string;      // originLocation のエイリアス
+  destination: string; // destinationLocation のエイリアス
+  
+  // 座席情報
+  remainingGo: number;
+  remainingReturn: number;
+  totalGo: number;
+  totalReturn: number;
+  
+  participants: string[];
+  url?: string;
 }
 
-/** イベント追加フォームの状態（useMainView 用） */
-export interface EventFormState {
-  date: string;
-  title: string;
-  setTitle: (value: string) => void;
-  details: string;
-  setDetails: (value: string) => void;
-  dropOffTime: string;
-  setDropOffTime: (value: string) => void;
-  pickUpTime: string;
-  setPickUpTime: (value: string) => void;
-  dropOffCount: number;
-  setDropOffCount: (value: number) => void;
-  pickUpCount: number;
-  setPickUpCount: (value: number) => void;
-  departurePoint: string;
-  setDeparturePoint: (value: string) => void;
-  destinationPoint: string;
-  setDestinationPoint: (value: string) => void;
-  participants: Participant[];
-}
+// --- 以下は不要になった、または使われていない型 (削除推奨) ---
+
+// EventStatus は EventData と役割が被っているため削除検討
+// EventFormState は React Hook Form に置き換わったため削除推奨
+// Participant は string[] (ID配列) で管理するようになったため削除推奨

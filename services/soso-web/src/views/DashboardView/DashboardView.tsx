@@ -1,10 +1,7 @@
-// src/views/DashboardView/DashboardView.tsx
 'use client';
 
 import React from 'react';
 import { useDashboardView } from './useDashboardView';
-
-// 作成したコンポーネント群をインポート
 import { CalendarBoard } from './components/CalendarBoard/CalendarBoard';
 import EventAddDialog from './components/EventAddDialog/EventAddDialog';
 import { EventDetailDialog } from './components/EventDetailDialog/EventDetailDialog';
@@ -14,7 +11,6 @@ interface DashboardViewProps {
 }
 
 export default function DashboardView({ calendarId }: DashboardViewProps) {
-  // フックから必要な状態と関数を取り出す
   const {
     events,
     reloadEvents,
@@ -35,32 +31,30 @@ export default function DashboardView({ calendarId }: DashboardViewProps) {
       
       {/* 1. カレンダー本体 */}
       <CalendarBoard 
-        events={events}
+        events={events as any} // 念のためキャストしておくのが無難ですが、互換性があれば不要
         onEventClick={handleEventClick}
         onAddEventClick={handleAddEventClick}
         className="h-full"
       />
 
       {/* 2. イベント追加ダイアログ */}
-      {/* isOpenがtrueの時だけ表示。selectedDateが必須なので空文字チェックも兼ねる */}
       {isAddOpen && selectedDate && (
         <EventAddDialog
           isOpen={isAddOpen}
           onClose={closeAddModal}
           selectedDate={selectedDate}
           calendarId={calendarId}
-          onSuccess={reloadEvents} // 成功したらカレンダーを更新
+          onSuccess={reloadEvents}
         />
       )}
 
       {/* 3. イベント詳細ダイアログ */}
-      {/* 選択されたイベントがある時だけ表示 */}
       {isDetailOpen && selectedEvent && (
         <EventDetailDialog
           isOpen={isDetailOpen}
           onClose={closeDetailModal}
           eventData={selectedEvent}
-          onEventUpdated={reloadEvents} // 更新(参加登録など)したらカレンダーを更新
+          onEventUpdated={reloadEvents}
         />
       )}
     </div>
