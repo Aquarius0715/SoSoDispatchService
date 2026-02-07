@@ -8,14 +8,14 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 
-import { CalendersSidebar } from "../../SidebarView/CalenderListSidebarView/components/CalenderSidebar";
-import { CalenderDetailSidebar } from "@/views/SidebarView/CalenderDetailSidebarView/CalenderDetailSidebar";
+import { CalendarsSidebar } from "../../SidebarView/CalendarListSidebarView/components/CalendarSidebar";
+import { CalendarDetailSidebar } from "@/views/SidebarView/CalendarDetailSidebarView/CalendarDetailSidebar";
 
 export type MobileSidebarSheetProps = {
-  calenderId: string | null;
+  calendarId: string | null;
 };
 
-export function MobileSidebarSheet({ calenderId }: MobileSidebarSheetProps) {
+export function MobileSidebarSheet({ calendarId }: MobileSidebarSheetProps) {
   return (
     <Sheet>
       <SheetTrigger asChild>
@@ -37,10 +37,10 @@ export function MobileSidebarSheet({ calenderId }: MobileSidebarSheetProps) {
         </DialogHeader>
 
         <div className="h-full bg-sidebar text-sidebar-foreground">
-          {calenderId ? (
-            <CalenderDetailSidebar calenderId={calenderId} />
+          {calendarId ? (
+            <CalendarDetailSidebar calendarId={calendarId} />
           ) : (
-            <CalendersSidebar />
+            <CalendarsSidebar />
           )}
         </div>
       </SheetContent>

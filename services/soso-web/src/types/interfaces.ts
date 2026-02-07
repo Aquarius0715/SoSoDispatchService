@@ -10,7 +10,7 @@ export interface User {
   updatedAt?: string;
 }
 
-export interface Calender {
+export interface Calendar {
   id: string;
   name: string;
   description?: string;
@@ -19,7 +19,7 @@ export interface Calender {
   updatedAt?: string;
 }
 
-export type CalenderMember = {
+export type CalendarMember = {
   id: string;
   username: string;
   hasCar: boolean;
@@ -29,7 +29,7 @@ export type CalenderMember = {
 
 export type SosoPointHistory = {
   id: number;
-  calenderId: string;
+  calendarId: string;
   userId: string;
   changedAt: string;
   changedBy?: string;

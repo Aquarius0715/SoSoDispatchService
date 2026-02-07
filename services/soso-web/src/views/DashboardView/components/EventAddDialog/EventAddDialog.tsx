@@ -21,7 +21,7 @@ interface EventAddDialogProps {
   isOpen: boolean;
   onClose: () => void;
   selectedDate: string;
-  calenderId: string;
+  calendarId: string;
   onSuccess: () => void;
 }
 
@@ -29,7 +29,7 @@ const EventAddDialog: React.FC<EventAddDialogProps> = ({
   isOpen,
   onClose,
   selectedDate,
-  calenderId,
+  calendarId,
   onSuccess
 }) => {
   const form = useForm<EventAddValues>({

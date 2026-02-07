@@ -5,7 +5,7 @@ import { listEvents, Event } from '@/requests/eventAPI';
 import type { EventData } from '@/types/interfaces';
 import { useSnackbar } from '@/components/ui/snackbar';
 
-export const useDashboardView = (calenderId: string) => {
+export const useDashboardView = (calendarId: string) => {
   const { showSnackbar } = useSnackbar();
 
   // --- 状態管理 ---
@@ -21,11 +21,11 @@ export const useDashboardView = (calenderId: string) => {
 
   // --- 1. イベント一覧の取得と変換 ---
   const reloadEvents = useCallback(async () => {
-    if (!calenderId) return;
+    if (!calendarId) return;
 
     setIsLoading(true);
     try {
-      const fetcher = listEvents(calenderId);
+      const fetcher = listEvents(calendarId);
       const rawEvents: Event[] = await fetcher();
 
       // APIの型(Event)をカレンダーの型(EventData)に変換（マッピング）
@@ -54,7 +54,7 @@ export const useDashboardView = (calenderId: string) => {
     } finally {
       setIsLoading(false);
     }
-  }, [calenderId, showSnackbar]);
+  }, [calendarId, showSnackbar]);
 
   // 初回読み込み
   useEffect(() => {

@@ -94,7 +94,7 @@ export function useLoginView(): UseLoginViewResult {
 
       setAccessToken(res.accessToken, res.accessExpiresAt);
       showSnackbar("ログインしました", "success");
-      router.push("/calenders");
+      router.push("/calendars");
     } catch (error) {
       const errorMessage = handleLoginError(error, form);
       showSnackbar(errorMessage, "error");

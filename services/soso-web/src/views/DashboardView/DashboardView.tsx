@@ -10,10 +10,10 @@ import EventAddDialog from './components/EventAddDialog/EventAddDialog';
 import { EventDetailDialog } from './components/EventDetailDialog/EventDetailDialog';
 
 interface DashboardViewProps {
-  calenderId: string;
+  calendarId: string;
 }
 
-export default function DashboardView({ calenderId }: DashboardViewProps) {
+export default function DashboardView({ calendarId }: DashboardViewProps) {
   // フックから必要な状態と関数を取り出す
   const {
     events,
@@ -28,7 +28,7 @@ export default function DashboardView({ calenderId }: DashboardViewProps) {
     closeDetailModal,
     selectedEvent,
     handleEventClick,
-  } = useDashboardView(calenderId);
+  } = useDashboardView(calendarId);
 
   return (
     <div className="relative w-full h-full flex flex-col bg-slate-50">
@@ -48,7 +48,7 @@ export default function DashboardView({ calenderId }: DashboardViewProps) {
           isOpen={isAddOpen}
           onClose={closeAddModal}
           selectedDate={selectedDate}
-          calenderId={calenderId}
+          calendarId={calendarId}
           onSuccess={reloadEvents} // 成功したらカレンダーを更新
         />
       )}

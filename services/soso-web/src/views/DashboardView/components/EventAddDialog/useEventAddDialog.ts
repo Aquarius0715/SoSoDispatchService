@@ -8,14 +8,14 @@ import { useSnackbar } from "@/components/ui/snackbar";
 import axios from "axios";
 
 interface UseEventAddDialogProps {
-  calenderId: string;
+  calendarId: string;
   selectedDate: string; // "2026-02-08" 形式
   onSuccess: () => void;
   onClose: () => void;
 }
 
 export const useEventAddDialog = ({
-  calenderId,
+  calendarId,
   selectedDate,
   onSuccess,
   onClose,
@@ -54,7 +54,7 @@ export const useEventAddDialog = ({
       };
 
       // 2. API窓口を呼び出し (インフラ層 createEndpoint を経由)
-      const poster = createEvent(calenderId);
+      const poster = createEvent(calendarId);
       await poster(payload);
 
       // 3. 成功時の処理

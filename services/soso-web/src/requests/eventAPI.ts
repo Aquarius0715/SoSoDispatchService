@@ -26,7 +26,7 @@ export interface EventCreateRequest {
  */
 export interface Event {
   id: string;                  // uuid
-  calenderId: string;          // uuid
+  calendarId: string;          // uuid
   creatorId: string;           // uuid
   title: string;
   description: string;
@@ -57,13 +57,13 @@ export interface EventDetail extends Event {
 
 /**
  * イベント作成
- * POST /calenders/{calender_id}/events
+ * POST /calendars/{calendar_id}/events
  * Response: Event
  */
-export const createEvent = (calenderId: string) => 
+export const createEvent = (calendarId: string) => 
   createEndpoint<EventCreateRequest, Event>(
     "POST", 
-    `/calenders/${calenderId}/events`, 
+    `/calendars/${calendarId}/events`, 
     { auth: true }
   );
 
@@ -105,12 +105,12 @@ export const registerReturnDriver = (eventId: string) =>
 
 /**
  * イベント一覧取得
- * GET /calenders/{calender_id}/events
+ * GET /calendars/{calendar_id}/events
  * Response: Event[] (Array of Event)
  */
-export const listEvents = (calenderId: string) =>
+export const listEvents = (calendarId: string) =>
   createEndpoint<void, Event[]>(
     "GET",
-    `/calenders/${calenderId}/events`,
+    `/calendars/${calendarId}/events`,
     { auth: true }
   );
