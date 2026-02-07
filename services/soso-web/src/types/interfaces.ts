@@ -68,3 +68,53 @@ export interface EventStatus {
   destinationPoint: string;
   members: string[];
 }
+
+/** カレンダーイベント詳細用（FullCalendar 連携） */
+export interface EventData {
+  id: string;
+  title: string;
+  start: Date;
+  end: Date;
+  description?: string;
+  location?: string;
+  url?: string;
+  extendedProps: {
+    dropOffCount: number;
+    pickUpCount: number;
+    seatsRequiredGo: number;
+    seatsRequiredReturn: number;
+    participants: string[];
+    description?: string;
+    originLocation?: string;
+    destinationLocation?: string;
+  };
+}
+
+/** イベント参加者（フォーム用） */
+export interface Participant {
+  id: number;
+  name: string;
+  isChecked: boolean;
+}
+
+/** イベント追加フォームの状態（useMainView 用） */
+export interface EventFormState {
+  date: string;
+  title: string;
+  setTitle: (value: string) => void;
+  details: string;
+  setDetails: (value: string) => void;
+  dropOffTime: string;
+  setDropOffTime: (value: string) => void;
+  pickUpTime: string;
+  setPickUpTime: (value: string) => void;
+  dropOffCount: number;
+  setDropOffCount: (value: number) => void;
+  pickUpCount: number;
+  setPickUpCount: (value: number) => void;
+  departurePoint: string;
+  setDeparturePoint: (value: string) => void;
+  destinationPoint: string;
+  setDestinationPoint: (value: string) => void;
+  participants: Participant[];
+}

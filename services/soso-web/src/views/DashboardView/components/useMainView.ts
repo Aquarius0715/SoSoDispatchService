@@ -2,34 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { EventInput } from '@fullcalendar/core';
-
-// フォーム状態の型定義
-interface Participant {
-  id: number;
-  name: string;
-  isChecked: boolean;
-}
-
-interface EventFormState {
-  date: string;
-  title: string;
-  setTitle: (value: string) => void;
-  details: string;
-  setDetails: (value: string) => void;
-  dropOffTime: string;
-  setDropOffTime: (value: string) => void;
-  pickUpTime: string;
-  setPickUpTime: (value: string) => void;
-  dropOffCount: number;
-  setDropOffCount: (value: number) => void;
-  pickUpCount: number;
-  setPickUpCount: (value: number) => void;
-  departurePoint: string;
-  setDeparturePoint: (value: string) => void;
-  destinationPoint: string;
-  setDestinationPoint: (value: string) => void;
-  participants: Participant[];
-}
+import type { Participant, EventFormState } from '@/types/interfaces';
 
 /**
  * カレンダーメインビューのロジックを管理するカスタムフック

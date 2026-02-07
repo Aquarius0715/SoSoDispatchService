@@ -1,28 +1,8 @@
 // src/views/DashboardView/components/EventDetailDialog/useEventDetailDialog.ts
 import { useState } from 'react';
 import { useSnackbar } from "@/components/ui/snackbar";
+import type { EventData } from "@/types/interfaces";
 // import { registerEvent } from "@/requests/eventAPI"; // ※API実装後にコメントアウト解除
-
-// イベント情報の型定義（本来は共通の型定義ファイルからインポート推奨）
-export interface EventData {
-  id: string;
-  title: string;
-  start: Date;
-  end: Date;
-  description?: string;
-  location?: string;
-  url?: string;
-  extendedProps: {
-    dropOffCount: number;
-    pickUpCount: number;
-    seatsRequiredGo: number;
-    seatsRequiredReturn: number;
-    participants: string[];
-    description?: string;
-    originLocation?: string;
-    destinationLocation?: string;
-  };
-}
 
 interface UseEventDetailDialogProps {
   eventData: EventData;

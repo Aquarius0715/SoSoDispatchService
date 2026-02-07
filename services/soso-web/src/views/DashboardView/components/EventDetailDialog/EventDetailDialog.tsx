@@ -14,7 +14,8 @@ import {
   Calendar, Clock, MapPin, Users, Car, Share2, Edit, ExternalLink, Loader2 
 } from "lucide-react";
 
-import { useEventDetailDialog, type EventData } from './useEventDetailDialog';
+import type { EventData } from '@/types/interfaces';
+import { useEventDetailDialog } from './useEventDetailDialog';
 
 interface EventDetailDialogProps {
   isOpen: boolean;

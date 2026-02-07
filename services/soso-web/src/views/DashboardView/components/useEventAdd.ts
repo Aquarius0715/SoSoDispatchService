@@ -1,12 +1,5 @@
 import { useState, useEffect } from 'react';
-import { EventStatus } from '@/types/interfaces';
-
-
-interface Participant {
-  id: number;
-  name: string;
-  isChecked: boolean;
-}
+import type { EventStatus, Participant } from '@/types/interfaces';
 
 export const useEventAdd = (
   initialStatus: EventStatus,
