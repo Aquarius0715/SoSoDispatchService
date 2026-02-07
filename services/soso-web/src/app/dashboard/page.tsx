@@ -2,9 +2,9 @@
 
 import React from 'react';
 import { useMainView } from "@/views/DashboardView/main-view/useMainView";
-import CalendarMainView from '@/views/DashboardView/main-view/components/CalendarMainView';
+import CalendarMainView from '@/views/DashboardView/components/CalendarMainView';
 // ↓これから作る、あるいは既存のモーダルコンポーネント
-import EventAddView from '@/views/DashboardView/main-view/components/EventAddView'; 
+import EventAddView from '@/views/DashboardView/components/EventAddView'; 
 
 export default function CalendarPage() {
   // カスタムフックから必要な状態と関数をすべて取り出す
