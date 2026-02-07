@@ -112,9 +112,14 @@ export const EventFormInputs = ({ control }: EventFormInputsProps) => {
                   type="number"
                   min={0}
                   placeholder="0"
-                  {...field}
-                  // Input type="number" でも値はstringで返るので、数値変換して保存
-                  onChange={(e) => field.onChange(Number(e.target.value))}
+                  value={field.value === 0 ? '' : field.value}
+                  onChange={(e) => {
+                    const value = e.target.value === '' ? 0 : Number(e.target.value);
+                    field.onChange(value);
+                  }}
+                  onBlur={field.onBlur}
+                  name={field.name}
+                  ref={field.ref}
                 />
               </FormControl>
               <FormMessage />
@@ -132,8 +137,14 @@ export const EventFormInputs = ({ control }: EventFormInputsProps) => {
                   type="number"
                   min={0}
                   placeholder="0"
-                  {...field}
-                  onChange={(e) => field.onChange(Number(e.target.value))}
+                  value={field.value === 0 ? '' : field.value}
+                  onChange={(e) => {
+                    const value = e.target.value === '' ? 0 : Number(e.target.value);
+                    field.onChange(value);
+                  }}
+                  onBlur={field.onBlur}
+                  name={field.name}
+                  ref={field.ref}
                 />
               </FormControl>
               <FormMessage />
