@@ -11,19 +11,18 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Form } from "@/components/ui/form"; // shadcn/ui
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { CalendarIcon } from "lucide-react";
+import { Form } from "@/components/ui/form";
+import { CalendarIcon, Loader2 } from "lucide-react";
 
 import { eventAddSchema, type EventAddValues } from "./schema";
 import { EventFormInputs } from "./components/EventFormInputs";
 
 interface EventAddDialogProps {
-  isOpen: boolean; // 今、ダイアログが開いているか
-  onClose: () => void; //モーダルを閉じるとき
-  selectedDate: string; // カレンダーで選ばれた日付
+  isOpen: boolean;
+  onClose: () => void;
+  selectedDate: string;
   calenderId: string;
-  onSuccess: () => void; // 作成成功時のリロード用
+  onSuccess: () => void;
 }
 
 const EventAddDialog: React.FC<EventAddDialogProps> = ({
@@ -33,8 +32,6 @@ const EventAddDialog: React.FC<EventAddDialogProps> = ({
   calenderId,
   onSuccess
 }) => {
-  // 本来は useEventAddDialog.ts に切り出すのが理想ですが、
-  // ここでは RegisterView 同様のロジック構造を示します
   const form = useForm<EventAddValues>({
     resolver: zodResolver(eventAddSchema) as any,
     defaultValues: {
@@ -54,10 +51,8 @@ const EventAddDialog: React.FC<EventAddDialogProps> = ({
 
   const onSubmit = form.handleSubmit(async (values) => {
     try {
-      // API連携ロジックをここに記述
-      // startTime: `${selectedDate}T${values.dropOffTime}:00Z` などの加工を行う
       console.log("Submit Data:", values);
-      
+      // ここに await APICall() が入る想定
       onSuccess();
       onClose();
       form.reset();
@@ -68,26 +63,36 @@ const EventAddDialog: React.FC<EventAddDialogProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-lg h-[80vh] flex flex-col overflow-hidden">
-        <DialogHeader>
+      {/* レイアウト: !flex で DialogContent のデフォルト grid を上書き
+        max-h-[90vh]: 画面高さの90%を上限に
+        overflow-hidden: はみ出しを防ぎ、中だけスクロールさせる
+      */}
+      <DialogContent className="sm:max-w-lg max-h-[90vh] !flex flex-col p-0 gap-0 overflow-hidden">
+        {/* Header: 常に上に固定 */}
+        <DialogHeader className="shrink-0 px-6 py-4 border-b bg-white">
           <DialogTitle className="text-xl font-bold flex items-center gap-2">
             <CalendarIcon className="h-5 w-5" />
             予定を追加 ({selectedDate})
           </DialogTitle>
         </DialogHeader>
 
-        {/* RegisterViewと同じくFormで包む */}
         <Form {...form}>
-          <form onSubmit={onSubmit} className="flex-1 flex flex-col min-h-0">
-            <ScrollArea className="flex-1 px-1">
-              <EventFormInputs control={form.control} />
-            </ScrollArea>
+          {/* フォーム本体: flex-1 + min-h-0 で残り領域を取り、はみ出さないようにする */}
+          <form onSubmit={onSubmit} className="flex-1 flex flex-col min-h-0 overflow-hidden">
+            {/* フォーム入力エリアのみスクロール（flex-1 min-h-0 で高さを拘束） */}
+            <div className="flex-1 min-h-0 overflow-y-auto">
+              <div className="px-6 py-6">
+                <EventFormInputs control={form.control} />
+              </div>
+            </div>
 
-            <DialogFooter className="p-6 pt-4 border-t bg-white shrink-0">
+            {/* Footer: 常に下に固定 */}
+            <DialogFooter className="shrink-0 px-6 py-4 border-t bg-gray-50">
               <Button variant="outline" type="button" onClick={onClose}>
                 キャンセル
               </Button>
               <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 {isSubmitting ? "保存中..." : "保存する"}
               </Button>
             </DialogFooter>
