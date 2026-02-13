@@ -54,21 +54,22 @@ async function ensureCsrfToken(): Promise<string> {
 }
 
 // ==============================
-// tokenexpired redirect
+// redirects (tokenexpired / not-found)
 // ==============================
-let redirected = false;
+let redirectedToTokenExpired = false;
+let redirectedToNotFound = false;
 
-function shouldSkipRedirect() {
+function shouldSkipRedirectToTokenExpired() {
   if (typeof window === "undefined") return true;
   return window.location.pathname.startsWith("/auth");
 }
 
 function redirectToTokenExpiredOnce() {
   if (typeof window === "undefined") return;
-  if (redirected) return;
-  if (shouldSkipRedirect()) return;
+  if (redirectedToTokenExpired) return;
+  if (shouldSkipRedirectToTokenExpired()) return;
 
-  redirected = true;
+  redirectedToTokenExpired = true;
   clearAccessToken();
 
   const next = window.location.pathname + window.location.search;
@@ -77,7 +78,26 @@ function redirectToTokenExpiredOnce() {
   );
 }
 
-// auth系 endpoint は refresh で救わない（ループ源になりやすい）
+function shouldSkipRedirectToNotFound() {
+  if (typeof window === "undefined") return true;
+  const p = window.location.pathname;
+  // auth 系は 403 でもこの画面に飛ばさない
+  if (p.startsWith("/auth")) return true;
+  if (p.startsWith("/not-found")) return true;
+  return false;
+}
+
+function redirectToNotFoundOnce() {
+  if (typeof window === "undefined") return;
+  if (redirectedToNotFound) return;
+  if (shouldSkipRedirectToNotFound()) return;
+
+  redirectedToNotFound = true;
+
+  window.location.assign("/not-found");
+}
+
+// auth系 endpoint は refresh で救わない（ループ源になりやすい）（ループ源になりやすい）
 function isAuthEndpoint(url?: string): boolean {
   if (!url) return false;
   return (
@@ -160,7 +180,13 @@ apiClient.interceptors.response.use(
     const cfg = error.config as InternalApiConfig | undefined;
     if (!cfg) return Promise.reject(error);
 
-    // ★ 401 のみ refresh 対象（403は救わない）
+    // 403 -> Not Found ページへ
+    if (status === 403) {
+      redirectToNotFoundOnce();
+      return Promise.reject(error);
+    }
+
+    // ★ 401 のみ refresh 対象
     if (status !== 401) {
       return Promise.reject(error);
     }

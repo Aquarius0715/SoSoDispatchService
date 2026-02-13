@@ -141,6 +141,7 @@
 │       │   ├── components
 │       │   │   └── ui
 │       │   │       ├── avatar.tsx
+│       │   │       ├── badge.tsx
 │       │   │       ├── breadcrumb.tsx
 │       │   │       ├── button.tsx
 │       │   │       ├── card.tsx
@@ -262,7 +263,7 @@
 │       └── vitest.shims.d.ts
 └── サイドバー作成ガイド.patch
 
-68 directories, 194 files
+68 directories, 195 files
 
 ===== FILE CONTENTS =====
 
@@ -620,7 +621,7 @@ volumes:
 
 [TRUNCATED] MAX_LINES=5000
 
------ FILE: project_dump.txt (size=23008) -----
+----- FILE: project_dump.txt (size=23060) -----
 ===== DIRECTORY TREE =====
 .
 ├── .DS_Store
@@ -764,6 +765,7 @@ volumes:
 │       │   ├── components
 │       │   │   └── ui
 │       │   │       ├── avatar.tsx
+│       │   │       ├── badge.tsx
 │       │   │       ├── breadcrumb.tsx
 │       │   │       ├── button.tsx
 │       │   │       ├── card.tsx
@@ -885,7 +887,7 @@ volumes:
 │       └── vitest.shims.d.ts
 └── サイドバー作成ガイド.patch
 
-68 directories, 194 files
+68 directories, 195 files
 
 ===== FILE CONTENTS =====
 
@@ -1243,7 +1245,7 @@ volumes:
 
 [TRUNCATED] MAX_LINES=5000
 
------ FILE: project_dump.txt (size=23008) -----
+----- FILE: project_dump.txt (size=23060) -----
 ===== DIRECTORY TREE =====
 .
 ├── .DS_Store
@@ -1387,6 +1389,7 @@ volumes:
 │       │   ├── components
 │       │   │   └── ui
 │       │   │       ├── avatar.tsx
+│       │   │       ├── badge.tsx
 │       │   │       ├── breadcrumb.tsx
 │       │   │       ├── button.tsx
 │       │   │       ├── card.tsx
@@ -1508,7 +1511,7 @@ volumes:
 │       └── vitest.shims.d.ts
 └── サイドバー作成ガイド.patch
 
-68 directories, 194 files
+68 directories, 195 files
 
 ===== FILE CONTENTS =====
 
@@ -1866,7 +1869,7 @@ volumes:
 
 [TRUNCATED] MAX_LINES=5000
 
------ FILE: project_dump.txt (size=23008) -----
+----- FILE: project_dump.txt (size=23060) -----
 ===== DIRECTORY TREE =====
 .
 ├── .DS_Store
@@ -2010,6 +2013,7 @@ volumes:
 │       │   ├── components
 │       │   │   └── ui
 │       │   │       ├── avatar.tsx
+│       │   │       ├── badge.tsx
 │       │   │       ├── breadcrumb.tsx
 │       │   │       ├── button.tsx
 │       │   │       ├── card.tsx
@@ -2131,7 +2135,7 @@ volumes:
 │       └── vitest.shims.d.ts
 └── サイドバー作成ガイド.patch
 
-68 directories, 194 files
+68 directories, 195 files
 
 ===== FILE CONTENTS =====
 
@@ -2489,7 +2493,7 @@ volumes:
 
 [TRUNCATED] MAX_LINES=5000
 
------ FILE: project_dump.txt (size=23008) -----
+----- FILE: project_dump.txt (size=23060) -----
 ===== DIRECTORY TREE =====
 .
 ├── .DS_Store
@@ -2633,6 +2637,7 @@ volumes:
 │       │   ├── components
 │       │   │   └── ui
 │       │   │       ├── avatar.tsx
+│       │   │       ├── badge.tsx
 │       │   │       ├── breadcrumb.tsx
 │       │   │       ├── button.tsx
 │       │   │       ├── card.tsx
@@ -2754,7 +2759,7 @@ volumes:
 │       └── vitest.shims.d.ts
 └── サイドバー作成ガイド.patch
 
-68 directories, 194 files
+68 directories, 195 files
 
 ===== FILE CONTENTS =====
 
@@ -3112,7 +3117,7 @@ volumes:
 
 [TRUNCATED] MAX_LINES=5000
 
------ FILE: project_dump.txt (size=23008) -----
+----- FILE: project_dump.txt (size=23060) -----
 ===== DIRECTORY TREE =====
 .
 ├── .DS_Store
@@ -3256,6 +3261,7 @@ volumes:
 │       │   ├── components
 │       │   │   └── ui
 │       │   │       ├── avatar.tsx
+│       │   │       ├── badge.tsx
 │       │   │       ├── breadcrumb.tsx
 │       │   │       ├── button.tsx
 │       │   │       ├── card.tsx
@@ -3377,7 +3383,7 @@ volumes:
 │       └── vitest.shims.d.ts
 └── サイドバー作成ガイド.patch
 
-68 directories, 194 files
+68 directories, 195 files
 
 ===== FILE CONTENTS =====
 
@@ -3735,7 +3741,7 @@ volumes:
 
 [TRUNCATED] MAX_LINES=5000
 
------ FILE: project_dump.txt (size=23008) -----
+----- FILE: project_dump.txt (size=23060) -----
 ===== DIRECTORY TREE =====
 .
 ├── .DS_Store
@@ -3879,6 +3885,7 @@ volumes:
 │       │   ├── components
 │       │   │   └── ui
 │       │   │       ├── avatar.tsx
+│       │   │       ├── badge.tsx
 │       │   │       ├── breadcrumb.tsx
 │       │   │       ├── button.tsx
 │       │   │       ├── card.tsx
@@ -4000,7 +4007,7 @@ volumes:
 │       └── vitest.shims.d.ts
 └── サイドバー作成ガイド.patch
 
-68 directories, 194 files
+68 directories, 195 files
 
 ===== FILE CONTENTS =====
 
@@ -4358,7 +4365,7 @@ volumes:
 
 [TRUNCATED] MAX_LINES=5000
 
------ FILE: project_dump.txt (size=23008) -----
+----- FILE: project_dump.txt (size=23060) -----
 ===== DIRECTORY TREE =====
 .
 ├── .DS_Store
@@ -4502,6 +4509,7 @@ volumes:
 │       │   ├── components
 │       │   │   └── ui
 │       │   │       ├── avatar.tsx
+│       │   │       ├── badge.tsx
 │       │   │       ├── breadcrumb.tsx
 │       │   │       ├── button.tsx
 │       │   │       ├── card.tsx
@@ -4623,7 +4631,7 @@ volumes:
 │       └── vitest.shims.d.ts
 └── サイドバー作成ガイド.patch
 
-68 directories, 194 files
+68 directories, 195 files
 
 ===== FILE CONTENTS =====
 
@@ -4981,7 +4989,7 @@ volumes:
 
 [TRUNCATED] MAX_LINES=5000
 
------ FILE: project_dump.txt (size=23008) -----
+----- FILE: project_dump.txt (size=23060) -----
 ===== DIRECTORY TREE =====
 .
 ├── .DS_Store
@@ -5125,6 +5133,7 @@ volumes:
 │       │   ├── components
 │       │   │   └── ui
 │       │   │       ├── avatar.tsx
+│       │   │       ├── badge.tsx
 │       │   │       ├── breadcrumb.tsx
 │       │   │       ├── button.tsx
 │       │   │       ├── card.tsx
@@ -5246,7 +5255,7 @@ volumes:
 │       └── vitest.shims.d.ts
 └── サイドバー作成ガイド.patch
 
-68 directories, 194 files
+68 directories, 195 files
 
 ===== FILE CONTENTS =====
 
@@ -5604,7 +5613,7 @@ volumes:
 
 [TRUNCATED] MAX_LINES=5000
 
------ FILE: project_dump.txt (size=23008) -----
+----- FILE: project_dump.txt (size=23060) -----
 ===== DIRECTORY TREE =====
 .
 ├── .DS_Store
@@ -5613,14 +5622,6 @@ volumes:
 │   │   ├── bug_report.yml
 │   │   ├── config.yml
 │   │   ├── feature_request.yml
-│   │   ├── question.yml
-│   │   └── task.yml
-│   ├── PULL_REQUEST_TEMPLATE.md
-│   └── copilot-instructions.md
-├── .gitignore
-├── Makefile
-├── README.md
-├── cookie.txt
 
 [TRUNCATED] MAX_LINES=5000
 
@@ -20113,6 +20114,58 @@ export { Avatar, AvatarImage, AvatarFallback }
 
 [TRUNCATED] MAX_LINES=5000
 
+----- FILE: services/soso-web/src/components/ui/badge.tsx (size=1783) -----
+import * as React from "react"
+import { Slot } from "@radix-ui/react-slot"
+import { cva, type VariantProps } from "class-variance-authority"
+
+import { cn } from "@/lib/utils"
+
+const badgeVariants = cva(
+  "inline-flex items-center justify-center rounded-full border border-transparent px-2 py-0.5 text-xs font-medium w-fit whitespace-nowrap shrink-0 [&>svg]:size-3 gap-1 [&>svg]:pointer-events-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive transition-[color,box-shadow] overflow-hidden",
+  {
+    variants: {
+      variant: {
+        default: "bg-primary text-primary-foreground [a&]:hover:bg-primary/90",
+        secondary:
+          "bg-secondary text-secondary-foreground [a&]:hover:bg-secondary/90",
+        destructive:
+          "bg-destructive text-white [a&]:hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",
+        outline:
+          "border-border text-foreground [a&]:hover:bg-accent [a&]:hover:text-accent-foreground",
+        ghost: "[a&]:hover:bg-accent [a&]:hover:text-accent-foreground",
+        link: "text-primary underline-offset-4 [a&]:hover:underline",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+    },
+  }
+)
+
+function Badge({
+  className,
+  variant = "default",
+  asChild = false,
+  ...props
+}: React.ComponentProps<"span"> &
+  VariantProps<typeof badgeVariants> & { asChild?: boolean }) {
+  const Comp = asChild ? Slot : "span"
+
+  return (
+    <Comp
+      data-slot="badge"
+      data-variant={variant}
+      className={cn(badgeVariants({ variant }), className)}
+      {...props}
+    />
+  )
+}
+
+export { Badge, badgeVariants }
+
+[TRUNCATED] MAX_LINES=5000
+
 ----- FILE: services/soso-web/src/components/ui/breadcrumb.tsx (size=2357) -----
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
@@ -25156,7 +25209,7 @@ export function CalenderDetailSidebarView({ calenderId }: Props) {
 
 [TRUNCATED] MAX_LINES=5000
 
------ FILE: services/soso-web/src/views/SidebarView/CalenderDetailSidebarView/MembersListPanel/MemberListPanel.tsx (size=1482) -----
+----- FILE: services/soso-web/src/views/SidebarView/CalenderDetailSidebarView/MembersListPanel/MemberListPanel.tsx (size=1523) -----
 // src/views/CalenderDetailSidebarView/CalenderDetailSidebar/members/MemberListPanel.tsx
 "use client";
 
@@ -25176,16 +25229,15 @@ export function MemberListPanel({ calenderId }: Props) {
 
   if (isLoading) {
     return (
-      <div className="space-y-2">
+      <div className="w-full min-w-0 space-y-2">
         {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} className="rounded-xl border bg-card p-3">
-            <div className="flex items-center gap-3">
-              <Skeleton className="h-9 w-9 rounded-full" />
-              <div className="min-w-0 flex-1 space-y-2">
+          <div key={i} className="w-full min-w-0 rounded-xl border bg-card p-3 overflow-hidden">
+            <div className="flex w-full min-w-0 items-center gap-3">
+              <Skeleton className="h-9 w-9 shrink-0 rounded-full" />
+              <div className="min-w-0 w-0 flex-1 space-y-2">
                 <Skeleton className="h-4 w-24" />
                 <Skeleton className="h-3 w-40" />
               </div>
-              <Skeleton className="h-4 w-10" />
             </div>
           </div>
         ))}
@@ -25204,7 +25256,7 @@ export function MemberListPanel({ calenderId }: Props) {
   }
 
   return (
-    <div className="space-y-2">
+    <div className="w-full min-w-0 space-y-2">
       {members.map((m) => (
         <MemberCard key={m.id} member={m} />
       ))}
@@ -25214,7 +25266,7 @@ export function MemberListPanel({ calenderId }: Props) {
 
 [TRUNCATED] MAX_LINES=5000
 
------ FILE: services/soso-web/src/views/SidebarView/CalenderDetailSidebarView/MembersListPanel/components/MemberCard.tsx (size=1757) -----
+----- FILE: services/soso-web/src/views/SidebarView/CalenderDetailSidebarView/MembersListPanel/components/MemberCard.tsx (size=2270) -----
 // src/views/CalenderDetailSidebarView/CalenderDetailSidebar/members/components/MemberCard.tsx
 "use client";
 
@@ -25231,22 +25283,29 @@ type Props = {
 };
 
 export function MemberCard({ member }: Props) {
+  const username = member.username || "（名前未設定）";
+
   return (
-    <Card>
-      <CardContent className="p-3">
-        <div className="flex items-center gap-3">
-          <Avatar className="h-9 w-9">
+    <Card className="w-full">
+      {/* 上下の余白を詰める: p-3 -> px-3 py-2（必要なら py-1.5 でもOK） */}
+      <CardContent className="overflow-hidden px-3 py-0">
+        <div className="flex w-full min-w-0 items-center gap-3 overflow-hidden">
+          <Avatar className="h-9 w-9 shrink-0">
             <AvatarFallback>
               {member.username?.slice(0, 1)?.toUpperCase() ?? "?"}
             </AvatarFallback>
           </Avatar>
 
-          <div className="min-w-0 flex-1">
-            <div className="truncate text-base font-semibold">
-              {member.username || "（名前未設定）"}
+          <div className="min-w-0 w-0 flex-1 overflow-hidden">
+            <div
+              className="truncate text-base font-semibold leading-tight"
+              title={username}
+            >
+              {username}
             </div>
 
-            <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+            {/* 余白を詰める: mt-1 -> mt-0.5 */}
+            <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground leading-none">
               <div className="inline-flex items-center gap-1">
                 <Car className="h-3.5 w-3.5" />
                 {member.hasCar ? "車あり" : "車なし"}
@@ -25256,13 +25315,16 @@ export function MemberCard({ member }: Props) {
                 {member.capacity}人
               </div>
             </div>
-          </div>
 
-          <div className="text-right">
-            <div className="text-[10px] leading-none text-muted-foreground">
-              SOSo
+            {/* 余白を詰める: mt-2 -> mt-1 */}
+            <div className="mt-2 flex items-baseline gap-2">
+              <div className="text-[10px] leading-none text-muted-foreground">
+                SOSo
+              </div>
+              <div className="text-sm font-semibold leading-none">
+                {(member.sosoPoint ?? 0).toString()}pt
+              </div>
             </div>
-            <div className="text-sm font-semibold">{member.sosoPoint}pt</div>
           </div>
         </div>
       </CardContent>
