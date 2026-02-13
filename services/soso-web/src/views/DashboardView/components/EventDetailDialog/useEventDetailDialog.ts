@@ -9,6 +9,7 @@ import {
 } from "@/requests/eventAPI";
 import { useSnackbar } from "@/components/ui/snackbar";
 import axios from "axios";
+import { useAuthState } from '@/contexts/AuthContext';
 
 interface UseEventDetailDialogProps {
   eventId: string;
@@ -27,6 +28,10 @@ export const useEventDetailDialog = ({
   const [isLoading, setIsLoading] = useState(false);
   const [isActionLoading, setIsActionLoading] = useState(false);
 
+  const { user } = useAuthState();
+
+  const [isMeDriver, setIsMeDriver] = useState(false);
+
   // 1. イベント詳細情報の取得
   const loadEventDetail = useCallback(async () => {
     if (!eventId) return;
@@ -36,6 +41,29 @@ export const useEventDetailDialog = ({
       const fetcher = getEventDetail(eventId);
       const data = await fetcher();
       setEventData(data);
+      
+      console.log("typeof", typeof(data.goDrivers))
+      console.log("Hello1")
+      const y = data.goDrivers || [{userId: "",username: "", capacity: 0}]; 
+      // data.goDriversがnullのときy = undefined、それ以外オブジェクト
+      console.log(y)
+      //console.log("Hello2")
+
+      //console.log(data.goDrivers.find(i => i.userId === user?.id))
+      const x = y.find(i => i.userId === user?.id)
+      console.log("x", x)
+      
+      if (x) {
+        //console.log("Length", y.length)
+        console.log("Modal Closed")
+        setIsMeDriver(true);
+      } else {
+        // console.log("Length", 0)
+        console.log("Modal Still Open")
+        setIsMeDriver(false);
+      }
+
+      
     } catch (error) {
       console.error(error);
       showSnackbar("イベント情報の取得に失敗しました", "error");
@@ -87,6 +115,7 @@ export const useEventDetailDialog = ({
     eventData,
     isLoading,
     isActionLoading,
+    isMeDriver,
     handleRegisterDriver,
     refresh: loadEventDetail,
   };

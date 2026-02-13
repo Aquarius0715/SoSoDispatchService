@@ -162,6 +162,7 @@ func (r *EventParticipantRepository) ExistsByEventAndUser(
 
 /* 参加者とユーザー情報をまとめた DTO */
 type ParticipantInfo struct {
+	UserID   string
 	UserName string
 	Capacity int
 	Type     model.Type
@@ -175,7 +176,7 @@ func (r *EventParticipantRepository) FetchUserInfos(
 ) ([]ParticipantInfo, error) {
 
 	const q = `
-		SELECT u.username, u.capacity, ep.type
+		SELECT u.id, u.username, u.capacity, ep.type
 		FROM event_participants AS ep
 		INNER JOIN users AS u ON u.id = ep.user_id
 		WHERE ep.event_id = ?`
@@ -189,7 +190,7 @@ func (r *EventParticipantRepository) FetchUserInfos(
 	var list []ParticipantInfo
 	for rows.Next() {
 		var p ParticipantInfo
-		if err := rows.Scan(&p.UserName, &p.Capacity, &p.Type); err != nil {
+		if err := rows.Scan(&p.UserID, &p.UserName, &p.Capacity, &p.Type); err != nil {
 			return nil, err
 		}
 		list = append(list, p)

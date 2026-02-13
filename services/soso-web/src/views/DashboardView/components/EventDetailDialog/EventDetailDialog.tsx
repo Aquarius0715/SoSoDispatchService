@@ -15,6 +15,7 @@ import {
 
 import type { EventData } from '@/types/interfaces';
 import { useEventDetailDialog } from './useEventDetailDialog';
+import { boolean } from 'zod';
 
 interface EventDetailDialogProps {
   isOpen: boolean;
@@ -31,6 +32,7 @@ export const EventDetailDialog: React.FC<EventDetailDialogProps> = ({
 }) => {
   // Hookを使用 (引数を eventId に合わせる)
   const {
+    isMeDriver,
     eventData, // APIから取得した詳細データ
     isLoading,
     isActionLoading,
@@ -189,7 +191,7 @@ export const EventDetailDialog: React.FC<EventDetailDialogProps> = ({
               className="flex-1"
               variant="outline"
               onClick={() => handleRegisterDriver('pickup')}
-              disabled={isActionLoading || display.remainingGo === 0}
+              disabled={isMeDriver || isActionLoading || display.remainingGo === 0}
             >
               {isActionLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
               迎え(行き)に登録

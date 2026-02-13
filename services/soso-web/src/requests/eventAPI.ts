@@ -34,9 +34,16 @@ export interface Event {
   endTime: string;             // date-time
   originLocation: string;
   destinationLocation: string;
+  goDrivers: GoDrivers[]; // goDrivers: {[{}]}
   seatsRequiredGo: number;     // integer
   seatsRequiredReturn: number; // integer
   participantUserIds: string[]; // uuid array
+}
+
+export interface GoDrivers {
+  userId: string,
+  username: string,
+  capacity: number
 }
 
 /**
