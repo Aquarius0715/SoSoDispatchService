@@ -15,7 +15,7 @@ export const createEvent = (calendarId: string) =>
   createEndpoint<EventCreateRequest, Event>(
     "POST", 
     `/calendars/${calendarId}/events`, 
-    { auth: true }
+    { auth: true, csrf: true }
   );
 
 /**
