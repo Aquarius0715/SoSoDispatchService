@@ -11,7 +11,7 @@ export type CalendarCreateRequest = {
 /** 自分が所属するカレンダー一覧を取得 */
 export async function getMyCalendars(): Promise<Calendar[]> {
   // OpenAPI: /calendars/my は bearer + csrf
-  return apiGet<Calendar[]>("/calendars/my", { _auth: true, _csrf: true });
+  return apiGet<Calendar[]>("/calendars/my", { _auth: true, _csrf: false });
 }
 
 /** カレンダーを作成 */
