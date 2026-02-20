@@ -11,7 +11,7 @@ export async function listCalendarMembers(
 ): Promise<CalendarMember[]> {
   return apiGet<CalendarMember[]>(`/calendars/${calendarId}/members`, {
     _auth: true,
-    _csrf: true,
+    _csrf: false,
   });
 }
 
@@ -26,7 +26,7 @@ export async function listSosoPointHistory(
     `/calendars/${calendarId}/soso_point_history`,
     {
       _auth: true,
-      _csrf: true,
+      _csrf: false,
     }
   );
 }

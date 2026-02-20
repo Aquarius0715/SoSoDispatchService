@@ -100,3 +100,60 @@ export interface EventDetails {
 // EventStatus は EventData と役割が被っているため削除検討
 // EventFormState は React Hook Form に置き換わったため削除推奨
 // Participant は string[] (ID配列) で管理するようになったため削除推奨
+
+// ==========================================
+// 1. 型定義 (Swagger Schemas に準拠)
+// ==========================================
+
+/**
+ * EventCreateRequest
+ * イベント作成時のリクエストボディ
+ */
+export interface EventCreateRequest {
+  title: string;
+  description?: string;
+  startTime: string;           // date-time (ISO 8601)
+  endTime: string;             // date-time (ISO 8601)
+  originLocation: string;
+  destinationLocation: string;
+  seatsRequiredGo: number;     // integer
+  seatsRequiredReturn: number; // integer
+  participantUserIds: string[]; // UUID array
+}
+
+/**
+ * Event (Response)
+ * 基本的なイベント情報 (GET /events, POST /events のレスポンス)
+ */
+export interface Event {
+  id: string;                  // uuid
+  calendarId: string;          // uuid
+  creatorId: string;           // uuid
+  title: string;
+  description: string;
+  startTime: string;           // date-time
+  endTime: string;             // date-time
+  originLocation: string;
+  destinationLocation: string;
+  goDrivers: GoDrivers[]; // goDrivers: {[{}]}
+  seatsRequiredGo: number;     // integer
+  seatsRequiredReturn: number; // integer
+  participantUserIds: string[]; // uuid array
+}
+
+export interface GoDrivers {
+  userId: string,
+  username: string,
+  capacity: number
+}
+
+/**
+ * EventDetail (Response)
+ * 詳細画面用 (Event を拡張し、残席数などを追加)
+ * Swagger: allOf [Event, { remainingGoSeats, ... }]
+ */
+export interface EventDetail extends Event {
+  remainingGoSeats: number;     // integer
+  remainingReturnSeats: number; // integer
+  participants: string[];       // 参加者の名前リスト (Swagger定義に基づく)
+}

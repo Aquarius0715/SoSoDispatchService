@@ -5,11 +5,11 @@ import {
   getEventDetail, 
   registerPickupDriver, 
   registerReturnDriver, 
-  EventDetail 
 } from "@/requests/eventAPI";
 import { useSnackbar } from "@/components/ui/snackbar";
 import axios from "axios";
 import { useAuthState } from '@/contexts/AuthContext';
+import { EventDetail } from '@/types/interfaces';
 
 interface UseEventDetailDialogProps {
   eventId: string;
