@@ -38,8 +38,7 @@ export const useEventDetailDialog = ({
     
     setIsLoading(true);
     try {
-      const fetcher = getEventDetail(eventId);
-      const data = await fetcher();
+      const data = await getEventDetail(eventId);
       setEventData(data);
       
       console.log("typeof", typeof(data.goDrivers))
@@ -86,11 +85,9 @@ export const useEventDetailDialog = ({
     setIsActionLoading(true);
     try {
       if (type === 'pickup') {
-        const poster = registerPickupDriver(eventId);
-        await poster();
+        await registerPickupDriver(eventId);
       } else {
-        const poster = registerReturnDriver(eventId);
-        await poster();
+        await registerReturnDriver(eventId);
       }
 
       showSnackbar(`${type === 'pickup' ? '迎え' : '送り'}ドライバーとして登録しました`, "success");

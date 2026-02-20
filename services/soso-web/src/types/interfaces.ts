@@ -95,7 +95,7 @@ export interface EventDetails {
   url?: string;
 }
 
-// --- 以下は不要になった、または使われていない型 (削除推奨) ---
+// --- 以下は不要になった、または使われていない型 (削除済み) ---
 
 // EventStatus は EventData と役割が被っているため削除検討
 // EventFormState は React Hook Form に置き換わったため削除推奨

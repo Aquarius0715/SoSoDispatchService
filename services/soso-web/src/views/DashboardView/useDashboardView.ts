@@ -2,7 +2,8 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { EventClickArg } from '@fullcalendar/core'; // FullCalendarの型をインポート
-import { listEvents, Event } from '@/requests/eventAPI';
+import { listEvents } from '@/requests/eventAPI';
+import { Event } from '@/types/interfaces';
 import type { EventData } from '@/types/interfaces';
 import { useSnackbar } from '@/components/ui/snackbar';
 
@@ -27,8 +28,7 @@ export const useDashboardView = (calendarId: string) => {
 
     setIsLoading(true);
     try {
-      const fetcher = listEvents(calendarId);
-      const rawEvents: Event[] = await fetcher();
+      const rawEvents: Event[] = await listEvents(calendarId);
 
       const formattedEvents: EventData[] = rawEvents.map((ev) => ({
         id: ev.id,
