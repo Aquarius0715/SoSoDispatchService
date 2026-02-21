@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 
 import { useEventDetailDialog } from './useEventDetailDialog';
+import { fmtJstDate, fmtJstTime } from '@/lib/dateUtils';
 
 interface EventDetailDialogProps {
   isOpen: boolean;
@@ -51,17 +52,6 @@ export const EventDetailDialog: React.FC<EventDetailDialogProps> = ({
     totalReturn: eventData.seatsRequiredReturn,
     participants: eventData.participants ?? [],
   } : null;
-
-  // 日付フォーマット関数
-  const fmtJstDate = (date: Date) => 
-    date.toLocaleDateString('ja-JP', {
-      year: 'numeric', month: '2-digit', day: '2-digit', weekday: 'short'
-    });
-
-  const fmtJstTime = (date: Date) => 
-    date.toLocaleTimeString('ja-JP', {
-      hour: '2-digit', minute: '2-digit', hour12: false
-    });
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
