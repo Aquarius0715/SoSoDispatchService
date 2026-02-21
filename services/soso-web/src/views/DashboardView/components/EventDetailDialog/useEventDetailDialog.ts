@@ -31,45 +31,28 @@ export const useEventDetailDialog = ({
   const { user } = useAuthState();
 
   const [isMeDriver, setIsMeDriver] = useState(false);
+  const [isMeReturnDriver, setIsMeReturnDriver] = useState(false);
 
   // 1. イベント詳細情報の取得
   const loadEventDetail = useCallback(async () => {
     if (!eventId) return;
-    
+
     setIsLoading(true);
     try {
       const data = await getEventDetail(eventId);
       setEventData(data);
-      
-      console.log("typeof", typeof(data.goDrivers))
-      console.log("Hello1")
-      const y = data.goDrivers || [{userId: "",username: "", capacity: 0}]; 
-      // data.goDriversがnullのときy = undefined、それ以外オブジェクト
-      console.log(y)
-      //console.log("Hello2")
 
-      //console.log(data.goDrivers.find(i => i.userId === user?.id))
-      const x = y.find(i => i.userId === user?.id)
-      console.log("x", x)
-      
-      if (x) {
-        //console.log("Length", y.length)
-        console.log("Modal Closed")
-        setIsMeDriver(true);
-      } else {
-        // console.log("Length", 0)
-        console.log("Modal Still Open")
-        setIsMeDriver(false);
-      }
-
-      
+      const goDrivers = data.goDrivers ?? [];
+      const returnDrivers = data.returnDrivers ?? [];
+      setIsMeDriver(goDrivers.some((d) => d.userId === user?.id));
+      setIsMeReturnDriver(returnDrivers.some((d) => d.userId === user?.id));
     } catch (error) {
       console.error(error);
       showSnackbar("イベント情報の取得に失敗しました", "error");
     } finally {
       setIsLoading(false);
     }
-  }, [eventId, showSnackbar]);
+  }, [eventId, user?.id, showSnackbar]);
 
   // モーダルが開いた時にデータをロード
   useEffect(() => {
@@ -113,6 +96,7 @@ export const useEventDetailDialog = ({
     isLoading,
     isActionLoading,
     isMeDriver,
+    isMeReturnDriver,
     handleRegisterDriver,
     refresh: loadEventDetail,
   };

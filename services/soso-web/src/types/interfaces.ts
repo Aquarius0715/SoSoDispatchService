@@ -57,6 +57,7 @@ export interface EventData {
   // FullCalendar の標準フィールド以外はここに詰めます
   extendedProps: {
     // 必須項目 (APIの Event 型にあるもの)
+    // 送り/迎えの対応: Go = 迎え(pickup), Return = 送り(dropOff)
     seatsRequiredGo: number;
     seatsRequiredReturn: number;
     originLocation: string;
@@ -65,34 +66,11 @@ export interface EventData {
     participants: string[]; // 参加者名の配列 または ID配列
 
     // 詳細API取得後に追加される可能性のある項目 (Optional)
-    remainingGoSeats?: number;     // 行きの残席
-    remainingReturnSeats?: number; // 帰りの残席
-    dropOffCount?: number;         // (互換性用)
-    pickUpCount?: number;          // (互換性用)
+    remainingGoSeats?: number;     // 迎えの残席 (Go = 迎え)
+    remainingReturnSeats?: number; // 送りの残席 (Return = 送り)
+    dropOffCount?: number;         // 送り人数の別名 (Return と同値)
+    pickUpCount?: number;          // 迎え人数の別名 (Go と同値)
   };
-}
-
-/** * イベント詳細ダイアログ表示用
- * EventData よりもリッチな情報（詳細APIのレスポンスなど）を扱う場合に使用
- */
-export interface EventDetails {
-  id: string;
-  title: string;
-  date: Date;        // string ではなく Date オブジェクトで統一したほうが扱いやすい
-  startTime: Date;
-  endTime: Date;
-  description: string;
-  origin: string;      // originLocation のエイリアス
-  destination: string; // destinationLocation のエイリアス
-  
-  // 座席情報
-  remainingGo: number;
-  remainingReturn: number;
-  totalGo: number;
-  totalReturn: number;
-  
-  participants: string[];
-  url?: string;
 }
 
 // --- 以下は不要になった、または使われていない型 (削除済み) ---
@@ -123,11 +101,12 @@ export interface EventCreateRequest {
 
 /**
  * Event (Response)
- * 基本的なイベント情報 (GET /events, POST /events のレスポンス)
+ * 基本的なイベント情報。Swagger Event に準拠。
+ * 注: API は calenderId という typo で返す場合がある。必要ならレスポンス時に calendarId にマッピングすること。
  */
 export interface Event {
   id: string;                  // uuid
-  calendarId: string;          // uuid
+  calendarId: string;          // uuid (API は calenderId で返す場合あり)
   creatorId: string;           // uuid
   title: string;
   description: string;
@@ -135,7 +114,9 @@ export interface Event {
   endTime: string;             // date-time
   originLocation: string;
   destinationLocation: string;
-  goDrivers: GoDrivers[]; // goDrivers: {[{}]}
+  /** Swagger には未記載だが API が返す場合あり */
+  goDrivers?: GoDrivers[];
+  returnDrivers?: GoDrivers[];
   seatsRequiredGo: number;     // integer
   seatsRequiredReturn: number; // integer
   participantUserIds: string[]; // uuid array
@@ -149,8 +130,8 @@ export interface GoDrivers {
 
 /**
  * EventDetail (Response)
- * 詳細画面用 (Event を拡張し、残席数などを追加)
- * Swagger: allOf [Event, { remainingGoSeats, ... }]
+ * GET /events/{event_id}/detail のレスポンス型。
+ * Swagger components.schemas.EventDetail に準拠（Event + remainingGoSeats, remainingReturnSeats, participants）。
  */
 export interface EventDetail extends Event {
   remainingGoSeats: number;     // integer

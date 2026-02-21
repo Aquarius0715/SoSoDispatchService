@@ -2,7 +2,8 @@
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { createEvent, EventCreateRequest } from "@/requests/eventAPI";
+import { createEvent } from "@/requests/eventAPI";
+import { EventCreateRequest } from "@/types/interfaces";
 import { eventAddSchema, type EventAddValues } from "./schema";
 import { useSnackbar } from "@/components/ui/snackbar";
 import axios from "axios";
@@ -47,15 +48,13 @@ export const useEventAddDialog = ({
         endTime: `${selectedDate}T${values.pickUpTime}:00+09:00`,
         originLocation: values.originLocation,
         destinationLocation: values.destinationLocation,
-        seatsRequiredGo: Number(values.dropOffCount),
-        seatsRequiredReturn: Number(values.pickUpCount),
+        seatsRequiredGo: Number(values.pickUpCount),
+        seatsRequiredReturn: Number(values.dropOffCount),
         participantUserIds: values.participantUserIds,
       };
 
       // 2. API窓口を呼び出し
-      const poster = createEvent(calendarId);
-      await poster(payload);
-
+      await createEvent(calendarId, payload);
       // 3. 成功時の処理
       showSnackbar("イベントを作成しました", "success");
       onSuccess(); // 親コンポーネント（カレンダー）を再読み込み

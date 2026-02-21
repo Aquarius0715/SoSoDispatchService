@@ -42,8 +42,8 @@ export const useDashboardView = (calendarId: string) => {
           destinationLocation: ev.destinationLocation,
           seatsRequiredGo: ev.seatsRequiredGo,
           seatsRequiredReturn: ev.seatsRequiredReturn,
-          dropOffCount: 0, 
-          pickUpCount: 0,
+          dropOffCount: ev.seatsRequiredReturn,
+          pickUpCount: ev.seatsRequiredGo,
           participants: ev.participantUserIds || [], // string[]として扱う
         },
       }));
