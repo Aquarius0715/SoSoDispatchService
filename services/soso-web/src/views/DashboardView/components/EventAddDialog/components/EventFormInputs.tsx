@@ -12,14 +12,21 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
+import { User } from "@/types/interfaces";
 
 import { EventAddValues } from "../schema";
 
 // 仮の参加者データ（本来は親からPropsで受け取るか、フックで取得する）
-const MOCK_PARTICIPANTS = [
-  { id: "1", name: "山田 太郎" },
-  { id: "2", name: "鈴木 花子" },
-  { id: "3", name: "佐藤 次郎" },
+// const MOCK_PARTICIPANTS = [
+//   { id: "1", name: "山田 太郎" },
+//   { id: "2", name: "鈴木 花子" },
+//   { id: "3", name: "佐藤 次郎" },
+// ];
+
+const MOCK_PARTICIPANTS: User[] = [
+  { id: "1", username: "山田 太郎", mailAddress: "yamada@example.com", hasCar: true, capacity: 1 },
+  { id: "2", username: "鈴木 花子", mailAddress: "suzuki@example.com", hasCar: false, capacity: 0 },
+  { id: "3", username: "佐藤 次郎", mailAddress: "sato@example.com", hasCar: true, capacity: 2 },
 ];
 
 interface EventFormInputsProps {
@@ -224,7 +231,7 @@ export const EventFormInputs = ({ control }: EventFormInputsProps) => {
                             />
                           </FormControl>
                           <FormLabel className="font-normal cursor-pointer">
-                            {user.name}
+                            {user.username}
                           </FormLabel>
                         </FormItem>
                       );

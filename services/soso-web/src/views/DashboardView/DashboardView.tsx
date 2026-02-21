@@ -22,7 +22,7 @@ export default function DashboardView({ calendarId }: DashboardViewProps) {
 
     isDetailOpen,
     closeDetailModal,
-    selectedEvent,
+    selectedEventId,
     handleEventClick,
   } = useDashboardView(calendarId);
 
@@ -48,12 +48,12 @@ export default function DashboardView({ calendarId }: DashboardViewProps) {
         />
       )}
 
-      {/* 3. イベント詳細ダイアログ */}
-      {isDetailOpen && selectedEvent && (
+      {/* 3. イベント詳細ダイアログ（中身はすべて詳細APIで取得） */}
+      {isDetailOpen && selectedEventId && (
         <EventDetailDialog
           isOpen={isDetailOpen}
           onClose={closeDetailModal}
-          eventData={selectedEvent}
+          eventId={selectedEventId}
           onEventUpdated={reloadEvents}
         />
       )}

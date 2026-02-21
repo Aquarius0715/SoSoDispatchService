@@ -13,52 +13,44 @@ import {
   Calendar, Clock, MapPin, Users, Car, Share2, Edit, ExternalLink, Loader2 
 } from "lucide-react";
 
-import type { EventData } from '@/types/interfaces';
 import { useEventDetailDialog } from './useEventDetailDialog';
-import { boolean } from 'zod';
 
 interface EventDetailDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  eventData: EventData; // FullCalendarから渡される基本情報
+  eventId: string;
   onEventUpdated: () => void;
 }
 
 export const EventDetailDialog: React.FC<EventDetailDialogProps> = ({
   isOpen,
   onClose,
-  eventData: initialData, // 初期表示用
+  eventId,
   onEventUpdated
 }) => {
-  // Hookを使用 (引数を eventId に合わせる)
   const {
     isMeDriver,
-    eventData, // APIから取得した詳細データ
+    eventData,
     isLoading,
     isActionLoading,
     handleRegisterDriver
-  } = useEventDetailDialog({ 
-    eventId: initialData.id, 
-    isOpen, 
-    onEventUpdated 
-  });
+  } = useEventDetailDialog({ eventId, isOpen, onEventUpdated });
 
-  // 表示用データの決定 (APIデータがあればそれを、なければ初期データを使用)
-  const display = {
-    title: eventData?.title || initialData.title,
-    date: eventData ? new Date(eventData.startTime) : initialData.start,
-    startTime: eventData ? new Date(eventData.startTime) : initialData.start,
-    endTime: eventData ? new Date(eventData.endTime) : initialData.end,
-    description: eventData?.description || initialData.extendedProps.description,
-    origin: eventData?.originLocation || initialData.extendedProps.originLocation,
-    destination: eventData?.destinationLocation || initialData.extendedProps.destinationLocation,
-    remainingGo: eventData?.remainingGoSeats ?? initialData.extendedProps.seatsRequiredGo,
-    remainingReturn: eventData?.remainingReturnSeats ?? initialData.extendedProps.seatsRequiredReturn,
-    totalGo: eventData?.seatsRequiredGo ?? initialData.extendedProps.seatsRequiredGo,
-    totalReturn: eventData?.seatsRequiredReturn ?? initialData.extendedProps.seatsRequiredReturn,
-    participants: eventData?.participants || initialData.extendedProps.participants || [],
-    url: initialData.url
-  };
+  // 表示用データはすべて詳細APIの eventData のみ（ローディング中は未取得）
+  const display = eventData ? {
+    title: eventData.title,
+    date: new Date(eventData.startTime),
+    startTime: new Date(eventData.startTime),
+    endTime: new Date(eventData.endTime),
+    description: eventData.description,
+    origin: eventData.originLocation,
+    destination: eventData.destinationLocation,
+    remainingGo: eventData.remainingGoSeats,
+    remainingReturn: eventData.remainingReturnSeats,
+    totalGo: eventData.seatsRequiredGo,
+    totalReturn: eventData.seatsRequiredReturn,
+    participants: eventData.participants ?? [],
+  } : null;
 
   // 日付フォーマット関数
   const fmtJstDate = (date: Date) => 
@@ -79,12 +71,14 @@ export const EventDetailDialog: React.FC<EventDetailDialogProps> = ({
           <div className="flex justify-between items-start gap-4">
             <div className="space-y-1">
               <DialogTitle className="text-xl font-bold leading-tight">
-                {display.title}
+                {display ? display.title : 'イベント詳細'}
               </DialogTitle>
-              <DialogDescription className="flex items-center gap-2 text-sm">
-                <Calendar className="h-4 w-4" />
-                {fmtJstDate(display.date)}
-              </DialogDescription>
+              {display && (
+                <DialogDescription className="flex items-center gap-2 text-sm">
+                  <Calendar className="h-4 w-4" />
+                  {fmtJstDate(display.date)}
+                </DialogDescription>
+              )}
             </div>
             {isLoading && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
           </div>
@@ -92,96 +86,105 @@ export const EventDetailDialog: React.FC<EventDetailDialogProps> = ({
 
         <ScrollArea className="max-h-[60vh] overflow-y-auto">
           <div className="p-6 space-y-6">
-            <Button variant="outline" className="w-full gap-2" size="sm">
-              <Share2 className="h-4 w-4" />
-              イベントを共有する
-            </Button>
-
-            <Separator />
-
-            <div className="space-y-3 text-sm">
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <Clock className="h-4 w-4 text-primary" />
-                <span className="font-medium text-foreground">
-                  {fmtJstTime(display.startTime)} 〜 {fmtJstTime(display.endTime)}
-                </span>
+            {!display ? (
+              <div className="flex items-center justify-center py-12 text-muted-foreground">
+                <Loader2 className="h-8 w-8 animate-spin mr-2" />
+                読み込み中...
               </div>
-              <div className="bg-muted/50 p-3 rounded-md text-sm leading-relaxed text-muted-foreground whitespace-pre-wrap">
-                {display.description || "詳細情報はありません"}
-              </div>
-            </div>
+            ) : (
+              <>
+                <Button variant="outline" className="w-full gap-2" size="sm">
+                  <Share2 className="h-4 w-4" />
+                  イベントを共有する
+                </Button>
 
-            <div className="grid grid-cols-2 gap-4">
-              <Card className="border-l-4 border-l-blue-500 shadow-sm">
-                <CardContent className="p-4 space-y-1">
-                  <div className="text-xs font-semibold text-muted-foreground flex items-center gap-1">
-                    <Car className="h-3 w-3" /> 送り (帰り)
-                  </div>
-                  <div className="text-2xl font-bold">
-                    {display.remainingReturn} 
-                    <span className="text-xs font-normal text-muted-foreground ml-1">
-                      / {display.totalReturn}席
+                <Separator />
+
+                <div className="space-y-3 text-sm">
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <Clock className="h-4 w-4 text-primary" />
+                    <span className="font-medium text-foreground">
+                      {fmtJstTime(display.startTime)} 〜 {fmtJstTime(display.endTime)}
                     </span>
                   </div>
-                  <Badge variant={display.remainingReturn === 0 ? "destructive" : "outline"} className="text-[10px] px-1 h-5">
-                    {display.remainingReturn === 0 ? "満席" : "募集中"}
-                  </Badge>
-                </CardContent>
-              </Card>
-
-              <Card className="border-l-4 border-l-green-500 shadow-sm">
-                <CardContent className="p-4 space-y-1">
-                  <div className="text-xs font-semibold text-muted-foreground flex items-center gap-1">
-                    <Car className="h-3 w-3" /> 迎え (行き)
+                  <div className="bg-muted/50 p-3 rounded-md text-sm leading-relaxed text-muted-foreground whitespace-pre-wrap">
+                    {display.description || "詳細情報はありません"}
                   </div>
-                  <div className="text-2xl font-bold">
-                    {display.remainingGo} 
-                    <span className="text-xs font-normal text-muted-foreground ml-1">
-                      / {display.totalGo}席
-                    </span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <Card className="border-l-4 border-l-blue-500 shadow-sm">
+                    <CardContent className="p-4 space-y-1">
+                      <div className="text-xs font-semibold text-muted-foreground flex items-center gap-1">
+                        <Car className="h-3 w-3" /> 送り (帰り)
+                      </div>
+                      <div className="text-2xl font-bold">
+                        {display.remainingReturn}
+                        <span className="text-xs font-normal text-muted-foreground ml-1">
+                          / {display.totalReturn}席
+                        </span>
+                      </div>
+                      <Badge variant={display.remainingReturn === 0 ? "destructive" : "outline"} className="text-[10px] px-1 h-5">
+                        {display.remainingReturn === 0 ? "満席" : "募集中"}
+                      </Badge>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="border-l-4 border-l-green-500 shadow-sm">
+                    <CardContent className="p-4 space-y-1">
+                      <div className="text-xs font-semibold text-muted-foreground flex items-center gap-1">
+                        <Car className="h-3 w-3" /> 迎え (行き)
+                      </div>
+                      <div className="text-2xl font-bold">
+                        {display.remainingGo}
+                        <span className="text-xs font-normal text-muted-foreground ml-1">
+                          / {display.totalGo}席
+                        </span>
+                      </div>
+                      <Badge variant={display.remainingGo === 0 ? "destructive" : "outline"} className="text-[10px] px-1 h-5">
+                        {display.remainingGo === 0 ? "満席" : "募集中"}
+                      </Badge>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 font-semibold text-sm">
+                    <Users className="h-4 w-4" />
+                    参加者
                   </div>
-                  <Badge variant={display.remainingGo === 0 ? "destructive" : "outline"} className="text-[10px] px-1 h-5">
-                    {display.remainingGo === 0 ? "満席" : "募集中"}
-                  </Badge>
-                </CardContent>
-              </Card>
-            </div>
-
-            <div className="space-y-2">
-              <div className="flex items-center gap-2 font-semibold text-sm">
-                <Users className="h-4 w-4" />
-                参加者
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {display.participants.length > 0 ? (
-                  display.participants.map((p, i) => (
-                    <Badge key={i} variant="secondary" className="font-normal">
-                      {p}
-                    </Badge>
-                  ))
-                ) : (
-                  <span className="text-sm text-muted-foreground">参加者はいません</span>
-                )}
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <div className="flex items-center gap-2 font-semibold text-sm">
-                <MapPin className="h-4 w-4" />
-                ルート・会場
-              </div>
-              <div className="text-sm pl-6 space-y-1">
-                <div className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-                  <span>{display.origin || "未設定"}</span>
+                  <div className="flex flex-wrap gap-2">
+                    {display.participants.length > 0 ? (
+                      display.participants.map((p, i) => (
+                        <Badge key={i} variant="secondary" className="font-normal">
+                          {p}
+                        </Badge>
+                      ))
+                    ) : (
+                      <span className="text-sm text-muted-foreground">参加者はいません</span>
+                    )}
+                  </div>
                 </div>
-                <div className="border-l border-dashed border-gray-300 h-3 ml-[2.5px]" />
-                <div className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
-                  <span>{display.destination || "未設定"}</span>
+
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 font-semibold text-sm">
+                    <MapPin className="h-4 w-4" />
+                    ルート・会場
+                  </div>
+                  <div className="text-sm pl-6 space-y-1">
+                    <div className="flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                      <span>{display.origin || "未設定"}</span>
+                    </div>
+                    <div className="border-l border-dashed border-gray-300 h-3 ml-[2.5px]" />
+                    <div className="flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
+                      <span>{display.destination || "未設定"}</span>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
+              </>
+            )}
           </div>
         </ScrollArea>
 
@@ -191,7 +194,7 @@ export const EventDetailDialog: React.FC<EventDetailDialogProps> = ({
               className="flex-1"
               variant="outline"
               onClick={() => handleRegisterDriver('pickup')}
-              disabled={isMeDriver || isActionLoading || display.remainingGo === 0}
+              disabled={!display || isMeDriver || isActionLoading || display.remainingGo === 0}
             >
               {isActionLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
               迎え(行き)に登録
@@ -201,7 +204,7 @@ export const EventDetailDialog: React.FC<EventDetailDialogProps> = ({
               className="flex-1"
               variant="outline"
               onClick={() => handleRegisterDriver('return')}
-              disabled={isActionLoading || display.remainingReturn === 0}
+              disabled={!display || isActionLoading || display.remainingReturn === 0}
             >
               {isActionLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
               送り(帰り)に登録

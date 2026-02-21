@@ -20,7 +20,7 @@ export const useDashboardView = (calendarId: string) => {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
   const [isDetailOpen, setIsDetailOpen] = useState(false);
-  const [selectedEvent, setSelectedEvent] = useState<EventData | null>(null);
+  const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
 
   // --- 1. イベント一覧の取得と変換 ---
   const reloadEvents = useCallback(async () => {
@@ -72,33 +72,11 @@ export const useDashboardView = (calendarId: string) => {
     setIsAddOpen(true);
   };
 
-  // カレンダーのイベントクリック時
-  // FullCalendarからは EventClickArg が来るので、そこから EventData を復元する
+  // カレンダーのイベントクリック時（IDだけ渡し、詳細はダイアログ内でAPI取得）
   const handleEventClick = (info: EventClickArg) => {
-    const rawEvent = info.event;
-    
-    // extendedProps は unknown 型に近いので、型アサーションで整形
-    const props = rawEvent.extendedProps;
-
-    const eventData: EventData = {
-      id: rawEvent.id,
-      title: rawEvent.title,
-      start: rawEvent.start!,
-      end: rawEvent.end!,
-      url: rawEvent.url,
-      extendedProps: {
-        description: props.description,
-        originLocation: props.originLocation,
-        destinationLocation: props.destinationLocation,
-        seatsRequiredGo: props.seatsRequiredGo,
-        seatsRequiredReturn: props.seatsRequiredReturn,
-        dropOffCount: props.dropOffCount,
-        pickUpCount: props.pickUpCount,
-        participants: props.participants,
-      }
-    };
-
-    setSelectedEvent(eventData);
+    const id = info.event.id;
+    if (!id) return;
+    setSelectedEventId(id);
     setIsDetailOpen(true);
   };
 
@@ -109,7 +87,7 @@ export const useDashboardView = (calendarId: string) => {
 
   const closeDetailModal = () => {
     setIsDetailOpen(false);
-    setSelectedEvent(null);
+    setSelectedEventId(null);
   };
 
   return {
@@ -118,7 +96,7 @@ export const useDashboardView = (calendarId: string) => {
     isAddOpen,
     selectedDate,
     isDetailOpen,
-    selectedEvent,
+    selectedEventId,
     reloadEvents,
     handleAddEventClick,
     handleEventClick,

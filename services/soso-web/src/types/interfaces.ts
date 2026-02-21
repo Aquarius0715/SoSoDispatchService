@@ -58,8 +58,8 @@ export interface EventData {
   extendedProps: {
     // 必須項目 (APIの Event 型にあるもの)
     // 送り/迎えの対応: Go = 迎え(pickup), Return = 送り(dropOff)
-    seatsRequiredGo: number;
-    seatsRequiredReturn: number;
+    seatsRequiredGo: number; // 全体の迎え人数
+    seatsRequiredReturn: number; // 全体の送り人数
     originLocation: string;
     destinationLocation: string;
     description?: string;
