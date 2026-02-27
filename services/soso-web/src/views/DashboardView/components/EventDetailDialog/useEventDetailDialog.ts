@@ -30,8 +30,11 @@ export const useEventDetailDialog = ({
 
   const { user } = useAuthState();
 
-  const [isMeDriver, setIsMeDriver] = useState(false);
-  const [isMeReturnDriver, setIsMeReturnDriver] = useState(false);
+  // eventData と user から派生（useState 不要）
+  const goDrivers = eventData?.goDrivers ?? [];
+  const returnDrivers = eventData?.returnDrivers ?? [];
+  const isMeDriver = goDrivers.some((d) => d.userId === user?.id);
+  const isMeReturnDriver = returnDrivers.some((d) => d.userId === user?.id);
 
   // 1. イベント詳細情報の取得
   const loadEventDetail = useCallback(async () => {
@@ -41,25 +44,20 @@ export const useEventDetailDialog = ({
     try {
       const data = await getEventDetail(eventId);
       setEventData(data);
-
-      const goDrivers = data.goDrivers ?? [];
-      const returnDrivers = data.returnDrivers ?? [];
-      setIsMeDriver(goDrivers.some((d) => d.userId === user?.id));
-      setIsMeReturnDriver(returnDrivers.some((d) => d.userId === user?.id));
     } catch (error) {
       console.error(error);
       showSnackbar("イベント情報の取得に失敗しました", "error");
     } finally {
       setIsLoading(false);
     }
-  }, [eventId, user?.id, showSnackbar]);
+  }, [eventId, showSnackbar]);
 
   // モーダルが開いた時にデータをロード
   useEffect(() => {
     if (isOpen) {
       loadEventDetail();
     }
-  }, [isOpen, loadEventDetail]);
+  }, [isOpen]);
 
   // 2. 配車登録アクション (行き/帰り)
   const handleRegisterDriver = async (type: 'pickup' | 'return') => {
