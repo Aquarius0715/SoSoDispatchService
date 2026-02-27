@@ -75,7 +75,7 @@ CREATE TABLE `event_participants` (
   `status`               ENUM('registered','cancelled')     NOT NULL DEFAULT 'registered',
   `type`                 ENUM('participants', 'go', 'return') NOT NULL,
   `registered_at`        DATETIME(6)                        NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
-  PRIMARY KEY (`event_id`,`user_id`),
+  PRIMARY KEY (`event_id`,`user_id`,`type`),
   INDEX `idx_rp_user` (`user_id`),
   CONSTRAINT `fk_rp_event`
     FOREIGN KEY (`event_id`) REFERENCES `events`(`id`)
