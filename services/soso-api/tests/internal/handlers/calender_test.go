@@ -20,7 +20,8 @@ func TestCalenderFindMyCalenders_OK(t *testing.T) {
 	defer dbm.Close()
 
 	repo := repository.NewCalenderRepository(dbm.DB)
-	h := handlers.NewCalenderHandler(repo)
+	mrepo := repository.NewCalenderMembershipRepository(dbm.DB)
+	h := handlers.NewCalenderHandler(repo, mrepo)
 	e := NewEcho()
 
 	rows := sqlmock.NewRows([]string{
@@ -57,15 +58,25 @@ func TestCalenderCreate_OK(t *testing.T) {
 	defer dbm.Close()
 
 	repo := repository.NewCalenderRepository(dbm.DB)
-	h := handlers.NewCalenderHandler(repo)
+	mrepo := repository.NewCalenderMembershipRepository(dbm.DB)
+	h := handlers.NewCalenderHandler(repo, mrepo)
 	e := NewEcho()
 
 	dbm.Mock.ExpectQuery(SQLCalenderFindByName).
 		WithArgs("jouhoukyoku").
 		WillReturnRows(sqlmock.NewRows([]string{}))
+
+	// transaction begin
+	dbm.Mock.ExpectBegin()
 	dbm.Mock.ExpectExec(SQLCalenderCreate).
 		WithArgs(sqlmock.AnyArg(), "jouhoukyoku", "jouhoukyoku", sqlmock.AnyArg()).
 		WillReturnResult(sqlmock.NewResult(1, 1))
+
+	dbm.Mock.ExpectExec(SQLCreateCalenderMembership).
+		WithArgs(sqlmock.AnyArg(), "u1", "admin").
+		WillReturnResult(sqlmock.NewResult(1, 1))
+
+	dbm.Mock.ExpectCommit()
 
 	req := httptest.NewRequest(http.MethodPost, "/calenders/create",
 		bytes.NewBufferString(`{"name":"jouhoukyoku","description":"jouhoukyoku"}`))
@@ -86,7 +97,8 @@ func TestCalenderCreate_Conflict(t *testing.T) {
 	defer dbm.Close()
 
 	repo := repository.NewCalenderRepository(dbm.DB)
-	h := handlers.NewCalenderHandler(repo)
+	mrepo := repository.NewCalenderMembershipRepository(dbm.DB)
+	h := handlers.NewCalenderHandler(repo, mrepo)
 	e := NewEcho()
 
 	now := time.Now()
@@ -118,7 +130,8 @@ func TestCalenderCreate_InvalidPayload(t *testing.T) {
 	defer dbm.Close()
 
 	repo := repository.NewCalenderRepository(dbm.DB)
-	h := handlers.NewCalenderHandler(repo)
+	mrepo := repository.NewCalenderMembershipRepository(dbm.DB)
+	h := handlers.NewCalenderHandler(repo, mrepo)
 	e := NewEcho()
 
 	req := httptest.NewRequest(http.MethodPost, "/calenders/create",
@@ -140,7 +153,8 @@ func TestCalenderCreate_Unauthorized(t *testing.T) {
 	defer dbm.Close()
 
 	repo := repository.NewCalenderRepository(dbm.DB)
-	h := handlers.NewCalenderHandler(repo)
+	mrepo := repository.NewCalenderMembershipRepository(dbm.DB)
+	h := handlers.NewCalenderHandler(repo, mrepo)
 	e := NewEcho()
 
 	req := httptest.NewRequest(http.MethodPost, "/calenders/create", nil)
@@ -158,7 +172,8 @@ func TestCalenderFindMyTransportEvents_OK(t *testing.T) {
 	defer dbm.Close()
 
 	repo := repository.NewCalenderRepository(dbm.DB)
-	h := handlers.NewCalenderHandler(repo)
+	mrepo := repository.NewCalenderMembershipRepository(dbm.DB)
+	h := handlers.NewCalenderHandler(repo, mrepo)
 	e := NewEcho()
 
 	now := time.Now()
@@ -212,7 +227,8 @@ func TestCalenderFindMyTransportEvents_Empty(t *testing.T) {
 	defer dbm.Close()
 
 	repo := repository.NewCalenderRepository(dbm.DB)
-	h := handlers.NewCalenderHandler(repo)
+	mrepo := repository.NewCalenderMembershipRepository(dbm.DB)
+	h := handlers.NewCalenderHandler(repo, mrepo)
 	e := NewEcho()
 
 	empty := sqlmock.NewRows([]string{
@@ -244,7 +260,8 @@ func TestCalenderFindMyTransportEvents_Unauthorized(t *testing.T) {
 	defer dbm.Close()
 
 	repo := repository.NewCalenderRepository(dbm.DB)
-	h := handlers.NewCalenderHandler(repo)
+	mrepo := repository.NewCalenderMembershipRepository(dbm.DB)
+	h := handlers.NewCalenderHandler(repo, mrepo)
 	e := NewEcho()
 
 	req := httptest.NewRequest(http.MethodGet, "/events/dispatch/me", nil)
