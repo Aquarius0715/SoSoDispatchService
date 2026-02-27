@@ -18,252 +18,258 @@
 ├── package-lock.json
 ├── package.json
 ├── project_dump.txt
-├── services
-│   ├── .DS_Store
-│   ├── soso-api
-│   │   ├── .DS_Store
-│   │   ├── api
-│   │   │   ├── docs.yaml
-│   │   │   └── swagger.yaml
-│   │   ├── cmd
-│   │   │   └── server
-│   │   │       └── main.go
-│   │   ├── config
-│   │   │   ├── .env
-│   │   │   └── .env.example
-│   │   ├── go.mod
-│   │   ├── go.sum
-│   │   ├── init
-│   │   │   └── 001_init.sql
-│   │   ├── internal
-│   │   │   ├── config
-│   │   │   │   ├── config.go
-│   │   │   │   └── router.go
-│   │   │   ├── handlers
-│   │   │   │   ├── auth.go
-│   │   │   │   ├── calender.go
-│   │   │   │   ├── calender_membership.go
-│   │   │   │   ├── event.go
-│   │   │   │   ├── soso_point_history.go
-│   │   │   │   └── user.go
-│   │   │   ├── model
-│   │   │   │   ├── calender.go
-│   │   │   │   ├── calender_member.go
-│   │   │   │   ├── calender_membership.go
-│   │   │   │   ├── event.go
-│   │   │   │   ├── event_participant.go
-│   │   │   │   ├── my_dispatch_event.go
-│   │   │   │   ├── refresh_token.go
-│   │   │   │   ├── soso_point_history.go
-│   │   │   │   └── user.go
-│   │   │   ├── repository
-│   │   │   │   ├── calender.go
-│   │   │   │   ├── calender_membership.go
-│   │   │   │   ├── db.go
-│   │   │   │   ├── event.go
-│   │   │   │   ├── event_participants.go
-│   │   │   │   ├── refresh_token.go
-│   │   │   │   ├── soso_point_history.go
-│   │   │   │   └── user.go
-│   │   │   └── validator
-│   │   │       ├── calender.go
-│   │   │       ├── calender_membership.go
-│   │   │       ├── event.go
-│   │   │       ├── user.go
-│   │   │       └── validator.go
-│   │   ├── pkg
-│   │   │   └── auth
-│   │   │       ├── jwt.go
-│   │   │       └── password.go
-│   │   ├── server
-│   │   └── tests
-│   │       └── internal
-│   │           ├── handlers
-│   │           │   ├── auth_test.go
-│   │           │   ├── calender_membership_test.go
-│   │           │   ├── calender_test.go
-│   │           │   ├── event_test.go
-│   │           │   ├── helpers_test.go
-│   │           │   ├── soso_point_history_test.go
-│   │           │   └── user_test.go
-│   │           └── repository
-│   │               ├── calender_membership_test.go
-│   │               ├── calender_test.go
-│   │               ├── event_participants_test.go
-│   │               ├── event_test.go
-│   │               ├── helpers_test.go
-│   │               ├── refresh_token_test.go
-│   │               ├── soso_point_history_test.go
-│   │               └── user_test.go
-│   └── soso-web
-│       ├── .DS_Store
-│       ├── .env
-│       ├── .env.example
-│       ├── .gitignore
-│       ├── README.md
-│       ├── components.json
-│       ├── lib
-│       │   └── utils.ts
-│       ├── next-env.d.ts
-│       ├── next.config.ts
-│       ├── nginx.conf
-│       ├── package-lock.json
-│       ├── package.json
-│       ├── postcss.config.mjs
-│       ├── public
-│       │   ├── file.svg
-│       │   ├── globe.svg
-│       │   ├── icons
-│       │   │   ├── double_s_icon.svg
-│       │   │   └── soso_icon.svg
-│       │   ├── next.svg
-│       │   ├── vercel.svg
-│       │   └── window.svg
-│       ├── src
-│       │   ├── app
-│       │   │   ├── auth
-│       │   │   │   ├── layout.tsx
-│       │   │   │   ├── login
-│       │   │   │   │   └── page.tsx
-│       │   │   │   ├── register
-│       │   │   │   │   └── page.tsx
-│       │   │   │   └── tokenexpired
-│       │   │   │       └── page.tsx
-│       │   │   ├── calenders
-│       │   │   │   ├── [calenderId]
-│       │   │   │   │   └── page.tsx
-│       │   │   │   ├── layout.tsx
-│       │   │   │   └── page.tsx
-│       │   │   ├── favicon.ico
-│       │   │   ├── globals.css
-│       │   │   ├── layout.tsx
-│       │   │   └── page.tsx
-│       │   ├── components
-│       │   │   └── ui
-│       │   │       ├── avatar.tsx
-│       │   │       ├── badge.tsx
-│       │   │       ├── breadcrumb.tsx
-│       │   │       ├── button.tsx
-│       │   │       ├── card.tsx
-│       │   │       ├── checkbox.tsx
-│       │   │       ├── dialog.tsx
-│       │   │       ├── dropdown-menu.tsx
-│       │   │       ├── form.tsx
-│       │   │       ├── input.tsx
-│       │   │       ├── label.tsx
-│       │   │       ├── menubar.tsx
-│       │   │       ├── radio-group.tsx
-│       │   │       ├── scroll-area.tsx
-│       │   │       ├── separator.tsx
-│       │   │       ├── sheet.tsx
-│       │   │       ├── sidebar.tsx
-│       │   │       ├── skeleton.tsx
-│       │   │       ├── snackbar.tsx
-│       │   │       ├── textarea.tsx
-│       │   │       └── tooltip.tsx
-│       │   ├── contexts
-│       │   │   └── AuthContext.tsx
-│       │   ├── hooks
-│       │   │   └── use-mobile.ts
-│       │   ├── layouts
-│       │   │   └── AppLayout
-│       │   │       └── AppLayout.tsx
-│       │   ├── lib
-│       │   │   ├── auth
-│       │   │   │   └── RequireAuth.tsx
-│       │   │   ├── server
-│       │   │   │   └── rootRedirect.ts
-│       │   │   └── utils.ts
-│       │   ├── middleware.ts
-│       │   ├── requests
-│       │   │   ├── authAPI.ts
-│       │   │   ├── calenderAPI.ts
-│       │   │   ├── calenderDetailAPI.ts
-│       │   │   ├── core
-│       │   │   │   ├── client.ts
-│       │   │   │   ├── endpoint.ts
-│       │   │   │   └── tokenStore.ts
-│       │   │   └── userAPI.ts
-│       │   ├── types
-│       │   │   └── interfaces.ts
-│       │   └── views
-│       │       ├── CalendersListView
-│       │       │   ├── CalendersListView.tsx
-│       │       │   ├── components
-│       │       │   │   ├── CalenderListItemCard.tsx
-│       │       │   │   └── CreateCalenderDialogView
-│       │       │   │       ├── CreateCalenderDialog.tsx
-│       │       │   │       ├── components
-│       │       │   │       │   └── CreateCalenderInputs.tsx
-│       │       │   │       ├── schema.ts
-│       │       │   │       └── useCreateCalenderDialog.ts
-│       │       │   └── useCalendersListView.ts
-│       │       ├── HeaderView
-│       │       │   ├── HeaderView.tsx
-│       │       │   ├── components
-│       │       │   │   ├── AccountMenu.tsx
-│       │       │   │   ├── HeaderAccountSection.tsx
-│       │       │   │   ├── HeaderCenterLogo.tsx
-│       │       │   │   ├── HeaderLogo.tsx
-│       │       │   │   ├── LogoutButton.tsx
-│       │       │   │   └── MobileSidebarSheet.tsx
-│       │       │   ├── schema.ts
-│       │       │   └── useHeaderView.ts
-│       │       ├── LoginView
-│       │       │   ├── LoginView.tsx
-│       │       │   ├── components
-│       │       │   │   ├── GoToRegisterLink.tsx
-│       │       │   │   └── LoginButton.tsx
-│       │       │   ├── schema.ts
-│       │       │   └── useLoginView.ts
-│       │       ├── RegisterView
-│       │       │   ├── RegisterView.tsx
-│       │       │   ├── components
-│       │       │   │   ├── CarInfoInputs.tsx
-│       │       │   │   └── RegisterButton.tsx
-│       │       │   ├── schema.ts
-│       │       │   └── useRegisterView.ts
-│       │       └── SidebarView
-│       │           ├── CalenderDetailSidebarView
-│       │           │   ├── CalenderDetailSidebar.tsx
-│       │           │   ├── CalenderDetailSidebarView.tsx
-│       │           │   ├── MembersListPanel
-│       │           │   │   ├── MemberListPanel.tsx
-│       │           │   │   ├── components
-│       │           │   │   │   └── MemberCard.tsx
-│       │           │   │   ├── schema.ts
-│       │           │   │   └── useMemberListPanel.ts
-│       │           │   ├── SoSoPointTimelinePanel
-│       │           │   │   ├── SoSoPointTimelinePanel.tsx
-│       │           │   │   ├── components
-│       │           │   │   │   └── TimelineCard.tsx
-│       │           │   │   ├── schema.ts
-│       │           │   │   └── useSoSoPointTimelinePanel.ts
-│       │           │   ├── components
-│       │           │   │   ├── SidebarMainCard.tsx
-│       │           │   │   ├── SidebarTabButton.tsx
-│       │           │   │   └── SidebarTabFooter.tsx
-│       │           │   ├── schema.ts
-│       │           │   └── useCalenderDetailSidebar.ts
-│       │           ├── CalenderListSidebarView
-│       │           │   ├── CalendersSidebarView.tsx
-│       │           │   └── components
-│       │           │       ├── CalenderSidebar.tsx
-│       │           │       ├── RegisteredEventsCard.tsx
-│       │           │       ├── StatusEditDialogView
-│       │           │       │   ├── StatusEditDialogView.tsx
-│       │           │       │   ├── components
-│       │           │       │   │   └── UserStatusInputs.tsx
-│       │           │       │   ├── schema.ts
-│       │           │       │   └── useStatusEditDialogView.ts
-│       │           │       └── UserStatusCard.tsx
-│       │           └── CalendersSidebarSwitch.tsx
-│       ├── tsconfig.json
-│       ├── vitest.config.ts
-│       └── vitest.shims.d.ts
-└── サイドバー作成ガイド.patch
+└── services
+    ├── .DS_Store
+    ├── soso-api
+    │   ├── .DS_Store
+    │   ├── api
+    │   │   ├── docs.yaml
+    │   │   └── swagger.yaml
+    │   ├── cmd
+    │   │   └── server
+    │   │       └── main.go
+    │   ├── config
+    │   │   ├── .env
+    │   │   └── .env.example
+    │   ├── go.mod
+    │   ├── go.sum
+    │   ├── init
+    │   │   └── 001_init.sql
+    │   ├── internal
+    │   │   ├── config
+    │   │   │   ├── config.go
+    │   │   │   └── router.go
+    │   │   ├── handlers
+    │   │   │   ├── auth.go
+    │   │   │   ├── calender.go
+    │   │   │   ├── calender_membership.go
+    │   │   │   ├── event.go
+    │   │   │   ├── soso_point_history.go
+    │   │   │   └── user.go
+    │   │   ├── model
+    │   │   │   ├── calender.go
+    │   │   │   ├── calender_member.go
+    │   │   │   ├── calender_membership.go
+    │   │   │   ├── event.go
+    │   │   │   ├── event_participant.go
+    │   │   │   ├── my_dispatch_event.go
+    │   │   │   ├── refresh_token.go
+    │   │   │   ├── soso_point_history.go
+    │   │   │   └── user.go
+    │   │   ├── repository
+    │   │   │   ├── calender.go
+    │   │   │   ├── calender_membership.go
+    │   │   │   ├── db.go
+    │   │   │   ├── event.go
+    │   │   │   ├── event_participants.go
+    │   │   │   ├── refresh_token.go
+    │   │   │   ├── soso_point_history.go
+    │   │   │   └── user.go
+    │   │   └── validator
+    │   │       ├── calender.go
+    │   │       ├── calender_membership.go
+    │   │       ├── event.go
+    │   │       ├── user.go
+    │   │       └── validator.go
+    │   ├── pkg
+    │   │   └── auth
+    │   │       ├── jwt.go
+    │   │       └── password.go
+    │   ├── server
+    │   └── tests
+    │       └── internal
+    │           ├── handlers
+    │           │   ├── auth_test.go
+    │           │   ├── calender_membership_test.go
+    │           │   ├── calender_test.go
+    │           │   ├── event_test.go
+    │           │   ├── helpers_test.go
+    │           │   ├── soso_point_history_test.go
+    │           │   └── user_test.go
+    │           └── repository
+    │               ├── calender_membership_test.go
+    │               ├── calender_test.go
+    │               ├── event_participants_test.go
+    │               ├── event_test.go
+    │               ├── helpers_test.go
+    │               ├── refresh_token_test.go
+    │               ├── soso_point_history_test.go
+    │               └── user_test.go
+    └── soso-web
+        ├── .DS_Store
+        ├── .env
+        ├── .env.example
+        ├── .gitignore
+        ├── README.md
+        ├── components.json
+        ├── lib
+        │   └── utils.ts
+        ├── next-env.d.ts
+        ├── next.config.ts
+        ├── nginx.conf
+        ├── package-lock.json
+        ├── package.json
+        ├── postcss.config.mjs
+        ├── public
+        │   ├── file.svg
+        │   ├── globe.svg
+        │   ├── icons
+        │   │   ├── double_s_icon.svg
+        │   │   └── soso_icon.svg
+        │   ├── next.svg
+        │   ├── vercel.svg
+        │   └── window.svg
+        ├── src
+        │   ├── app
+        │   │   ├── auth
+        │   │   │   ├── layout.tsx
+        │   │   │   ├── login
+        │   │   │   │   └── page.tsx
+        │   │   │   ├── register
+        │   │   │   │   └── page.tsx
+        │   │   │   └── tokenexpired
+        │   │   │       └── page.tsx
+        │   │   ├── calenders
+        │   │   │   ├── [calenderId]
+        │   │   │   │   └── page.tsx
+        │   │   │   ├── invite
+        │   │   │   │   └── page.tsx
+        │   │   │   ├── layout.tsx
+        │   │   │   └── page.tsx
+        │   │   ├── favicon.ico
+        │   │   ├── globals.css
+        │   │   ├── layout.tsx
+        │   │   ├── not-found
+        │   │   │   └── page.tsx
+        │   │   └── page.tsx
+        │   ├── components
+        │   │   └── ui
+        │   │       ├── avatar.tsx
+        │   │       ├── badge.tsx
+        │   │       ├── breadcrumb.tsx
+        │   │       ├── button.tsx
+        │   │       ├── card.tsx
+        │   │       ├── checkbox.tsx
+        │   │       ├── dialog.tsx
+        │   │       ├── dropdown-menu.tsx
+        │   │       ├── form.tsx
+        │   │       ├── input.tsx
+        │   │       ├── label.tsx
+        │   │       ├── menubar.tsx
+        │   │       ├── radio-group.tsx
+        │   │       ├── scroll-area.tsx
+        │   │       ├── separator.tsx
+        │   │       ├── sheet.tsx
+        │   │       ├── sidebar.tsx
+        │   │       ├── skeleton.tsx
+        │   │       ├── snackbar.tsx
+        │   │       ├── textarea.tsx
+        │   │       └── tooltip.tsx
+        │   ├── contexts
+        │   │   └── AuthContext.tsx
+        │   ├── hooks
+        │   │   └── use-mobile.ts
+        │   ├── layouts
+        │   │   └── AppLayout
+        │   │       └── AppLayout.tsx
+        │   ├── lib
+        │   │   ├── auth
+        │   │   │   └── RequireAuth.tsx
+        │   │   ├── server
+        │   │   │   └── rootRedirect.ts
+        │   │   └── utils.ts
+        │   ├── middleware.ts
+        │   ├── requests
+        │   │   ├── authAPI.ts
+        │   │   ├── calenderAPI.ts
+        │   │   ├── calenderDetailAPI.ts
+        │   │   ├── core
+        │   │   │   ├── client.ts
+        │   │   │   ├── endpoint.ts
+        │   │   │   └── tokenStore.ts
+        │   │   └── userAPI.ts
+        │   ├── types
+        │   │   └── interfaces.ts
+        │   └── views
+        │       ├── CalenderInviteView
+        │       │   ├── CalenderInviteView.tsx
+        │       │   └── useCalenderInviteView.ts
+        │       ├── CalendersListView
+        │       │   ├── CalendersListView.tsx
+        │       │   ├── components
+        │       │   │   ├── CalenderListItemCard.tsx
+        │       │   │   └── CreateCalenderDialogView
+        │       │   │       ├── CreateCalenderDialog.tsx
+        │       │   │       ├── components
+        │       │   │       │   └── CreateCalenderInputs.tsx
+        │       │   │       ├── schema.ts
+        │       │   │       └── useCreateCalenderDialog.ts
+        │       │   └── useCalendersListView.ts
+        │       ├── HeaderView
+        │       │   ├── HeaderView.tsx
+        │       │   ├── components
+        │       │   │   ├── AccountMenu.tsx
+        │       │   │   ├── HeaderAccountSection.tsx
+        │       │   │   ├── HeaderCenterLogo.tsx
+        │       │   │   ├── HeaderLogo.tsx
+        │       │   │   ├── LogoutButton.tsx
+        │       │   │   └── MobileSidebarSheet.tsx
+        │       │   ├── schema.ts
+        │       │   └── useHeaderView.ts
+        │       ├── LoginView
+        │       │   ├── LoginView.tsx
+        │       │   ├── components
+        │       │   │   ├── GoToRegisterLink.tsx
+        │       │   │   └── LoginButton.tsx
+        │       │   ├── schema.ts
+        │       │   └── useLoginView.ts
+        │       ├── RegisterView
+        │       │   ├── RegisterView.tsx
+        │       │   ├── components
+        │       │   │   ├── CarInfoInputs.tsx
+        │       │   │   └── RegisterButton.tsx
+        │       │   ├── schema.ts
+        │       │   └── useRegisterView.ts
+        │       └── SidebarView
+        │           ├── CalenderDetailSidebarView
+        │           │   ├── CalenderDetailSidebar.tsx
+        │           │   ├── CalenderDetailSidebarView.tsx
+        │           │   ├── MembersListPanel
+        │           │   │   ├── MemberListPanel.tsx
+        │           │   │   ├── components
+        │           │   │   │   └── MemberCard.tsx
+        │           │   │   ├── schema.ts
+        │           │   │   └── useMemberListPanel.ts
+        │           │   ├── SoSoPointTimelinePanel
+        │           │   │   ├── SoSoPointTimelinePanel.tsx
+        │           │   │   ├── components
+        │           │   │   │   └── TimelineCard.tsx
+        │           │   │   ├── schema.ts
+        │           │   │   └── useSoSoPointTimelinePanel.ts
+        │           │   ├── components
+        │           │   │   ├── SidebarMainCard.tsx
+        │           │   │   ├── SidebarTabButton.tsx
+        │           │   │   └── SidebarTabFooter.tsx
+        │           │   ├── schema.ts
+        │           │   └── useCalenderDetailSidebar.ts
+        │           ├── CalenderListSidebarView
+        │           │   ├── CalendersSidebarView.tsx
+        │           │   └── components
+        │           │       ├── CalenderSidebar.tsx
+        │           │       ├── RegisteredEventsCard.tsx
+        │           │       ├── StatusEditDialogView
+        │           │       │   ├── StatusEditDialogView.tsx
+        │           │       │   ├── components
+        │           │       │   │   └── UserStatusInputs.tsx
+        │           │       │   ├── schema.ts
+        │           │       │   └── useStatusEditDialogView.ts
+        │           │       └── UserStatusCard.tsx
+        │           └── CalendersSidebarSwitch.tsx
+        ├── tsconfig.json
+        ├── vitest.config.ts
+        └── vitest.shims.d.ts
 
-68 directories, 195 files
+71 directories, 198 files
 
 ===== FILE CONTENTS =====
 
@@ -621,7 +627,7 @@ volumes:
 
 [TRUNCATED] MAX_LINES=5000
 
------ FILE: project_dump.txt (size=23060) -----
+----- FILE: project_dump.txt (size=22421) -----
 ===== DIRECTORY TREE =====
 .
 ├── .DS_Store
@@ -642,252 +648,258 @@ volumes:
 ├── package-lock.json
 ├── package.json
 ├── project_dump.txt
-├── services
-│   ├── .DS_Store
-│   ├── soso-api
-│   │   ├── .DS_Store
-│   │   ├── api
-│   │   │   ├── docs.yaml
-│   │   │   └── swagger.yaml
-│   │   ├── cmd
-│   │   │   └── server
-│   │   │       └── main.go
-│   │   ├── config
-│   │   │   ├── .env
-│   │   │   └── .env.example
-│   │   ├── go.mod
-│   │   ├── go.sum
-│   │   ├── init
-│   │   │   └── 001_init.sql
-│   │   ├── internal
-│   │   │   ├── config
-│   │   │   │   ├── config.go
-│   │   │   │   └── router.go
-│   │   │   ├── handlers
-│   │   │   │   ├── auth.go
-│   │   │   │   ├── calender.go
-│   │   │   │   ├── calender_membership.go
-│   │   │   │   ├── event.go
-│   │   │   │   ├── soso_point_history.go
-│   │   │   │   └── user.go
-│   │   │   ├── model
-│   │   │   │   ├── calender.go
-│   │   │   │   ├── calender_member.go
-│   │   │   │   ├── calender_membership.go
-│   │   │   │   ├── event.go
-│   │   │   │   ├── event_participant.go
-│   │   │   │   ├── my_dispatch_event.go
-│   │   │   │   ├── refresh_token.go
-│   │   │   │   ├── soso_point_history.go
-│   │   │   │   └── user.go
-│   │   │   ├── repository
-│   │   │   │   ├── calender.go
-│   │   │   │   ├── calender_membership.go
-│   │   │   │   ├── db.go
-│   │   │   │   ├── event.go
-│   │   │   │   ├── event_participants.go
-│   │   │   │   ├── refresh_token.go
-│   │   │   │   ├── soso_point_history.go
-│   │   │   │   └── user.go
-│   │   │   └── validator
-│   │   │       ├── calender.go
-│   │   │       ├── calender_membership.go
-│   │   │       ├── event.go
-│   │   │       ├── user.go
-│   │   │       └── validator.go
-│   │   ├── pkg
-│   │   │   └── auth
-│   │   │       ├── jwt.go
-│   │   │       └── password.go
-│   │   ├── server
-│   │   └── tests
-│   │       └── internal
-│   │           ├── handlers
-│   │           │   ├── auth_test.go
-│   │           │   ├── calender_membership_test.go
-│   │           │   ├── calender_test.go
-│   │           │   ├── event_test.go
-│   │           │   ├── helpers_test.go
-│   │           │   ├── soso_point_history_test.go
-│   │           │   └── user_test.go
-│   │           └── repository
-│   │               ├── calender_membership_test.go
-│   │               ├── calender_test.go
-│   │               ├── event_participants_test.go
-│   │               ├── event_test.go
-│   │               ├── helpers_test.go
-│   │               ├── refresh_token_test.go
-│   │               ├── soso_point_history_test.go
-│   │               └── user_test.go
-│   └── soso-web
-│       ├── .DS_Store
-│       ├── .env
-│       ├── .env.example
-│       ├── .gitignore
-│       ├── README.md
-│       ├── components.json
-│       ├── lib
-│       │   └── utils.ts
-│       ├── next-env.d.ts
-│       ├── next.config.ts
-│       ├── nginx.conf
-│       ├── package-lock.json
-│       ├── package.json
-│       ├── postcss.config.mjs
-│       ├── public
-│       │   ├── file.svg
-│       │   ├── globe.svg
-│       │   ├── icons
-│       │   │   ├── double_s_icon.svg
-│       │   │   └── soso_icon.svg
-│       │   ├── next.svg
-│       │   ├── vercel.svg
-│       │   └── window.svg
-│       ├── src
-│       │   ├── app
-│       │   │   ├── auth
-│       │   │   │   ├── layout.tsx
-│       │   │   │   ├── login
-│       │   │   │   │   └── page.tsx
-│       │   │   │   ├── register
-│       │   │   │   │   └── page.tsx
-│       │   │   │   └── tokenexpired
-│       │   │   │       └── page.tsx
-│       │   │   ├── calenders
-│       │   │   │   ├── [calenderId]
-│       │   │   │   │   └── page.tsx
-│       │   │   │   ├── layout.tsx
-│       │   │   │   └── page.tsx
-│       │   │   ├── favicon.ico
-│       │   │   ├── globals.css
-│       │   │   ├── layout.tsx
-│       │   │   └── page.tsx
-│       │   ├── components
-│       │   │   └── ui
-│       │   │       ├── avatar.tsx
-│       │   │       ├── badge.tsx
-│       │   │       ├── breadcrumb.tsx
-│       │   │       ├── button.tsx
-│       │   │       ├── card.tsx
-│       │   │       ├── checkbox.tsx
-│       │   │       ├── dialog.tsx
-│       │   │       ├── dropdown-menu.tsx
-│       │   │       ├── form.tsx
-│       │   │       ├── input.tsx
-│       │   │       ├── label.tsx
-│       │   │       ├── menubar.tsx
-│       │   │       ├── radio-group.tsx
-│       │   │       ├── scroll-area.tsx
-│       │   │       ├── separator.tsx
-│       │   │       ├── sheet.tsx
-│       │   │       ├── sidebar.tsx
-│       │   │       ├── skeleton.tsx
-│       │   │       ├── snackbar.tsx
-│       │   │       ├── textarea.tsx
-│       │   │       └── tooltip.tsx
-│       │   ├── contexts
-│       │   │   └── AuthContext.tsx
-│       │   ├── hooks
-│       │   │   └── use-mobile.ts
-│       │   ├── layouts
-│       │   │   └── AppLayout
-│       │   │       └── AppLayout.tsx
-│       │   ├── lib
-│       │   │   ├── auth
-│       │   │   │   └── RequireAuth.tsx
-│       │   │   ├── server
-│       │   │   │   └── rootRedirect.ts
-│       │   │   └── utils.ts
-│       │   ├── middleware.ts
-│       │   ├── requests
-│       │   │   ├── authAPI.ts
-│       │   │   ├── calenderAPI.ts
-│       │   │   ├── calenderDetailAPI.ts
-│       │   │   ├── core
-│       │   │   │   ├── client.ts
-│       │   │   │   ├── endpoint.ts
-│       │   │   │   └── tokenStore.ts
-│       │   │   └── userAPI.ts
-│       │   ├── types
-│       │   │   └── interfaces.ts
-│       │   └── views
-│       │       ├── CalendersListView
-│       │       │   ├── CalendersListView.tsx
-│       │       │   ├── components
-│       │       │   │   ├── CalenderListItemCard.tsx
-│       │       │   │   └── CreateCalenderDialogView
-│       │       │   │       ├── CreateCalenderDialog.tsx
-│       │       │   │       ├── components
-│       │       │   │       │   └── CreateCalenderInputs.tsx
-│       │       │   │       ├── schema.ts
-│       │       │   │       └── useCreateCalenderDialog.ts
-│       │       │   └── useCalendersListView.ts
-│       │       ├── HeaderView
-│       │       │   ├── HeaderView.tsx
-│       │       │   ├── components
-│       │       │   │   ├── AccountMenu.tsx
-│       │       │   │   ├── HeaderAccountSection.tsx
-│       │       │   │   ├── HeaderCenterLogo.tsx
-│       │       │   │   ├── HeaderLogo.tsx
-│       │       │   │   ├── LogoutButton.tsx
-│       │       │   │   └── MobileSidebarSheet.tsx
-│       │       │   ├── schema.ts
-│       │       │   └── useHeaderView.ts
-│       │       ├── LoginView
-│       │       │   ├── LoginView.tsx
-│       │       │   ├── components
-│       │       │   │   ├── GoToRegisterLink.tsx
-│       │       │   │   └── LoginButton.tsx
-│       │       │   ├── schema.ts
-│       │       │   └── useLoginView.ts
-│       │       ├── RegisterView
-│       │       │   ├── RegisterView.tsx
-│       │       │   ├── components
-│       │       │   │   ├── CarInfoInputs.tsx
-│       │       │   │   └── RegisterButton.tsx
-│       │       │   ├── schema.ts
-│       │       │   └── useRegisterView.ts
-│       │       └── SidebarView
-│       │           ├── CalenderDetailSidebarView
-│       │           │   ├── CalenderDetailSidebar.tsx
-│       │           │   ├── CalenderDetailSidebarView.tsx
-│       │           │   ├── MembersListPanel
-│       │           │   │   ├── MemberListPanel.tsx
-│       │           │   │   ├── components
-│       │           │   │   │   └── MemberCard.tsx
-│       │           │   │   ├── schema.ts
-│       │           │   │   └── useMemberListPanel.ts
-│       │           │   ├── SoSoPointTimelinePanel
-│       │           │   │   ├── SoSoPointTimelinePanel.tsx
-│       │           │   │   ├── components
-│       │           │   │   │   └── TimelineCard.tsx
-│       │           │   │   ├── schema.ts
-│       │           │   │   └── useSoSoPointTimelinePanel.ts
-│       │           │   ├── components
-│       │           │   │   ├── SidebarMainCard.tsx
-│       │           │   │   ├── SidebarTabButton.tsx
-│       │           │   │   └── SidebarTabFooter.tsx
-│       │           │   ├── schema.ts
-│       │           │   └── useCalenderDetailSidebar.ts
-│       │           ├── CalenderListSidebarView
-│       │           │   ├── CalendersSidebarView.tsx
-│       │           │   └── components
-│       │           │       ├── CalenderSidebar.tsx
-│       │           │       ├── RegisteredEventsCard.tsx
-│       │           │       ├── StatusEditDialogView
-│       │           │       │   ├── StatusEditDialogView.tsx
-│       │           │       │   ├── components
-│       │           │       │   │   └── UserStatusInputs.tsx
-│       │           │       │   ├── schema.ts
-│       │           │       │   └── useStatusEditDialogView.ts
-│       │           │       └── UserStatusCard.tsx
-│       │           └── CalendersSidebarSwitch.tsx
-│       ├── tsconfig.json
-│       ├── vitest.config.ts
-│       └── vitest.shims.d.ts
-└── サイドバー作成ガイド.patch
+└── services
+    ├── .DS_Store
+    ├── soso-api
+    │   ├── .DS_Store
+    │   ├── api
+    │   │   ├── docs.yaml
+    │   │   └── swagger.yaml
+    │   ├── cmd
+    │   │   └── server
+    │   │       └── main.go
+    │   ├── config
+    │   │   ├── .env
+    │   │   └── .env.example
+    │   ├── go.mod
+    │   ├── go.sum
+    │   ├── init
+    │   │   └── 001_init.sql
+    │   ├── internal
+    │   │   ├── config
+    │   │   │   ├── config.go
+    │   │   │   └── router.go
+    │   │   ├── handlers
+    │   │   │   ├── auth.go
+    │   │   │   ├── calender.go
+    │   │   │   ├── calender_membership.go
+    │   │   │   ├── event.go
+    │   │   │   ├── soso_point_history.go
+    │   │   │   └── user.go
+    │   │   ├── model
+    │   │   │   ├── calender.go
+    │   │   │   ├── calender_member.go
+    │   │   │   ├── calender_membership.go
+    │   │   │   ├── event.go
+    │   │   │   ├── event_participant.go
+    │   │   │   ├── my_dispatch_event.go
+    │   │   │   ├── refresh_token.go
+    │   │   │   ├── soso_point_history.go
+    │   │   │   └── user.go
+    │   │   ├── repository
+    │   │   │   ├── calender.go
+    │   │   │   ├── calender_membership.go
+    │   │   │   ├── db.go
+    │   │   │   ├── event.go
+    │   │   │   ├── event_participants.go
+    │   │   │   ├── refresh_token.go
+    │   │   │   ├── soso_point_history.go
+    │   │   │   └── user.go
+    │   │   └── validator
+    │   │       ├── calender.go
+    │   │       ├── calender_membership.go
+    │   │       ├── event.go
+    │   │       ├── user.go
+    │   │       └── validator.go
+    │   ├── pkg
+    │   │   └── auth
+    │   │       ├── jwt.go
+    │   │       └── password.go
+    │   ├── server
+    │   └── tests
+    │       └── internal
+    │           ├── handlers
+    │           │   ├── auth_test.go
+    │           │   ├── calender_membership_test.go
+    │           │   ├── calender_test.go
+    │           │   ├── event_test.go
+    │           │   ├── helpers_test.go
+    │           │   ├── soso_point_history_test.go
+    │           │   └── user_test.go
+    │           └── repository
+    │               ├── calender_membership_test.go
+    │               ├── calender_test.go
+    │               ├── event_participants_test.go
+    │               ├── event_test.go
+    │               ├── helpers_test.go
+    │               ├── refresh_token_test.go
+    │               ├── soso_point_history_test.go
+    │               └── user_test.go
+    └── soso-web
+        ├── .DS_Store
+        ├── .env
+        ├── .env.example
+        ├── .gitignore
+        ├── README.md
+        ├── components.json
+        ├── lib
+        │   └── utils.ts
+        ├── next-env.d.ts
+        ├── next.config.ts
+        ├── nginx.conf
+        ├── package-lock.json
+        ├── package.json
+        ├── postcss.config.mjs
+        ├── public
+        │   ├── file.svg
+        │   ├── globe.svg
+        │   ├── icons
+        │   │   ├── double_s_icon.svg
+        │   │   └── soso_icon.svg
+        │   ├── next.svg
+        │   ├── vercel.svg
+        │   └── window.svg
+        ├── src
+        │   ├── app
+        │   │   ├── auth
+        │   │   │   ├── layout.tsx
+        │   │   │   ├── login
+        │   │   │   │   └── page.tsx
+        │   │   │   ├── register
+        │   │   │   │   └── page.tsx
+        │   │   │   └── tokenexpired
+        │   │   │       └── page.tsx
+        │   │   ├── calenders
+        │   │   │   ├── [calenderId]
+        │   │   │   │   └── page.tsx
+        │   │   │   ├── invite
+        │   │   │   │   └── page.tsx
+        │   │   │   ├── layout.tsx
+        │   │   │   └── page.tsx
+        │   │   ├── favicon.ico
+        │   │   ├── globals.css
+        │   │   ├── layout.tsx
+        │   │   ├── not-found
+        │   │   │   └── page.tsx
+        │   │   └── page.tsx
+        │   ├── components
+        │   │   └── ui
+        │   │       ├── avatar.tsx
+        │   │       ├── badge.tsx
+        │   │       ├── breadcrumb.tsx
+        │   │       ├── button.tsx
+        │   │       ├── card.tsx
+        │   │       ├── checkbox.tsx
+        │   │       ├── dialog.tsx
+        │   │       ├── dropdown-menu.tsx
+        │   │       ├── form.tsx
+        │   │       ├── input.tsx
+        │   │       ├── label.tsx
+        │   │       ├── menubar.tsx
+        │   │       ├── radio-group.tsx
+        │   │       ├── scroll-area.tsx
+        │   │       ├── separator.tsx
+        │   │       ├── sheet.tsx
+        │   │       ├── sidebar.tsx
+        │   │       ├── skeleton.tsx
+        │   │       ├── snackbar.tsx
+        │   │       ├── textarea.tsx
+        │   │       └── tooltip.tsx
+        │   ├── contexts
+        │   │   └── AuthContext.tsx
+        │   ├── hooks
+        │   │   └── use-mobile.ts
+        │   ├── layouts
+        │   │   └── AppLayout
+        │   │       └── AppLayout.tsx
+        │   ├── lib
+        │   │   ├── auth
+        │   │   │   └── RequireAuth.tsx
+        │   │   ├── server
+        │   │   │   └── rootRedirect.ts
+        │   │   └── utils.ts
+        │   ├── middleware.ts
+        │   ├── requests
+        │   │   ├── authAPI.ts
+        │   │   ├── calenderAPI.ts
+        │   │   ├── calenderDetailAPI.ts
+        │   │   ├── core
+        │   │   │   ├── client.ts
+        │   │   │   ├── endpoint.ts
+        │   │   │   └── tokenStore.ts
+        │   │   └── userAPI.ts
+        │   ├── types
+        │   │   └── interfaces.ts
+        │   └── views
+        │       ├── CalenderInviteView
+        │       │   ├── CalenderInviteView.tsx
+        │       │   └── useCalenderInviteView.ts
+        │       ├── CalendersListView
+        │       │   ├── CalendersListView.tsx
+        │       │   ├── components
+        │       │   │   ├── CalenderListItemCard.tsx
+        │       │   │   └── CreateCalenderDialogView
+        │       │   │       ├── CreateCalenderDialog.tsx
+        │       │   │       ├── components
+        │       │   │       │   └── CreateCalenderInputs.tsx
+        │       │   │       ├── schema.ts
+        │       │   │       └── useCreateCalenderDialog.ts
+        │       │   └── useCalendersListView.ts
+        │       ├── HeaderView
+        │       │   ├── HeaderView.tsx
+        │       │   ├── components
+        │       │   │   ├── AccountMenu.tsx
+        │       │   │   ├── HeaderAccountSection.tsx
+        │       │   │   ├── HeaderCenterLogo.tsx
+        │       │   │   ├── HeaderLogo.tsx
+        │       │   │   ├── LogoutButton.tsx
+        │       │   │   └── MobileSidebarSheet.tsx
+        │       │   ├── schema.ts
+        │       │   └── useHeaderView.ts
+        │       ├── LoginView
+        │       │   ├── LoginView.tsx
+        │       │   ├── components
+        │       │   │   ├── GoToRegisterLink.tsx
+        │       │   │   └── LoginButton.tsx
+        │       │   ├── schema.ts
+        │       │   └── useLoginView.ts
+        │       ├── RegisterView
+        │       │   ├── RegisterView.tsx
+        │       │   ├── components
+        │       │   │   ├── CarInfoInputs.tsx
+        │       │   │   └── RegisterButton.tsx
+        │       │   ├── schema.ts
+        │       │   └── useRegisterView.ts
+        │       └── SidebarView
+        │           ├── CalenderDetailSidebarView
+        │           │   ├── CalenderDetailSidebar.tsx
+        │           │   ├── CalenderDetailSidebarView.tsx
+        │           │   ├── MembersListPanel
+        │           │   │   ├── MemberListPanel.tsx
+        │           │   │   ├── components
+        │           │   │   │   └── MemberCard.tsx
+        │           │   │   ├── schema.ts
+        │           │   │   └── useMemberListPanel.ts
+        │           │   ├── SoSoPointTimelinePanel
+        │           │   │   ├── SoSoPointTimelinePanel.tsx
+        │           │   │   ├── components
+        │           │   │   │   └── TimelineCard.tsx
+        │           │   │   ├── schema.ts
+        │           │   │   └── useSoSoPointTimelinePanel.ts
+        │           │   ├── components
+        │           │   │   ├── SidebarMainCard.tsx
+        │           │   │   ├── SidebarTabButton.tsx
+        │           │   │   └── SidebarTabFooter.tsx
+        │           │   ├── schema.ts
+        │           │   └── useCalenderDetailSidebar.ts
+        │           ├── CalenderListSidebarView
+        │           │   ├── CalendersSidebarView.tsx
+        │           │   └── components
+        │           │       ├── CalenderSidebar.tsx
+        │           │       ├── RegisteredEventsCard.tsx
+        │           │       ├── StatusEditDialogView
+        │           │       │   ├── StatusEditDialogView.tsx
+        │           │       │   ├── components
+        │           │       │   │   └── UserStatusInputs.tsx
+        │           │       │   ├── schema.ts
+        │           │       │   └── useStatusEditDialogView.ts
+        │           │       └── UserStatusCard.tsx
+        │           └── CalendersSidebarSwitch.tsx
+        ├── tsconfig.json
+        ├── vitest.config.ts
+        └── vitest.shims.d.ts
 
-68 directories, 195 files
+71 directories, 198 files
 
 ===== FILE CONTENTS =====
 
@@ -1245,7 +1257,7 @@ volumes:
 
 [TRUNCATED] MAX_LINES=5000
 
------ FILE: project_dump.txt (size=23060) -----
+----- FILE: project_dump.txt (size=22421) -----
 ===== DIRECTORY TREE =====
 .
 ├── .DS_Store
@@ -1266,252 +1278,258 @@ volumes:
 ├── package-lock.json
 ├── package.json
 ├── project_dump.txt
-├── services
-│   ├── .DS_Store
-│   ├── soso-api
-│   │   ├── .DS_Store
-│   │   ├── api
-│   │   │   ├── docs.yaml
-│   │   │   └── swagger.yaml
-│   │   ├── cmd
-│   │   │   └── server
-│   │   │       └── main.go
-│   │   ├── config
-│   │   │   ├── .env
-│   │   │   └── .env.example
-│   │   ├── go.mod
-│   │   ├── go.sum
-│   │   ├── init
-│   │   │   └── 001_init.sql
-│   │   ├── internal
-│   │   │   ├── config
-│   │   │   │   ├── config.go
-│   │   │   │   └── router.go
-│   │   │   ├── handlers
-│   │   │   │   ├── auth.go
-│   │   │   │   ├── calender.go
-│   │   │   │   ├── calender_membership.go
-│   │   │   │   ├── event.go
-│   │   │   │   ├── soso_point_history.go
-│   │   │   │   └── user.go
-│   │   │   ├── model
-│   │   │   │   ├── calender.go
-│   │   │   │   ├── calender_member.go
-│   │   │   │   ├── calender_membership.go
-│   │   │   │   ├── event.go
-│   │   │   │   ├── event_participant.go
-│   │   │   │   ├── my_dispatch_event.go
-│   │   │   │   ├── refresh_token.go
-│   │   │   │   ├── soso_point_history.go
-│   │   │   │   └── user.go
-│   │   │   ├── repository
-│   │   │   │   ├── calender.go
-│   │   │   │   ├── calender_membership.go
-│   │   │   │   ├── db.go
-│   │   │   │   ├── event.go
-│   │   │   │   ├── event_participants.go
-│   │   │   │   ├── refresh_token.go
-│   │   │   │   ├── soso_point_history.go
-│   │   │   │   └── user.go
-│   │   │   └── validator
-│   │   │       ├── calender.go
-│   │   │       ├── calender_membership.go
-│   │   │       ├── event.go
-│   │   │       ├── user.go
-│   │   │       └── validator.go
-│   │   ├── pkg
-│   │   │   └── auth
-│   │   │       ├── jwt.go
-│   │   │       └── password.go
-│   │   ├── server
-│   │   └── tests
-│   │       └── internal
-│   │           ├── handlers
-│   │           │   ├── auth_test.go
-│   │           │   ├── calender_membership_test.go
-│   │           │   ├── calender_test.go
-│   │           │   ├── event_test.go
-│   │           │   ├── helpers_test.go
-│   │           │   ├── soso_point_history_test.go
-│   │           │   └── user_test.go
-│   │           └── repository
-│   │               ├── calender_membership_test.go
-│   │               ├── calender_test.go
-│   │               ├── event_participants_test.go
-│   │               ├── event_test.go
-│   │               ├── helpers_test.go
-│   │               ├── refresh_token_test.go
-│   │               ├── soso_point_history_test.go
-│   │               └── user_test.go
-│   └── soso-web
-│       ├── .DS_Store
-│       ├── .env
-│       ├── .env.example
-│       ├── .gitignore
-│       ├── README.md
-│       ├── components.json
-│       ├── lib
-│       │   └── utils.ts
-│       ├── next-env.d.ts
-│       ├── next.config.ts
-│       ├── nginx.conf
-│       ├── package-lock.json
-│       ├── package.json
-│       ├── postcss.config.mjs
-│       ├── public
-│       │   ├── file.svg
-│       │   ├── globe.svg
-│       │   ├── icons
-│       │   │   ├── double_s_icon.svg
-│       │   │   └── soso_icon.svg
-│       │   ├── next.svg
-│       │   ├── vercel.svg
-│       │   └── window.svg
-│       ├── src
-│       │   ├── app
-│       │   │   ├── auth
-│       │   │   │   ├── layout.tsx
-│       │   │   │   ├── login
-│       │   │   │   │   └── page.tsx
-│       │   │   │   ├── register
-│       │   │   │   │   └── page.tsx
-│       │   │   │   └── tokenexpired
-│       │   │   │       └── page.tsx
-│       │   │   ├── calenders
-│       │   │   │   ├── [calenderId]
-│       │   │   │   │   └── page.tsx
-│       │   │   │   ├── layout.tsx
-│       │   │   │   └── page.tsx
-│       │   │   ├── favicon.ico
-│       │   │   ├── globals.css
-│       │   │   ├── layout.tsx
-│       │   │   └── page.tsx
-│       │   ├── components
-│       │   │   └── ui
-│       │   │       ├── avatar.tsx
-│       │   │       ├── badge.tsx
-│       │   │       ├── breadcrumb.tsx
-│       │   │       ├── button.tsx
-│       │   │       ├── card.tsx
-│       │   │       ├── checkbox.tsx
-│       │   │       ├── dialog.tsx
-│       │   │       ├── dropdown-menu.tsx
-│       │   │       ├── form.tsx
-│       │   │       ├── input.tsx
-│       │   │       ├── label.tsx
-│       │   │       ├── menubar.tsx
-│       │   │       ├── radio-group.tsx
-│       │   │       ├── scroll-area.tsx
-│       │   │       ├── separator.tsx
-│       │   │       ├── sheet.tsx
-│       │   │       ├── sidebar.tsx
-│       │   │       ├── skeleton.tsx
-│       │   │       ├── snackbar.tsx
-│       │   │       ├── textarea.tsx
-│       │   │       └── tooltip.tsx
-│       │   ├── contexts
-│       │   │   └── AuthContext.tsx
-│       │   ├── hooks
-│       │   │   └── use-mobile.ts
-│       │   ├── layouts
-│       │   │   └── AppLayout
-│       │   │       └── AppLayout.tsx
-│       │   ├── lib
-│       │   │   ├── auth
-│       │   │   │   └── RequireAuth.tsx
-│       │   │   ├── server
-│       │   │   │   └── rootRedirect.ts
-│       │   │   └── utils.ts
-│       │   ├── middleware.ts
-│       │   ├── requests
-│       │   │   ├── authAPI.ts
-│       │   │   ├── calenderAPI.ts
-│       │   │   ├── calenderDetailAPI.ts
-│       │   │   ├── core
-│       │   │   │   ├── client.ts
-│       │   │   │   ├── endpoint.ts
-│       │   │   │   └── tokenStore.ts
-│       │   │   └── userAPI.ts
-│       │   ├── types
-│       │   │   └── interfaces.ts
-│       │   └── views
-│       │       ├── CalendersListView
-│       │       │   ├── CalendersListView.tsx
-│       │       │   ├── components
-│       │       │   │   ├── CalenderListItemCard.tsx
-│       │       │   │   └── CreateCalenderDialogView
-│       │       │   │       ├── CreateCalenderDialog.tsx
-│       │       │   │       ├── components
-│       │       │   │       │   └── CreateCalenderInputs.tsx
-│       │       │   │       ├── schema.ts
-│       │       │   │       └── useCreateCalenderDialog.ts
-│       │       │   └── useCalendersListView.ts
-│       │       ├── HeaderView
-│       │       │   ├── HeaderView.tsx
-│       │       │   ├── components
-│       │       │   │   ├── AccountMenu.tsx
-│       │       │   │   ├── HeaderAccountSection.tsx
-│       │       │   │   ├── HeaderCenterLogo.tsx
-│       │       │   │   ├── HeaderLogo.tsx
-│       │       │   │   ├── LogoutButton.tsx
-│       │       │   │   └── MobileSidebarSheet.tsx
-│       │       │   ├── schema.ts
-│       │       │   └── useHeaderView.ts
-│       │       ├── LoginView
-│       │       │   ├── LoginView.tsx
-│       │       │   ├── components
-│       │       │   │   ├── GoToRegisterLink.tsx
-│       │       │   │   └── LoginButton.tsx
-│       │       │   ├── schema.ts
-│       │       │   └── useLoginView.ts
-│       │       ├── RegisterView
-│       │       │   ├── RegisterView.tsx
-│       │       │   ├── components
-│       │       │   │   ├── CarInfoInputs.tsx
-│       │       │   │   └── RegisterButton.tsx
-│       │       │   ├── schema.ts
-│       │       │   └── useRegisterView.ts
-│       │       └── SidebarView
-│       │           ├── CalenderDetailSidebarView
-│       │           │   ├── CalenderDetailSidebar.tsx
-│       │           │   ├── CalenderDetailSidebarView.tsx
-│       │           │   ├── MembersListPanel
-│       │           │   │   ├── MemberListPanel.tsx
-│       │           │   │   ├── components
-│       │           │   │   │   └── MemberCard.tsx
-│       │           │   │   ├── schema.ts
-│       │           │   │   └── useMemberListPanel.ts
-│       │           │   ├── SoSoPointTimelinePanel
-│       │           │   │   ├── SoSoPointTimelinePanel.tsx
-│       │           │   │   ├── components
-│       │           │   │   │   └── TimelineCard.tsx
-│       │           │   │   ├── schema.ts
-│       │           │   │   └── useSoSoPointTimelinePanel.ts
-│       │           │   ├── components
-│       │           │   │   ├── SidebarMainCard.tsx
-│       │           │   │   ├── SidebarTabButton.tsx
-│       │           │   │   └── SidebarTabFooter.tsx
-│       │           │   ├── schema.ts
-│       │           │   └── useCalenderDetailSidebar.ts
-│       │           ├── CalenderListSidebarView
-│       │           │   ├── CalendersSidebarView.tsx
-│       │           │   └── components
-│       │           │       ├── CalenderSidebar.tsx
-│       │           │       ├── RegisteredEventsCard.tsx
-│       │           │       ├── StatusEditDialogView
-│       │           │       │   ├── StatusEditDialogView.tsx
-│       │           │       │   ├── components
-│       │           │       │   │   └── UserStatusInputs.tsx
-│       │           │       │   ├── schema.ts
-│       │           │       │   └── useStatusEditDialogView.ts
-│       │           │       └── UserStatusCard.tsx
-│       │           └── CalendersSidebarSwitch.tsx
-│       ├── tsconfig.json
-│       ├── vitest.config.ts
-│       └── vitest.shims.d.ts
-└── サイドバー作成ガイド.patch
+└── services
+    ├── .DS_Store
+    ├── soso-api
+    │   ├── .DS_Store
+    │   ├── api
+    │   │   ├── docs.yaml
+    │   │   └── swagger.yaml
+    │   ├── cmd
+    │   │   └── server
+    │   │       └── main.go
+    │   ├── config
+    │   │   ├── .env
+    │   │   └── .env.example
+    │   ├── go.mod
+    │   ├── go.sum
+    │   ├── init
+    │   │   └── 001_init.sql
+    │   ├── internal
+    │   │   ├── config
+    │   │   │   ├── config.go
+    │   │   │   └── router.go
+    │   │   ├── handlers
+    │   │   │   ├── auth.go
+    │   │   │   ├── calender.go
+    │   │   │   ├── calender_membership.go
+    │   │   │   ├── event.go
+    │   │   │   ├── soso_point_history.go
+    │   │   │   └── user.go
+    │   │   ├── model
+    │   │   │   ├── calender.go
+    │   │   │   ├── calender_member.go
+    │   │   │   ├── calender_membership.go
+    │   │   │   ├── event.go
+    │   │   │   ├── event_participant.go
+    │   │   │   ├── my_dispatch_event.go
+    │   │   │   ├── refresh_token.go
+    │   │   │   ├── soso_point_history.go
+    │   │   │   └── user.go
+    │   │   ├── repository
+    │   │   │   ├── calender.go
+    │   │   │   ├── calender_membership.go
+    │   │   │   ├── db.go
+    │   │   │   ├── event.go
+    │   │   │   ├── event_participants.go
+    │   │   │   ├── refresh_token.go
+    │   │   │   ├── soso_point_history.go
+    │   │   │   └── user.go
+    │   │   └── validator
+    │   │       ├── calender.go
+    │   │       ├── calender_membership.go
+    │   │       ├── event.go
+    │   │       ├── user.go
+    │   │       └── validator.go
+    │   ├── pkg
+    │   │   └── auth
+    │   │       ├── jwt.go
+    │   │       └── password.go
+    │   ├── server
+    │   └── tests
+    │       └── internal
+    │           ├── handlers
+    │           │   ├── auth_test.go
+    │           │   ├── calender_membership_test.go
+    │           │   ├── calender_test.go
+    │           │   ├── event_test.go
+    │           │   ├── helpers_test.go
+    │           │   ├── soso_point_history_test.go
+    │           │   └── user_test.go
+    │           └── repository
+    │               ├── calender_membership_test.go
+    │               ├── calender_test.go
+    │               ├── event_participants_test.go
+    │               ├── event_test.go
+    │               ├── helpers_test.go
+    │               ├── refresh_token_test.go
+    │               ├── soso_point_history_test.go
+    │               └── user_test.go
+    └── soso-web
+        ├── .DS_Store
+        ├── .env
+        ├── .env.example
+        ├── .gitignore
+        ├── README.md
+        ├── components.json
+        ├── lib
+        │   └── utils.ts
+        ├── next-env.d.ts
+        ├── next.config.ts
+        ├── nginx.conf
+        ├── package-lock.json
+        ├── package.json
+        ├── postcss.config.mjs
+        ├── public
+        │   ├── file.svg
+        │   ├── globe.svg
+        │   ├── icons
+        │   │   ├── double_s_icon.svg
+        │   │   └── soso_icon.svg
+        │   ├── next.svg
+        │   ├── vercel.svg
+        │   └── window.svg
+        ├── src
+        │   ├── app
+        │   │   ├── auth
+        │   │   │   ├── layout.tsx
+        │   │   │   ├── login
+        │   │   │   │   └── page.tsx
+        │   │   │   ├── register
+        │   │   │   │   └── page.tsx
+        │   │   │   └── tokenexpired
+        │   │   │       └── page.tsx
+        │   │   ├── calenders
+        │   │   │   ├── [calenderId]
+        │   │   │   │   └── page.tsx
+        │   │   │   ├── invite
+        │   │   │   │   └── page.tsx
+        │   │   │   ├── layout.tsx
+        │   │   │   └── page.tsx
+        │   │   ├── favicon.ico
+        │   │   ├── globals.css
+        │   │   ├── layout.tsx
+        │   │   ├── not-found
+        │   │   │   └── page.tsx
+        │   │   └── page.tsx
+        │   ├── components
+        │   │   └── ui
+        │   │       ├── avatar.tsx
+        │   │       ├── badge.tsx
+        │   │       ├── breadcrumb.tsx
+        │   │       ├── button.tsx
+        │   │       ├── card.tsx
+        │   │       ├── checkbox.tsx
+        │   │       ├── dialog.tsx
+        │   │       ├── dropdown-menu.tsx
+        │   │       ├── form.tsx
+        │   │       ├── input.tsx
+        │   │       ├── label.tsx
+        │   │       ├── menubar.tsx
+        │   │       ├── radio-group.tsx
+        │   │       ├── scroll-area.tsx
+        │   │       ├── separator.tsx
+        │   │       ├── sheet.tsx
+        │   │       ├── sidebar.tsx
+        │   │       ├── skeleton.tsx
+        │   │       ├── snackbar.tsx
+        │   │       ├── textarea.tsx
+        │   │       └── tooltip.tsx
+        │   ├── contexts
+        │   │   └── AuthContext.tsx
+        │   ├── hooks
+        │   │   └── use-mobile.ts
+        │   ├── layouts
+        │   │   └── AppLayout
+        │   │       └── AppLayout.tsx
+        │   ├── lib
+        │   │   ├── auth
+        │   │   │   └── RequireAuth.tsx
+        │   │   ├── server
+        │   │   │   └── rootRedirect.ts
+        │   │   └── utils.ts
+        │   ├── middleware.ts
+        │   ├── requests
+        │   │   ├── authAPI.ts
+        │   │   ├── calenderAPI.ts
+        │   │   ├── calenderDetailAPI.ts
+        │   │   ├── core
+        │   │   │   ├── client.ts
+        │   │   │   ├── endpoint.ts
+        │   │   │   └── tokenStore.ts
+        │   │   └── userAPI.ts
+        │   ├── types
+        │   │   └── interfaces.ts
+        │   └── views
+        │       ├── CalenderInviteView
+        │       │   ├── CalenderInviteView.tsx
+        │       │   └── useCalenderInviteView.ts
+        │       ├── CalendersListView
+        │       │   ├── CalendersListView.tsx
+        │       │   ├── components
+        │       │   │   ├── CalenderListItemCard.tsx
+        │       │   │   └── CreateCalenderDialogView
+        │       │   │       ├── CreateCalenderDialog.tsx
+        │       │   │       ├── components
+        │       │   │       │   └── CreateCalenderInputs.tsx
+        │       │   │       ├── schema.ts
+        │       │   │       └── useCreateCalenderDialog.ts
+        │       │   └── useCalendersListView.ts
+        │       ├── HeaderView
+        │       │   ├── HeaderView.tsx
+        │       │   ├── components
+        │       │   │   ├── AccountMenu.tsx
+        │       │   │   ├── HeaderAccountSection.tsx
+        │       │   │   ├── HeaderCenterLogo.tsx
+        │       │   │   ├── HeaderLogo.tsx
+        │       │   │   ├── LogoutButton.tsx
+        │       │   │   └── MobileSidebarSheet.tsx
+        │       │   ├── schema.ts
+        │       │   └── useHeaderView.ts
+        │       ├── LoginView
+        │       │   ├── LoginView.tsx
+        │       │   ├── components
+        │       │   │   ├── GoToRegisterLink.tsx
+        │       │   │   └── LoginButton.tsx
+        │       │   ├── schema.ts
+        │       │   └── useLoginView.ts
+        │       ├── RegisterView
+        │       │   ├── RegisterView.tsx
+        │       │   ├── components
+        │       │   │   ├── CarInfoInputs.tsx
+        │       │   │   └── RegisterButton.tsx
+        │       │   ├── schema.ts
+        │       │   └── useRegisterView.ts
+        │       └── SidebarView
+        │           ├── CalenderDetailSidebarView
+        │           │   ├── CalenderDetailSidebar.tsx
+        │           │   ├── CalenderDetailSidebarView.tsx
+        │           │   ├── MembersListPanel
+        │           │   │   ├── MemberListPanel.tsx
+        │           │   │   ├── components
+        │           │   │   │   └── MemberCard.tsx
+        │           │   │   ├── schema.ts
+        │           │   │   └── useMemberListPanel.ts
+        │           │   ├── SoSoPointTimelinePanel
+        │           │   │   ├── SoSoPointTimelinePanel.tsx
+        │           │   │   ├── components
+        │           │   │   │   └── TimelineCard.tsx
+        │           │   │   ├── schema.ts
+        │           │   │   └── useSoSoPointTimelinePanel.ts
+        │           │   ├── components
+        │           │   │   ├── SidebarMainCard.tsx
+        │           │   │   ├── SidebarTabButton.tsx
+        │           │   │   └── SidebarTabFooter.tsx
+        │           │   ├── schema.ts
+        │           │   └── useCalenderDetailSidebar.ts
+        │           ├── CalenderListSidebarView
+        │           │   ├── CalendersSidebarView.tsx
+        │           │   └── components
+        │           │       ├── CalenderSidebar.tsx
+        │           │       ├── RegisteredEventsCard.tsx
+        │           │       ├── StatusEditDialogView
+        │           │       │   ├── StatusEditDialogView.tsx
+        │           │       │   ├── components
+        │           │       │   │   └── UserStatusInputs.tsx
+        │           │       │   ├── schema.ts
+        │           │       │   └── useStatusEditDialogView.ts
+        │           │       └── UserStatusCard.tsx
+        │           └── CalendersSidebarSwitch.tsx
+        ├── tsconfig.json
+        ├── vitest.config.ts
+        └── vitest.shims.d.ts
 
-68 directories, 195 files
+71 directories, 198 files
 
 ===== FILE CONTENTS =====
 
@@ -1869,7 +1887,7 @@ volumes:
 
 [TRUNCATED] MAX_LINES=5000
 
------ FILE: project_dump.txt (size=23060) -----
+----- FILE: project_dump.txt (size=22421) -----
 ===== DIRECTORY TREE =====
 .
 ├── .DS_Store
@@ -1890,252 +1908,258 @@ volumes:
 ├── package-lock.json
 ├── package.json
 ├── project_dump.txt
-├── services
-│   ├── .DS_Store
-│   ├── soso-api
-│   │   ├── .DS_Store
-│   │   ├── api
-│   │   │   ├── docs.yaml
-│   │   │   └── swagger.yaml
-│   │   ├── cmd
-│   │   │   └── server
-│   │   │       └── main.go
-│   │   ├── config
-│   │   │   ├── .env
-│   │   │   └── .env.example
-│   │   ├── go.mod
-│   │   ├── go.sum
-│   │   ├── init
-│   │   │   └── 001_init.sql
-│   │   ├── internal
-│   │   │   ├── config
-│   │   │   │   ├── config.go
-│   │   │   │   └── router.go
-│   │   │   ├── handlers
-│   │   │   │   ├── auth.go
-│   │   │   │   ├── calender.go
-│   │   │   │   ├── calender_membership.go
-│   │   │   │   ├── event.go
-│   │   │   │   ├── soso_point_history.go
-│   │   │   │   └── user.go
-│   │   │   ├── model
-│   │   │   │   ├── calender.go
-│   │   │   │   ├── calender_member.go
-│   │   │   │   ├── calender_membership.go
-│   │   │   │   ├── event.go
-│   │   │   │   ├── event_participant.go
-│   │   │   │   ├── my_dispatch_event.go
-│   │   │   │   ├── refresh_token.go
-│   │   │   │   ├── soso_point_history.go
-│   │   │   │   └── user.go
-│   │   │   ├── repository
-│   │   │   │   ├── calender.go
-│   │   │   │   ├── calender_membership.go
-│   │   │   │   ├── db.go
-│   │   │   │   ├── event.go
-│   │   │   │   ├── event_participants.go
-│   │   │   │   ├── refresh_token.go
-│   │   │   │   ├── soso_point_history.go
-│   │   │   │   └── user.go
-│   │   │   └── validator
-│   │   │       ├── calender.go
-│   │   │       ├── calender_membership.go
-│   │   │       ├── event.go
-│   │   │       ├── user.go
-│   │   │       └── validator.go
-│   │   ├── pkg
-│   │   │   └── auth
-│   │   │       ├── jwt.go
-│   │   │       └── password.go
-│   │   ├── server
-│   │   └── tests
-│   │       └── internal
-│   │           ├── handlers
-│   │           │   ├── auth_test.go
-│   │           │   ├── calender_membership_test.go
-│   │           │   ├── calender_test.go
-│   │           │   ├── event_test.go
-│   │           │   ├── helpers_test.go
-│   │           │   ├── soso_point_history_test.go
-│   │           │   └── user_test.go
-│   │           └── repository
-│   │               ├── calender_membership_test.go
-│   │               ├── calender_test.go
-│   │               ├── event_participants_test.go
-│   │               ├── event_test.go
-│   │               ├── helpers_test.go
-│   │               ├── refresh_token_test.go
-│   │               ├── soso_point_history_test.go
-│   │               └── user_test.go
-│   └── soso-web
-│       ├── .DS_Store
-│       ├── .env
-│       ├── .env.example
-│       ├── .gitignore
-│       ├── README.md
-│       ├── components.json
-│       ├── lib
-│       │   └── utils.ts
-│       ├── next-env.d.ts
-│       ├── next.config.ts
-│       ├── nginx.conf
-│       ├── package-lock.json
-│       ├── package.json
-│       ├── postcss.config.mjs
-│       ├── public
-│       │   ├── file.svg
-│       │   ├── globe.svg
-│       │   ├── icons
-│       │   │   ├── double_s_icon.svg
-│       │   │   └── soso_icon.svg
-│       │   ├── next.svg
-│       │   ├── vercel.svg
-│       │   └── window.svg
-│       ├── src
-│       │   ├── app
-│       │   │   ├── auth
-│       │   │   │   ├── layout.tsx
-│       │   │   │   ├── login
-│       │   │   │   │   └── page.tsx
-│       │   │   │   ├── register
-│       │   │   │   │   └── page.tsx
-│       │   │   │   └── tokenexpired
-│       │   │   │       └── page.tsx
-│       │   │   ├── calenders
-│       │   │   │   ├── [calenderId]
-│       │   │   │   │   └── page.tsx
-│       │   │   │   ├── layout.tsx
-│       │   │   │   └── page.tsx
-│       │   │   ├── favicon.ico
-│       │   │   ├── globals.css
-│       │   │   ├── layout.tsx
-│       │   │   └── page.tsx
-│       │   ├── components
-│       │   │   └── ui
-│       │   │       ├── avatar.tsx
-│       │   │       ├── badge.tsx
-│       │   │       ├── breadcrumb.tsx
-│       │   │       ├── button.tsx
-│       │   │       ├── card.tsx
-│       │   │       ├── checkbox.tsx
-│       │   │       ├── dialog.tsx
-│       │   │       ├── dropdown-menu.tsx
-│       │   │       ├── form.tsx
-│       │   │       ├── input.tsx
-│       │   │       ├── label.tsx
-│       │   │       ├── menubar.tsx
-│       │   │       ├── radio-group.tsx
-│       │   │       ├── scroll-area.tsx
-│       │   │       ├── separator.tsx
-│       │   │       ├── sheet.tsx
-│       │   │       ├── sidebar.tsx
-│       │   │       ├── skeleton.tsx
-│       │   │       ├── snackbar.tsx
-│       │   │       ├── textarea.tsx
-│       │   │       └── tooltip.tsx
-│       │   ├── contexts
-│       │   │   └── AuthContext.tsx
-│       │   ├── hooks
-│       │   │   └── use-mobile.ts
-│       │   ├── layouts
-│       │   │   └── AppLayout
-│       │   │       └── AppLayout.tsx
-│       │   ├── lib
-│       │   │   ├── auth
-│       │   │   │   └── RequireAuth.tsx
-│       │   │   ├── server
-│       │   │   │   └── rootRedirect.ts
-│       │   │   └── utils.ts
-│       │   ├── middleware.ts
-│       │   ├── requests
-│       │   │   ├── authAPI.ts
-│       │   │   ├── calenderAPI.ts
-│       │   │   ├── calenderDetailAPI.ts
-│       │   │   ├── core
-│       │   │   │   ├── client.ts
-│       │   │   │   ├── endpoint.ts
-│       │   │   │   └── tokenStore.ts
-│       │   │   └── userAPI.ts
-│       │   ├── types
-│       │   │   └── interfaces.ts
-│       │   └── views
-│       │       ├── CalendersListView
-│       │       │   ├── CalendersListView.tsx
-│       │       │   ├── components
-│       │       │   │   ├── CalenderListItemCard.tsx
-│       │       │   │   └── CreateCalenderDialogView
-│       │       │   │       ├── CreateCalenderDialog.tsx
-│       │       │   │       ├── components
-│       │       │   │       │   └── CreateCalenderInputs.tsx
-│       │       │   │       ├── schema.ts
-│       │       │   │       └── useCreateCalenderDialog.ts
-│       │       │   └── useCalendersListView.ts
-│       │       ├── HeaderView
-│       │       │   ├── HeaderView.tsx
-│       │       │   ├── components
-│       │       │   │   ├── AccountMenu.tsx
-│       │       │   │   ├── HeaderAccountSection.tsx
-│       │       │   │   ├── HeaderCenterLogo.tsx
-│       │       │   │   ├── HeaderLogo.tsx
-│       │       │   │   ├── LogoutButton.tsx
-│       │       │   │   └── MobileSidebarSheet.tsx
-│       │       │   ├── schema.ts
-│       │       │   └── useHeaderView.ts
-│       │       ├── LoginView
-│       │       │   ├── LoginView.tsx
-│       │       │   ├── components
-│       │       │   │   ├── GoToRegisterLink.tsx
-│       │       │   │   └── LoginButton.tsx
-│       │       │   ├── schema.ts
-│       │       │   └── useLoginView.ts
-│       │       ├── RegisterView
-│       │       │   ├── RegisterView.tsx
-│       │       │   ├── components
-│       │       │   │   ├── CarInfoInputs.tsx
-│       │       │   │   └── RegisterButton.tsx
-│       │       │   ├── schema.ts
-│       │       │   └── useRegisterView.ts
-│       │       └── SidebarView
-│       │           ├── CalenderDetailSidebarView
-│       │           │   ├── CalenderDetailSidebar.tsx
-│       │           │   ├── CalenderDetailSidebarView.tsx
-│       │           │   ├── MembersListPanel
-│       │           │   │   ├── MemberListPanel.tsx
-│       │           │   │   ├── components
-│       │           │   │   │   └── MemberCard.tsx
-│       │           │   │   ├── schema.ts
-│       │           │   │   └── useMemberListPanel.ts
-│       │           │   ├── SoSoPointTimelinePanel
-│       │           │   │   ├── SoSoPointTimelinePanel.tsx
-│       │           │   │   ├── components
-│       │           │   │   │   └── TimelineCard.tsx
-│       │           │   │   ├── schema.ts
-│       │           │   │   └── useSoSoPointTimelinePanel.ts
-│       │           │   ├── components
-│       │           │   │   ├── SidebarMainCard.tsx
-│       │           │   │   ├── SidebarTabButton.tsx
-│       │           │   │   └── SidebarTabFooter.tsx
-│       │           │   ├── schema.ts
-│       │           │   └── useCalenderDetailSidebar.ts
-│       │           ├── CalenderListSidebarView
-│       │           │   ├── CalendersSidebarView.tsx
-│       │           │   └── components
-│       │           │       ├── CalenderSidebar.tsx
-│       │           │       ├── RegisteredEventsCard.tsx
-│       │           │       ├── StatusEditDialogView
-│       │           │       │   ├── StatusEditDialogView.tsx
-│       │           │       │   ├── components
-│       │           │       │   │   └── UserStatusInputs.tsx
-│       │           │       │   ├── schema.ts
-│       │           │       │   └── useStatusEditDialogView.ts
-│       │           │       └── UserStatusCard.tsx
-│       │           └── CalendersSidebarSwitch.tsx
-│       ├── tsconfig.json
-│       ├── vitest.config.ts
-│       └── vitest.shims.d.ts
-└── サイドバー作成ガイド.patch
+└── services
+    ├── .DS_Store
+    ├── soso-api
+    │   ├── .DS_Store
+    │   ├── api
+    │   │   ├── docs.yaml
+    │   │   └── swagger.yaml
+    │   ├── cmd
+    │   │   └── server
+    │   │       └── main.go
+    │   ├── config
+    │   │   ├── .env
+    │   │   └── .env.example
+    │   ├── go.mod
+    │   ├── go.sum
+    │   ├── init
+    │   │   └── 001_init.sql
+    │   ├── internal
+    │   │   ├── config
+    │   │   │   ├── config.go
+    │   │   │   └── router.go
+    │   │   ├── handlers
+    │   │   │   ├── auth.go
+    │   │   │   ├── calender.go
+    │   │   │   ├── calender_membership.go
+    │   │   │   ├── event.go
+    │   │   │   ├── soso_point_history.go
+    │   │   │   └── user.go
+    │   │   ├── model
+    │   │   │   ├── calender.go
+    │   │   │   ├── calender_member.go
+    │   │   │   ├── calender_membership.go
+    │   │   │   ├── event.go
+    │   │   │   ├── event_participant.go
+    │   │   │   ├── my_dispatch_event.go
+    │   │   │   ├── refresh_token.go
+    │   │   │   ├── soso_point_history.go
+    │   │   │   └── user.go
+    │   │   ├── repository
+    │   │   │   ├── calender.go
+    │   │   │   ├── calender_membership.go
+    │   │   │   ├── db.go
+    │   │   │   ├── event.go
+    │   │   │   ├── event_participants.go
+    │   │   │   ├── refresh_token.go
+    │   │   │   ├── soso_point_history.go
+    │   │   │   └── user.go
+    │   │   └── validator
+    │   │       ├── calender.go
+    │   │       ├── calender_membership.go
+    │   │       ├── event.go
+    │   │       ├── user.go
+    │   │       └── validator.go
+    │   ├── pkg
+    │   │   └── auth
+    │   │       ├── jwt.go
+    │   │       └── password.go
+    │   ├── server
+    │   └── tests
+    │       └── internal
+    │           ├── handlers
+    │           │   ├── auth_test.go
+    │           │   ├── calender_membership_test.go
+    │           │   ├── calender_test.go
+    │           │   ├── event_test.go
+    │           │   ├── helpers_test.go
+    │           │   ├── soso_point_history_test.go
+    │           │   └── user_test.go
+    │           └── repository
+    │               ├── calender_membership_test.go
+    │               ├── calender_test.go
+    │               ├── event_participants_test.go
+    │               ├── event_test.go
+    │               ├── helpers_test.go
+    │               ├── refresh_token_test.go
+    │               ├── soso_point_history_test.go
+    │               └── user_test.go
+    └── soso-web
+        ├── .DS_Store
+        ├── .env
+        ├── .env.example
+        ├── .gitignore
+        ├── README.md
+        ├── components.json
+        ├── lib
+        │   └── utils.ts
+        ├── next-env.d.ts
+        ├── next.config.ts
+        ├── nginx.conf
+        ├── package-lock.json
+        ├── package.json
+        ├── postcss.config.mjs
+        ├── public
+        │   ├── file.svg
+        │   ├── globe.svg
+        │   ├── icons
+        │   │   ├── double_s_icon.svg
+        │   │   └── soso_icon.svg
+        │   ├── next.svg
+        │   ├── vercel.svg
+        │   └── window.svg
+        ├── src
+        │   ├── app
+        │   │   ├── auth
+        │   │   │   ├── layout.tsx
+        │   │   │   ├── login
+        │   │   │   │   └── page.tsx
+        │   │   │   ├── register
+        │   │   │   │   └── page.tsx
+        │   │   │   └── tokenexpired
+        │   │   │       └── page.tsx
+        │   │   ├── calenders
+        │   │   │   ├── [calenderId]
+        │   │   │   │   └── page.tsx
+        │   │   │   ├── invite
+        │   │   │   │   └── page.tsx
+        │   │   │   ├── layout.tsx
+        │   │   │   └── page.tsx
+        │   │   ├── favicon.ico
+        │   │   ├── globals.css
+        │   │   ├── layout.tsx
+        │   │   ├── not-found
+        │   │   │   └── page.tsx
+        │   │   └── page.tsx
+        │   ├── components
+        │   │   └── ui
+        │   │       ├── avatar.tsx
+        │   │       ├── badge.tsx
+        │   │       ├── breadcrumb.tsx
+        │   │       ├── button.tsx
+        │   │       ├── card.tsx
+        │   │       ├── checkbox.tsx
+        │   │       ├── dialog.tsx
+        │   │       ├── dropdown-menu.tsx
+        │   │       ├── form.tsx
+        │   │       ├── input.tsx
+        │   │       ├── label.tsx
+        │   │       ├── menubar.tsx
+        │   │       ├── radio-group.tsx
+        │   │       ├── scroll-area.tsx
+        │   │       ├── separator.tsx
+        │   │       ├── sheet.tsx
+        │   │       ├── sidebar.tsx
+        │   │       ├── skeleton.tsx
+        │   │       ├── snackbar.tsx
+        │   │       ├── textarea.tsx
+        │   │       └── tooltip.tsx
+        │   ├── contexts
+        │   │   └── AuthContext.tsx
+        │   ├── hooks
+        │   │   └── use-mobile.ts
+        │   ├── layouts
+        │   │   └── AppLayout
+        │   │       └── AppLayout.tsx
+        │   ├── lib
+        │   │   ├── auth
+        │   │   │   └── RequireAuth.tsx
+        │   │   ├── server
+        │   │   │   └── rootRedirect.ts
+        │   │   └── utils.ts
+        │   ├── middleware.ts
+        │   ├── requests
+        │   │   ├── authAPI.ts
+        │   │   ├── calenderAPI.ts
+        │   │   ├── calenderDetailAPI.ts
+        │   │   ├── core
+        │   │   │   ├── client.ts
+        │   │   │   ├── endpoint.ts
+        │   │   │   └── tokenStore.ts
+        │   │   └── userAPI.ts
+        │   ├── types
+        │   │   └── interfaces.ts
+        │   └── views
+        │       ├── CalenderInviteView
+        │       │   ├── CalenderInviteView.tsx
+        │       │   └── useCalenderInviteView.ts
+        │       ├── CalendersListView
+        │       │   ├── CalendersListView.tsx
+        │       │   ├── components
+        │       │   │   ├── CalenderListItemCard.tsx
+        │       │   │   └── CreateCalenderDialogView
+        │       │   │       ├── CreateCalenderDialog.tsx
+        │       │   │       ├── components
+        │       │   │       │   └── CreateCalenderInputs.tsx
+        │       │   │       ├── schema.ts
+        │       │   │       └── useCreateCalenderDialog.ts
+        │       │   └── useCalendersListView.ts
+        │       ├── HeaderView
+        │       │   ├── HeaderView.tsx
+        │       │   ├── components
+        │       │   │   ├── AccountMenu.tsx
+        │       │   │   ├── HeaderAccountSection.tsx
+        │       │   │   ├── HeaderCenterLogo.tsx
+        │       │   │   ├── HeaderLogo.tsx
+        │       │   │   ├── LogoutButton.tsx
+        │       │   │   └── MobileSidebarSheet.tsx
+        │       │   ├── schema.ts
+        │       │   └── useHeaderView.ts
+        │       ├── LoginView
+        │       │   ├── LoginView.tsx
+        │       │   ├── components
+        │       │   │   ├── GoToRegisterLink.tsx
+        │       │   │   └── LoginButton.tsx
+        │       │   ├── schema.ts
+        │       │   └── useLoginView.ts
+        │       ├── RegisterView
+        │       │   ├── RegisterView.tsx
+        │       │   ├── components
+        │       │   │   ├── CarInfoInputs.tsx
+        │       │   │   └── RegisterButton.tsx
+        │       │   ├── schema.ts
+        │       │   └── useRegisterView.ts
+        │       └── SidebarView
+        │           ├── CalenderDetailSidebarView
+        │           │   ├── CalenderDetailSidebar.tsx
+        │           │   ├── CalenderDetailSidebarView.tsx
+        │           │   ├── MembersListPanel
+        │           │   │   ├── MemberListPanel.tsx
+        │           │   │   ├── components
+        │           │   │   │   └── MemberCard.tsx
+        │           │   │   ├── schema.ts
+        │           │   │   └── useMemberListPanel.ts
+        │           │   ├── SoSoPointTimelinePanel
+        │           │   │   ├── SoSoPointTimelinePanel.tsx
+        │           │   │   ├── components
+        │           │   │   │   └── TimelineCard.tsx
+        │           │   │   ├── schema.ts
+        │           │   │   └── useSoSoPointTimelinePanel.ts
+        │           │   ├── components
+        │           │   │   ├── SidebarMainCard.tsx
+        │           │   │   ├── SidebarTabButton.tsx
+        │           │   │   └── SidebarTabFooter.tsx
+        │           │   ├── schema.ts
+        │           │   └── useCalenderDetailSidebar.ts
+        │           ├── CalenderListSidebarView
+        │           │   ├── CalendersSidebarView.tsx
+        │           │   └── components
+        │           │       ├── CalenderSidebar.tsx
+        │           │       ├── RegisteredEventsCard.tsx
+        │           │       ├── StatusEditDialogView
+        │           │       │   ├── StatusEditDialogView.tsx
+        │           │       │   ├── components
+        │           │       │   │   └── UserStatusInputs.tsx
+        │           │       │   ├── schema.ts
+        │           │       │   └── useStatusEditDialogView.ts
+        │           │       └── UserStatusCard.tsx
+        │           └── CalendersSidebarSwitch.tsx
+        ├── tsconfig.json
+        ├── vitest.config.ts
+        └── vitest.shims.d.ts
 
-68 directories, 195 files
+71 directories, 198 files
 
 ===== FILE CONTENTS =====
 
@@ -2493,7 +2517,7 @@ volumes:
 
 [TRUNCATED] MAX_LINES=5000
 
------ FILE: project_dump.txt (size=23060) -----
+----- FILE: project_dump.txt (size=22421) -----
 ===== DIRECTORY TREE =====
 .
 ├── .DS_Store
@@ -2514,252 +2538,258 @@ volumes:
 ├── package-lock.json
 ├── package.json
 ├── project_dump.txt
-├── services
-│   ├── .DS_Store
-│   ├── soso-api
-│   │   ├── .DS_Store
-│   │   ├── api
-│   │   │   ├── docs.yaml
-│   │   │   └── swagger.yaml
-│   │   ├── cmd
-│   │   │   └── server
-│   │   │       └── main.go
-│   │   ├── config
-│   │   │   ├── .env
-│   │   │   └── .env.example
-│   │   ├── go.mod
-│   │   ├── go.sum
-│   │   ├── init
-│   │   │   └── 001_init.sql
-│   │   ├── internal
-│   │   │   ├── config
-│   │   │   │   ├── config.go
-│   │   │   │   └── router.go
-│   │   │   ├── handlers
-│   │   │   │   ├── auth.go
-│   │   │   │   ├── calender.go
-│   │   │   │   ├── calender_membership.go
-│   │   │   │   ├── event.go
-│   │   │   │   ├── soso_point_history.go
-│   │   │   │   └── user.go
-│   │   │   ├── model
-│   │   │   │   ├── calender.go
-│   │   │   │   ├── calender_member.go
-│   │   │   │   ├── calender_membership.go
-│   │   │   │   ├── event.go
-│   │   │   │   ├── event_participant.go
-│   │   │   │   ├── my_dispatch_event.go
-│   │   │   │   ├── refresh_token.go
-│   │   │   │   ├── soso_point_history.go
-│   │   │   │   └── user.go
-│   │   │   ├── repository
-│   │   │   │   ├── calender.go
-│   │   │   │   ├── calender_membership.go
-│   │   │   │   ├── db.go
-│   │   │   │   ├── event.go
-│   │   │   │   ├── event_participants.go
-│   │   │   │   ├── refresh_token.go
-│   │   │   │   ├── soso_point_history.go
-│   │   │   │   └── user.go
-│   │   │   └── validator
-│   │   │       ├── calender.go
-│   │   │       ├── calender_membership.go
-│   │   │       ├── event.go
-│   │   │       ├── user.go
-│   │   │       └── validator.go
-│   │   ├── pkg
-│   │   │   └── auth
-│   │   │       ├── jwt.go
-│   │   │       └── password.go
-│   │   ├── server
-│   │   └── tests
-│   │       └── internal
-│   │           ├── handlers
-│   │           │   ├── auth_test.go
-│   │           │   ├── calender_membership_test.go
-│   │           │   ├── calender_test.go
-│   │           │   ├── event_test.go
-│   │           │   ├── helpers_test.go
-│   │           │   ├── soso_point_history_test.go
-│   │           │   └── user_test.go
-│   │           └── repository
-│   │               ├── calender_membership_test.go
-│   │               ├── calender_test.go
-│   │               ├── event_participants_test.go
-│   │               ├── event_test.go
-│   │               ├── helpers_test.go
-│   │               ├── refresh_token_test.go
-│   │               ├── soso_point_history_test.go
-│   │               └── user_test.go
-│   └── soso-web
-│       ├── .DS_Store
-│       ├── .env
-│       ├── .env.example
-│       ├── .gitignore
-│       ├── README.md
-│       ├── components.json
-│       ├── lib
-│       │   └── utils.ts
-│       ├── next-env.d.ts
-│       ├── next.config.ts
-│       ├── nginx.conf
-│       ├── package-lock.json
-│       ├── package.json
-│       ├── postcss.config.mjs
-│       ├── public
-│       │   ├── file.svg
-│       │   ├── globe.svg
-│       │   ├── icons
-│       │   │   ├── double_s_icon.svg
-│       │   │   └── soso_icon.svg
-│       │   ├── next.svg
-│       │   ├── vercel.svg
-│       │   └── window.svg
-│       ├── src
-│       │   ├── app
-│       │   │   ├── auth
-│       │   │   │   ├── layout.tsx
-│       │   │   │   ├── login
-│       │   │   │   │   └── page.tsx
-│       │   │   │   ├── register
-│       │   │   │   │   └── page.tsx
-│       │   │   │   └── tokenexpired
-│       │   │   │       └── page.tsx
-│       │   │   ├── calenders
-│       │   │   │   ├── [calenderId]
-│       │   │   │   │   └── page.tsx
-│       │   │   │   ├── layout.tsx
-│       │   │   │   └── page.tsx
-│       │   │   ├── favicon.ico
-│       │   │   ├── globals.css
-│       │   │   ├── layout.tsx
-│       │   │   └── page.tsx
-│       │   ├── components
-│       │   │   └── ui
-│       │   │       ├── avatar.tsx
-│       │   │       ├── badge.tsx
-│       │   │       ├── breadcrumb.tsx
-│       │   │       ├── button.tsx
-│       │   │       ├── card.tsx
-│       │   │       ├── checkbox.tsx
-│       │   │       ├── dialog.tsx
-│       │   │       ├── dropdown-menu.tsx
-│       │   │       ├── form.tsx
-│       │   │       ├── input.tsx
-│       │   │       ├── label.tsx
-│       │   │       ├── menubar.tsx
-│       │   │       ├── radio-group.tsx
-│       │   │       ├── scroll-area.tsx
-│       │   │       ├── separator.tsx
-│       │   │       ├── sheet.tsx
-│       │   │       ├── sidebar.tsx
-│       │   │       ├── skeleton.tsx
-│       │   │       ├── snackbar.tsx
-│       │   │       ├── textarea.tsx
-│       │   │       └── tooltip.tsx
-│       │   ├── contexts
-│       │   │   └── AuthContext.tsx
-│       │   ├── hooks
-│       │   │   └── use-mobile.ts
-│       │   ├── layouts
-│       │   │   └── AppLayout
-│       │   │       └── AppLayout.tsx
-│       │   ├── lib
-│       │   │   ├── auth
-│       │   │   │   └── RequireAuth.tsx
-│       │   │   ├── server
-│       │   │   │   └── rootRedirect.ts
-│       │   │   └── utils.ts
-│       │   ├── middleware.ts
-│       │   ├── requests
-│       │   │   ├── authAPI.ts
-│       │   │   ├── calenderAPI.ts
-│       │   │   ├── calenderDetailAPI.ts
-│       │   │   ├── core
-│       │   │   │   ├── client.ts
-│       │   │   │   ├── endpoint.ts
-│       │   │   │   └── tokenStore.ts
-│       │   │   └── userAPI.ts
-│       │   ├── types
-│       │   │   └── interfaces.ts
-│       │   └── views
-│       │       ├── CalendersListView
-│       │       │   ├── CalendersListView.tsx
-│       │       │   ├── components
-│       │       │   │   ├── CalenderListItemCard.tsx
-│       │       │   │   └── CreateCalenderDialogView
-│       │       │   │       ├── CreateCalenderDialog.tsx
-│       │       │   │       ├── components
-│       │       │   │       │   └── CreateCalenderInputs.tsx
-│       │       │   │       ├── schema.ts
-│       │       │   │       └── useCreateCalenderDialog.ts
-│       │       │   └── useCalendersListView.ts
-│       │       ├── HeaderView
-│       │       │   ├── HeaderView.tsx
-│       │       │   ├── components
-│       │       │   │   ├── AccountMenu.tsx
-│       │       │   │   ├── HeaderAccountSection.tsx
-│       │       │   │   ├── HeaderCenterLogo.tsx
-│       │       │   │   ├── HeaderLogo.tsx
-│       │       │   │   ├── LogoutButton.tsx
-│       │       │   │   └── MobileSidebarSheet.tsx
-│       │       │   ├── schema.ts
-│       │       │   └── useHeaderView.ts
-│       │       ├── LoginView
-│       │       │   ├── LoginView.tsx
-│       │       │   ├── components
-│       │       │   │   ├── GoToRegisterLink.tsx
-│       │       │   │   └── LoginButton.tsx
-│       │       │   ├── schema.ts
-│       │       │   └── useLoginView.ts
-│       │       ├── RegisterView
-│       │       │   ├── RegisterView.tsx
-│       │       │   ├── components
-│       │       │   │   ├── CarInfoInputs.tsx
-│       │       │   │   └── RegisterButton.tsx
-│       │       │   ├── schema.ts
-│       │       │   └── useRegisterView.ts
-│       │       └── SidebarView
-│       │           ├── CalenderDetailSidebarView
-│       │           │   ├── CalenderDetailSidebar.tsx
-│       │           │   ├── CalenderDetailSidebarView.tsx
-│       │           │   ├── MembersListPanel
-│       │           │   │   ├── MemberListPanel.tsx
-│       │           │   │   ├── components
-│       │           │   │   │   └── MemberCard.tsx
-│       │           │   │   ├── schema.ts
-│       │           │   │   └── useMemberListPanel.ts
-│       │           │   ├── SoSoPointTimelinePanel
-│       │           │   │   ├── SoSoPointTimelinePanel.tsx
-│       │           │   │   ├── components
-│       │           │   │   │   └── TimelineCard.tsx
-│       │           │   │   ├── schema.ts
-│       │           │   │   └── useSoSoPointTimelinePanel.ts
-│       │           │   ├── components
-│       │           │   │   ├── SidebarMainCard.tsx
-│       │           │   │   ├── SidebarTabButton.tsx
-│       │           │   │   └── SidebarTabFooter.tsx
-│       │           │   ├── schema.ts
-│       │           │   └── useCalenderDetailSidebar.ts
-│       │           ├── CalenderListSidebarView
-│       │           │   ├── CalendersSidebarView.tsx
-│       │           │   └── components
-│       │           │       ├── CalenderSidebar.tsx
-│       │           │       ├── RegisteredEventsCard.tsx
-│       │           │       ├── StatusEditDialogView
-│       │           │       │   ├── StatusEditDialogView.tsx
-│       │           │       │   ├── components
-│       │           │       │   │   └── UserStatusInputs.tsx
-│       │           │       │   ├── schema.ts
-│       │           │       │   └── useStatusEditDialogView.ts
-│       │           │       └── UserStatusCard.tsx
-│       │           └── CalendersSidebarSwitch.tsx
-│       ├── tsconfig.json
-│       ├── vitest.config.ts
-│       └── vitest.shims.d.ts
-└── サイドバー作成ガイド.patch
+└── services
+    ├── .DS_Store
+    ├── soso-api
+    │   ├── .DS_Store
+    │   ├── api
+    │   │   ├── docs.yaml
+    │   │   └── swagger.yaml
+    │   ├── cmd
+    │   │   └── server
+    │   │       └── main.go
+    │   ├── config
+    │   │   ├── .env
+    │   │   └── .env.example
+    │   ├── go.mod
+    │   ├── go.sum
+    │   ├── init
+    │   │   └── 001_init.sql
+    │   ├── internal
+    │   │   ├── config
+    │   │   │   ├── config.go
+    │   │   │   └── router.go
+    │   │   ├── handlers
+    │   │   │   ├── auth.go
+    │   │   │   ├── calender.go
+    │   │   │   ├── calender_membership.go
+    │   │   │   ├── event.go
+    │   │   │   ├── soso_point_history.go
+    │   │   │   └── user.go
+    │   │   ├── model
+    │   │   │   ├── calender.go
+    │   │   │   ├── calender_member.go
+    │   │   │   ├── calender_membership.go
+    │   │   │   ├── event.go
+    │   │   │   ├── event_participant.go
+    │   │   │   ├── my_dispatch_event.go
+    │   │   │   ├── refresh_token.go
+    │   │   │   ├── soso_point_history.go
+    │   │   │   └── user.go
+    │   │   ├── repository
+    │   │   │   ├── calender.go
+    │   │   │   ├── calender_membership.go
+    │   │   │   ├── db.go
+    │   │   │   ├── event.go
+    │   │   │   ├── event_participants.go
+    │   │   │   ├── refresh_token.go
+    │   │   │   ├── soso_point_history.go
+    │   │   │   └── user.go
+    │   │   └── validator
+    │   │       ├── calender.go
+    │   │       ├── calender_membership.go
+    │   │       ├── event.go
+    │   │       ├── user.go
+    │   │       └── validator.go
+    │   ├── pkg
+    │   │   └── auth
+    │   │       ├── jwt.go
+    │   │       └── password.go
+    │   ├── server
+    │   └── tests
+    │       └── internal
+    │           ├── handlers
+    │           │   ├── auth_test.go
+    │           │   ├── calender_membership_test.go
+    │           │   ├── calender_test.go
+    │           │   ├── event_test.go
+    │           │   ├── helpers_test.go
+    │           │   ├── soso_point_history_test.go
+    │           │   └── user_test.go
+    │           └── repository
+    │               ├── calender_membership_test.go
+    │               ├── calender_test.go
+    │               ├── event_participants_test.go
+    │               ├── event_test.go
+    │               ├── helpers_test.go
+    │               ├── refresh_token_test.go
+    │               ├── soso_point_history_test.go
+    │               └── user_test.go
+    └── soso-web
+        ├── .DS_Store
+        ├── .env
+        ├── .env.example
+        ├── .gitignore
+        ├── README.md
+        ├── components.json
+        ├── lib
+        │   └── utils.ts
+        ├── next-env.d.ts
+        ├── next.config.ts
+        ├── nginx.conf
+        ├── package-lock.json
+        ├── package.json
+        ├── postcss.config.mjs
+        ├── public
+        │   ├── file.svg
+        │   ├── globe.svg
+        │   ├── icons
+        │   │   ├── double_s_icon.svg
+        │   │   └── soso_icon.svg
+        │   ├── next.svg
+        │   ├── vercel.svg
+        │   └── window.svg
+        ├── src
+        │   ├── app
+        │   │   ├── auth
+        │   │   │   ├── layout.tsx
+        │   │   │   ├── login
+        │   │   │   │   └── page.tsx
+        │   │   │   ├── register
+        │   │   │   │   └── page.tsx
+        │   │   │   └── tokenexpired
+        │   │   │       └── page.tsx
+        │   │   ├── calenders
+        │   │   │   ├── [calenderId]
+        │   │   │   │   └── page.tsx
+        │   │   │   ├── invite
+        │   │   │   │   └── page.tsx
+        │   │   │   ├── layout.tsx
+        │   │   │   └── page.tsx
+        │   │   ├── favicon.ico
+        │   │   ├── globals.css
+        │   │   ├── layout.tsx
+        │   │   ├── not-found
+        │   │   │   └── page.tsx
+        │   │   └── page.tsx
+        │   ├── components
+        │   │   └── ui
+        │   │       ├── avatar.tsx
+        │   │       ├── badge.tsx
+        │   │       ├── breadcrumb.tsx
+        │   │       ├── button.tsx
+        │   │       ├── card.tsx
+        │   │       ├── checkbox.tsx
+        │   │       ├── dialog.tsx
+        │   │       ├── dropdown-menu.tsx
+        │   │       ├── form.tsx
+        │   │       ├── input.tsx
+        │   │       ├── label.tsx
+        │   │       ├── menubar.tsx
+        │   │       ├── radio-group.tsx
+        │   │       ├── scroll-area.tsx
+        │   │       ├── separator.tsx
+        │   │       ├── sheet.tsx
+        │   │       ├── sidebar.tsx
+        │   │       ├── skeleton.tsx
+        │   │       ├── snackbar.tsx
+        │   │       ├── textarea.tsx
+        │   │       └── tooltip.tsx
+        │   ├── contexts
+        │   │   └── AuthContext.tsx
+        │   ├── hooks
+        │   │   └── use-mobile.ts
+        │   ├── layouts
+        │   │   └── AppLayout
+        │   │       └── AppLayout.tsx
+        │   ├── lib
+        │   │   ├── auth
+        │   │   │   └── RequireAuth.tsx
+        │   │   ├── server
+        │   │   │   └── rootRedirect.ts
+        │   │   └── utils.ts
+        │   ├── middleware.ts
+        │   ├── requests
+        │   │   ├── authAPI.ts
+        │   │   ├── calenderAPI.ts
+        │   │   ├── calenderDetailAPI.ts
+        │   │   ├── core
+        │   │   │   ├── client.ts
+        │   │   │   ├── endpoint.ts
+        │   │   │   └── tokenStore.ts
+        │   │   └── userAPI.ts
+        │   ├── types
+        │   │   └── interfaces.ts
+        │   └── views
+        │       ├── CalenderInviteView
+        │       │   ├── CalenderInviteView.tsx
+        │       │   └── useCalenderInviteView.ts
+        │       ├── CalendersListView
+        │       │   ├── CalendersListView.tsx
+        │       │   ├── components
+        │       │   │   ├── CalenderListItemCard.tsx
+        │       │   │   └── CreateCalenderDialogView
+        │       │   │       ├── CreateCalenderDialog.tsx
+        │       │   │       ├── components
+        │       │   │       │   └── CreateCalenderInputs.tsx
+        │       │   │       ├── schema.ts
+        │       │   │       └── useCreateCalenderDialog.ts
+        │       │   └── useCalendersListView.ts
+        │       ├── HeaderView
+        │       │   ├── HeaderView.tsx
+        │       │   ├── components
+        │       │   │   ├── AccountMenu.tsx
+        │       │   │   ├── HeaderAccountSection.tsx
+        │       │   │   ├── HeaderCenterLogo.tsx
+        │       │   │   ├── HeaderLogo.tsx
+        │       │   │   ├── LogoutButton.tsx
+        │       │   │   └── MobileSidebarSheet.tsx
+        │       │   ├── schema.ts
+        │       │   └── useHeaderView.ts
+        │       ├── LoginView
+        │       │   ├── LoginView.tsx
+        │       │   ├── components
+        │       │   │   ├── GoToRegisterLink.tsx
+        │       │   │   └── LoginButton.tsx
+        │       │   ├── schema.ts
+        │       │   └── useLoginView.ts
+        │       ├── RegisterView
+        │       │   ├── RegisterView.tsx
+        │       │   ├── components
+        │       │   │   ├── CarInfoInputs.tsx
+        │       │   │   └── RegisterButton.tsx
+        │       │   ├── schema.ts
+        │       │   └── useRegisterView.ts
+        │       └── SidebarView
+        │           ├── CalenderDetailSidebarView
+        │           │   ├── CalenderDetailSidebar.tsx
+        │           │   ├── CalenderDetailSidebarView.tsx
+        │           │   ├── MembersListPanel
+        │           │   │   ├── MemberListPanel.tsx
+        │           │   │   ├── components
+        │           │   │   │   └── MemberCard.tsx
+        │           │   │   ├── schema.ts
+        │           │   │   └── useMemberListPanel.ts
+        │           │   ├── SoSoPointTimelinePanel
+        │           │   │   ├── SoSoPointTimelinePanel.tsx
+        │           │   │   ├── components
+        │           │   │   │   └── TimelineCard.tsx
+        │           │   │   ├── schema.ts
+        │           │   │   └── useSoSoPointTimelinePanel.ts
+        │           │   ├── components
+        │           │   │   ├── SidebarMainCard.tsx
+        │           │   │   ├── SidebarTabButton.tsx
+        │           │   │   └── SidebarTabFooter.tsx
+        │           │   ├── schema.ts
+        │           │   └── useCalenderDetailSidebar.ts
+        │           ├── CalenderListSidebarView
+        │           │   ├── CalendersSidebarView.tsx
+        │           │   └── components
+        │           │       ├── CalenderSidebar.tsx
+        │           │       ├── RegisteredEventsCard.tsx
+        │           │       ├── StatusEditDialogView
+        │           │       │   ├── StatusEditDialogView.tsx
+        │           │       │   ├── components
+        │           │       │   │   └── UserStatusInputs.tsx
+        │           │       │   ├── schema.ts
+        │           │       │   └── useStatusEditDialogView.ts
+        │           │       └── UserStatusCard.tsx
+        │           └── CalendersSidebarSwitch.tsx
+        ├── tsconfig.json
+        ├── vitest.config.ts
+        └── vitest.shims.d.ts
 
-68 directories, 195 files
+71 directories, 198 files
 
 ===== FILE CONTENTS =====
 
@@ -3117,7 +3147,7 @@ volumes:
 
 [TRUNCATED] MAX_LINES=5000
 
------ FILE: project_dump.txt (size=23060) -----
+----- FILE: project_dump.txt (size=22421) -----
 ===== DIRECTORY TREE =====
 .
 ├── .DS_Store
@@ -3138,252 +3168,258 @@ volumes:
 ├── package-lock.json
 ├── package.json
 ├── project_dump.txt
-├── services
-│   ├── .DS_Store
-│   ├── soso-api
-│   │   ├── .DS_Store
-│   │   ├── api
-│   │   │   ├── docs.yaml
-│   │   │   └── swagger.yaml
-│   │   ├── cmd
-│   │   │   └── server
-│   │   │       └── main.go
-│   │   ├── config
-│   │   │   ├── .env
-│   │   │   └── .env.example
-│   │   ├── go.mod
-│   │   ├── go.sum
-│   │   ├── init
-│   │   │   └── 001_init.sql
-│   │   ├── internal
-│   │   │   ├── config
-│   │   │   │   ├── config.go
-│   │   │   │   └── router.go
-│   │   │   ├── handlers
-│   │   │   │   ├── auth.go
-│   │   │   │   ├── calender.go
-│   │   │   │   ├── calender_membership.go
-│   │   │   │   ├── event.go
-│   │   │   │   ├── soso_point_history.go
-│   │   │   │   └── user.go
-│   │   │   ├── model
-│   │   │   │   ├── calender.go
-│   │   │   │   ├── calender_member.go
-│   │   │   │   ├── calender_membership.go
-│   │   │   │   ├── event.go
-│   │   │   │   ├── event_participant.go
-│   │   │   │   ├── my_dispatch_event.go
-│   │   │   │   ├── refresh_token.go
-│   │   │   │   ├── soso_point_history.go
-│   │   │   │   └── user.go
-│   │   │   ├── repository
-│   │   │   │   ├── calender.go
-│   │   │   │   ├── calender_membership.go
-│   │   │   │   ├── db.go
-│   │   │   │   ├── event.go
-│   │   │   │   ├── event_participants.go
-│   │   │   │   ├── refresh_token.go
-│   │   │   │   ├── soso_point_history.go
-│   │   │   │   └── user.go
-│   │   │   └── validator
-│   │   │       ├── calender.go
-│   │   │       ├── calender_membership.go
-│   │   │       ├── event.go
-│   │   │       ├── user.go
-│   │   │       └── validator.go
-│   │   ├── pkg
-│   │   │   └── auth
-│   │   │       ├── jwt.go
-│   │   │       └── password.go
-│   │   ├── server
-│   │   └── tests
-│   │       └── internal
-│   │           ├── handlers
-│   │           │   ├── auth_test.go
-│   │           │   ├── calender_membership_test.go
-│   │           │   ├── calender_test.go
-│   │           │   ├── event_test.go
-│   │           │   ├── helpers_test.go
-│   │           │   ├── soso_point_history_test.go
-│   │           │   └── user_test.go
-│   │           └── repository
-│   │               ├── calender_membership_test.go
-│   │               ├── calender_test.go
-│   │               ├── event_participants_test.go
-│   │               ├── event_test.go
-│   │               ├── helpers_test.go
-│   │               ├── refresh_token_test.go
-│   │               ├── soso_point_history_test.go
-│   │               └── user_test.go
-│   └── soso-web
-│       ├── .DS_Store
-│       ├── .env
-│       ├── .env.example
-│       ├── .gitignore
-│       ├── README.md
-│       ├── components.json
-│       ├── lib
-│       │   └── utils.ts
-│       ├── next-env.d.ts
-│       ├── next.config.ts
-│       ├── nginx.conf
-│       ├── package-lock.json
-│       ├── package.json
-│       ├── postcss.config.mjs
-│       ├── public
-│       │   ├── file.svg
-│       │   ├── globe.svg
-│       │   ├── icons
-│       │   │   ├── double_s_icon.svg
-│       │   │   └── soso_icon.svg
-│       │   ├── next.svg
-│       │   ├── vercel.svg
-│       │   └── window.svg
-│       ├── src
-│       │   ├── app
-│       │   │   ├── auth
-│       │   │   │   ├── layout.tsx
-│       │   │   │   ├── login
-│       │   │   │   │   └── page.tsx
-│       │   │   │   ├── register
-│       │   │   │   │   └── page.tsx
-│       │   │   │   └── tokenexpired
-│       │   │   │       └── page.tsx
-│       │   │   ├── calenders
-│       │   │   │   ├── [calenderId]
-│       │   │   │   │   └── page.tsx
-│       │   │   │   ├── layout.tsx
-│       │   │   │   └── page.tsx
-│       │   │   ├── favicon.ico
-│       │   │   ├── globals.css
-│       │   │   ├── layout.tsx
-│       │   │   └── page.tsx
-│       │   ├── components
-│       │   │   └── ui
-│       │   │       ├── avatar.tsx
-│       │   │       ├── badge.tsx
-│       │   │       ├── breadcrumb.tsx
-│       │   │       ├── button.tsx
-│       │   │       ├── card.tsx
-│       │   │       ├── checkbox.tsx
-│       │   │       ├── dialog.tsx
-│       │   │       ├── dropdown-menu.tsx
-│       │   │       ├── form.tsx
-│       │   │       ├── input.tsx
-│       │   │       ├── label.tsx
-│       │   │       ├── menubar.tsx
-│       │   │       ├── radio-group.tsx
-│       │   │       ├── scroll-area.tsx
-│       │   │       ├── separator.tsx
-│       │   │       ├── sheet.tsx
-│       │   │       ├── sidebar.tsx
-│       │   │       ├── skeleton.tsx
-│       │   │       ├── snackbar.tsx
-│       │   │       ├── textarea.tsx
-│       │   │       └── tooltip.tsx
-│       │   ├── contexts
-│       │   │   └── AuthContext.tsx
-│       │   ├── hooks
-│       │   │   └── use-mobile.ts
-│       │   ├── layouts
-│       │   │   └── AppLayout
-│       │   │       └── AppLayout.tsx
-│       │   ├── lib
-│       │   │   ├── auth
-│       │   │   │   └── RequireAuth.tsx
-│       │   │   ├── server
-│       │   │   │   └── rootRedirect.ts
-│       │   │   └── utils.ts
-│       │   ├── middleware.ts
-│       │   ├── requests
-│       │   │   ├── authAPI.ts
-│       │   │   ├── calenderAPI.ts
-│       │   │   ├── calenderDetailAPI.ts
-│       │   │   ├── core
-│       │   │   │   ├── client.ts
-│       │   │   │   ├── endpoint.ts
-│       │   │   │   └── tokenStore.ts
-│       │   │   └── userAPI.ts
-│       │   ├── types
-│       │   │   └── interfaces.ts
-│       │   └── views
-│       │       ├── CalendersListView
-│       │       │   ├── CalendersListView.tsx
-│       │       │   ├── components
-│       │       │   │   ├── CalenderListItemCard.tsx
-│       │       │   │   └── CreateCalenderDialogView
-│       │       │   │       ├── CreateCalenderDialog.tsx
-│       │       │   │       ├── components
-│       │       │   │       │   └── CreateCalenderInputs.tsx
-│       │       │   │       ├── schema.ts
-│       │       │   │       └── useCreateCalenderDialog.ts
-│       │       │   └── useCalendersListView.ts
-│       │       ├── HeaderView
-│       │       │   ├── HeaderView.tsx
-│       │       │   ├── components
-│       │       │   │   ├── AccountMenu.tsx
-│       │       │   │   ├── HeaderAccountSection.tsx
-│       │       │   │   ├── HeaderCenterLogo.tsx
-│       │       │   │   ├── HeaderLogo.tsx
-│       │       │   │   ├── LogoutButton.tsx
-│       │       │   │   └── MobileSidebarSheet.tsx
-│       │       │   ├── schema.ts
-│       │       │   └── useHeaderView.ts
-│       │       ├── LoginView
-│       │       │   ├── LoginView.tsx
-│       │       │   ├── components
-│       │       │   │   ├── GoToRegisterLink.tsx
-│       │       │   │   └── LoginButton.tsx
-│       │       │   ├── schema.ts
-│       │       │   └── useLoginView.ts
-│       │       ├── RegisterView
-│       │       │   ├── RegisterView.tsx
-│       │       │   ├── components
-│       │       │   │   ├── CarInfoInputs.tsx
-│       │       │   │   └── RegisterButton.tsx
-│       │       │   ├── schema.ts
-│       │       │   └── useRegisterView.ts
-│       │       └── SidebarView
-│       │           ├── CalenderDetailSidebarView
-│       │           │   ├── CalenderDetailSidebar.tsx
-│       │           │   ├── CalenderDetailSidebarView.tsx
-│       │           │   ├── MembersListPanel
-│       │           │   │   ├── MemberListPanel.tsx
-│       │           │   │   ├── components
-│       │           │   │   │   └── MemberCard.tsx
-│       │           │   │   ├── schema.ts
-│       │           │   │   └── useMemberListPanel.ts
-│       │           │   ├── SoSoPointTimelinePanel
-│       │           │   │   ├── SoSoPointTimelinePanel.tsx
-│       │           │   │   ├── components
-│       │           │   │   │   └── TimelineCard.tsx
-│       │           │   │   ├── schema.ts
-│       │           │   │   └── useSoSoPointTimelinePanel.ts
-│       │           │   ├── components
-│       │           │   │   ├── SidebarMainCard.tsx
-│       │           │   │   ├── SidebarTabButton.tsx
-│       │           │   │   └── SidebarTabFooter.tsx
-│       │           │   ├── schema.ts
-│       │           │   └── useCalenderDetailSidebar.ts
-│       │           ├── CalenderListSidebarView
-│       │           │   ├── CalendersSidebarView.tsx
-│       │           │   └── components
-│       │           │       ├── CalenderSidebar.tsx
-│       │           │       ├── RegisteredEventsCard.tsx
-│       │           │       ├── StatusEditDialogView
-│       │           │       │   ├── StatusEditDialogView.tsx
-│       │           │       │   ├── components
-│       │           │       │   │   └── UserStatusInputs.tsx
-│       │           │       │   ├── schema.ts
-│       │           │       │   └── useStatusEditDialogView.ts
-│       │           │       └── UserStatusCard.tsx
-│       │           └── CalendersSidebarSwitch.tsx
-│       ├── tsconfig.json
-│       ├── vitest.config.ts
-│       └── vitest.shims.d.ts
-└── サイドバー作成ガイド.patch
+└── services
+    ├── .DS_Store
+    ├── soso-api
+    │   ├── .DS_Store
+    │   ├── api
+    │   │   ├── docs.yaml
+    │   │   └── swagger.yaml
+    │   ├── cmd
+    │   │   └── server
+    │   │       └── main.go
+    │   ├── config
+    │   │   ├── .env
+    │   │   └── .env.example
+    │   ├── go.mod
+    │   ├── go.sum
+    │   ├── init
+    │   │   └── 001_init.sql
+    │   ├── internal
+    │   │   ├── config
+    │   │   │   ├── config.go
+    │   │   │   └── router.go
+    │   │   ├── handlers
+    │   │   │   ├── auth.go
+    │   │   │   ├── calender.go
+    │   │   │   ├── calender_membership.go
+    │   │   │   ├── event.go
+    │   │   │   ├── soso_point_history.go
+    │   │   │   └── user.go
+    │   │   ├── model
+    │   │   │   ├── calender.go
+    │   │   │   ├── calender_member.go
+    │   │   │   ├── calender_membership.go
+    │   │   │   ├── event.go
+    │   │   │   ├── event_participant.go
+    │   │   │   ├── my_dispatch_event.go
+    │   │   │   ├── refresh_token.go
+    │   │   │   ├── soso_point_history.go
+    │   │   │   └── user.go
+    │   │   ├── repository
+    │   │   │   ├── calender.go
+    │   │   │   ├── calender_membership.go
+    │   │   │   ├── db.go
+    │   │   │   ├── event.go
+    │   │   │   ├── event_participants.go
+    │   │   │   ├── refresh_token.go
+    │   │   │   ├── soso_point_history.go
+    │   │   │   └── user.go
+    │   │   └── validator
+    │   │       ├── calender.go
+    │   │       ├── calender_membership.go
+    │   │       ├── event.go
+    │   │       ├── user.go
+    │   │       └── validator.go
+    │   ├── pkg
+    │   │   └── auth
+    │   │       ├── jwt.go
+    │   │       └── password.go
+    │   ├── server
+    │   └── tests
+    │       └── internal
+    │           ├── handlers
+    │           │   ├── auth_test.go
+    │           │   ├── calender_membership_test.go
+    │           │   ├── calender_test.go
+    │           │   ├── event_test.go
+    │           │   ├── helpers_test.go
+    │           │   ├── soso_point_history_test.go
+    │           │   └── user_test.go
+    │           └── repository
+    │               ├── calender_membership_test.go
+    │               ├── calender_test.go
+    │               ├── event_participants_test.go
+    │               ├── event_test.go
+    │               ├── helpers_test.go
+    │               ├── refresh_token_test.go
+    │               ├── soso_point_history_test.go
+    │               └── user_test.go
+    └── soso-web
+        ├── .DS_Store
+        ├── .env
+        ├── .env.example
+        ├── .gitignore
+        ├── README.md
+        ├── components.json
+        ├── lib
+        │   └── utils.ts
+        ├── next-env.d.ts
+        ├── next.config.ts
+        ├── nginx.conf
+        ├── package-lock.json
+        ├── package.json
+        ├── postcss.config.mjs
+        ├── public
+        │   ├── file.svg
+        │   ├── globe.svg
+        │   ├── icons
+        │   │   ├── double_s_icon.svg
+        │   │   └── soso_icon.svg
+        │   ├── next.svg
+        │   ├── vercel.svg
+        │   └── window.svg
+        ├── src
+        │   ├── app
+        │   │   ├── auth
+        │   │   │   ├── layout.tsx
+        │   │   │   ├── login
+        │   │   │   │   └── page.tsx
+        │   │   │   ├── register
+        │   │   │   │   └── page.tsx
+        │   │   │   └── tokenexpired
+        │   │   │       └── page.tsx
+        │   │   ├── calenders
+        │   │   │   ├── [calenderId]
+        │   │   │   │   └── page.tsx
+        │   │   │   ├── invite
+        │   │   │   │   └── page.tsx
+        │   │   │   ├── layout.tsx
+        │   │   │   └── page.tsx
+        │   │   ├── favicon.ico
+        │   │   ├── globals.css
+        │   │   ├── layout.tsx
+        │   │   ├── not-found
+        │   │   │   └── page.tsx
+        │   │   └── page.tsx
+        │   ├── components
+        │   │   └── ui
+        │   │       ├── avatar.tsx
+        │   │       ├── badge.tsx
+        │   │       ├── breadcrumb.tsx
+        │   │       ├── button.tsx
+        │   │       ├── card.tsx
+        │   │       ├── checkbox.tsx
+        │   │       ├── dialog.tsx
+        │   │       ├── dropdown-menu.tsx
+        │   │       ├── form.tsx
+        │   │       ├── input.tsx
+        │   │       ├── label.tsx
+        │   │       ├── menubar.tsx
+        │   │       ├── radio-group.tsx
+        │   │       ├── scroll-area.tsx
+        │   │       ├── separator.tsx
+        │   │       ├── sheet.tsx
+        │   │       ├── sidebar.tsx
+        │   │       ├── skeleton.tsx
+        │   │       ├── snackbar.tsx
+        │   │       ├── textarea.tsx
+        │   │       └── tooltip.tsx
+        │   ├── contexts
+        │   │   └── AuthContext.tsx
+        │   ├── hooks
+        │   │   └── use-mobile.ts
+        │   ├── layouts
+        │   │   └── AppLayout
+        │   │       └── AppLayout.tsx
+        │   ├── lib
+        │   │   ├── auth
+        │   │   │   └── RequireAuth.tsx
+        │   │   ├── server
+        │   │   │   └── rootRedirect.ts
+        │   │   └── utils.ts
+        │   ├── middleware.ts
+        │   ├── requests
+        │   │   ├── authAPI.ts
+        │   │   ├── calenderAPI.ts
+        │   │   ├── calenderDetailAPI.ts
+        │   │   ├── core
+        │   │   │   ├── client.ts
+        │   │   │   ├── endpoint.ts
+        │   │   │   └── tokenStore.ts
+        │   │   └── userAPI.ts
+        │   ├── types
+        │   │   └── interfaces.ts
+        │   └── views
+        │       ├── CalenderInviteView
+        │       │   ├── CalenderInviteView.tsx
+        │       │   └── useCalenderInviteView.ts
+        │       ├── CalendersListView
+        │       │   ├── CalendersListView.tsx
+        │       │   ├── components
+        │       │   │   ├── CalenderListItemCard.tsx
+        │       │   │   └── CreateCalenderDialogView
+        │       │   │       ├── CreateCalenderDialog.tsx
+        │       │   │       ├── components
+        │       │   │       │   └── CreateCalenderInputs.tsx
+        │       │   │       ├── schema.ts
+        │       │   │       └── useCreateCalenderDialog.ts
+        │       │   └── useCalendersListView.ts
+        │       ├── HeaderView
+        │       │   ├── HeaderView.tsx
+        │       │   ├── components
+        │       │   │   ├── AccountMenu.tsx
+        │       │   │   ├── HeaderAccountSection.tsx
+        │       │   │   ├── HeaderCenterLogo.tsx
+        │       │   │   ├── HeaderLogo.tsx
+        │       │   │   ├── LogoutButton.tsx
+        │       │   │   └── MobileSidebarSheet.tsx
+        │       │   ├── schema.ts
+        │       │   └── useHeaderView.ts
+        │       ├── LoginView
+        │       │   ├── LoginView.tsx
+        │       │   ├── components
+        │       │   │   ├── GoToRegisterLink.tsx
+        │       │   │   └── LoginButton.tsx
+        │       │   ├── schema.ts
+        │       │   └── useLoginView.ts
+        │       ├── RegisterView
+        │       │   ├── RegisterView.tsx
+        │       │   ├── components
+        │       │   │   ├── CarInfoInputs.tsx
+        │       │   │   └── RegisterButton.tsx
+        │       │   ├── schema.ts
+        │       │   └── useRegisterView.ts
+        │       └── SidebarView
+        │           ├── CalenderDetailSidebarView
+        │           │   ├── CalenderDetailSidebar.tsx
+        │           │   ├── CalenderDetailSidebarView.tsx
+        │           │   ├── MembersListPanel
+        │           │   │   ├── MemberListPanel.tsx
+        │           │   │   ├── components
+        │           │   │   │   └── MemberCard.tsx
+        │           │   │   ├── schema.ts
+        │           │   │   └── useMemberListPanel.ts
+        │           │   ├── SoSoPointTimelinePanel
+        │           │   │   ├── SoSoPointTimelinePanel.tsx
+        │           │   │   ├── components
+        │           │   │   │   └── TimelineCard.tsx
+        │           │   │   ├── schema.ts
+        │           │   │   └── useSoSoPointTimelinePanel.ts
+        │           │   ├── components
+        │           │   │   ├── SidebarMainCard.tsx
+        │           │   │   ├── SidebarTabButton.tsx
+        │           │   │   └── SidebarTabFooter.tsx
+        │           │   ├── schema.ts
+        │           │   └── useCalenderDetailSidebar.ts
+        │           ├── CalenderListSidebarView
+        │           │   ├── CalendersSidebarView.tsx
+        │           │   └── components
+        │           │       ├── CalenderSidebar.tsx
+        │           │       ├── RegisteredEventsCard.tsx
+        │           │       ├── StatusEditDialogView
+        │           │       │   ├── StatusEditDialogView.tsx
+        │           │       │   ├── components
+        │           │       │   │   └── UserStatusInputs.tsx
+        │           │       │   ├── schema.ts
+        │           │       │   └── useStatusEditDialogView.ts
+        │           │       └── UserStatusCard.tsx
+        │           └── CalendersSidebarSwitch.tsx
+        ├── tsconfig.json
+        ├── vitest.config.ts
+        └── vitest.shims.d.ts
 
-68 directories, 195 files
+71 directories, 198 files
 
 ===== FILE CONTENTS =====
 
@@ -3741,7 +3777,7 @@ volumes:
 
 [TRUNCATED] MAX_LINES=5000
 
------ FILE: project_dump.txt (size=23060) -----
+----- FILE: project_dump.txt (size=22421) -----
 ===== DIRECTORY TREE =====
 .
 ├── .DS_Store
@@ -3762,252 +3798,258 @@ volumes:
 ├── package-lock.json
 ├── package.json
 ├── project_dump.txt
-├── services
-│   ├── .DS_Store
-│   ├── soso-api
-│   │   ├── .DS_Store
-│   │   ├── api
-│   │   │   ├── docs.yaml
-│   │   │   └── swagger.yaml
-│   │   ├── cmd
-│   │   │   └── server
-│   │   │       └── main.go
-│   │   ├── config
-│   │   │   ├── .env
-│   │   │   └── .env.example
-│   │   ├── go.mod
-│   │   ├── go.sum
-│   │   ├── init
-│   │   │   └── 001_init.sql
-│   │   ├── internal
-│   │   │   ├── config
-│   │   │   │   ├── config.go
-│   │   │   │   └── router.go
-│   │   │   ├── handlers
-│   │   │   │   ├── auth.go
-│   │   │   │   ├── calender.go
-│   │   │   │   ├── calender_membership.go
-│   │   │   │   ├── event.go
-│   │   │   │   ├── soso_point_history.go
-│   │   │   │   └── user.go
-│   │   │   ├── model
-│   │   │   │   ├── calender.go
-│   │   │   │   ├── calender_member.go
-│   │   │   │   ├── calender_membership.go
-│   │   │   │   ├── event.go
-│   │   │   │   ├── event_participant.go
-│   │   │   │   ├── my_dispatch_event.go
-│   │   │   │   ├── refresh_token.go
-│   │   │   │   ├── soso_point_history.go
-│   │   │   │   └── user.go
-│   │   │   ├── repository
-│   │   │   │   ├── calender.go
-│   │   │   │   ├── calender_membership.go
-│   │   │   │   ├── db.go
-│   │   │   │   ├── event.go
-│   │   │   │   ├── event_participants.go
-│   │   │   │   ├── refresh_token.go
-│   │   │   │   ├── soso_point_history.go
-│   │   │   │   └── user.go
-│   │   │   └── validator
-│   │   │       ├── calender.go
-│   │   │       ├── calender_membership.go
-│   │   │       ├── event.go
-│   │   │       ├── user.go
-│   │   │       └── validator.go
-│   │   ├── pkg
-│   │   │   └── auth
-│   │   │       ├── jwt.go
-│   │   │       └── password.go
-│   │   ├── server
-│   │   └── tests
-│   │       └── internal
-│   │           ├── handlers
-│   │           │   ├── auth_test.go
-│   │           │   ├── calender_membership_test.go
-│   │           │   ├── calender_test.go
-│   │           │   ├── event_test.go
-│   │           │   ├── helpers_test.go
-│   │           │   ├── soso_point_history_test.go
-│   │           │   └── user_test.go
-│   │           └── repository
-│   │               ├── calender_membership_test.go
-│   │               ├── calender_test.go
-│   │               ├── event_participants_test.go
-│   │               ├── event_test.go
-│   │               ├── helpers_test.go
-│   │               ├── refresh_token_test.go
-│   │               ├── soso_point_history_test.go
-│   │               └── user_test.go
-│   └── soso-web
-│       ├── .DS_Store
-│       ├── .env
-│       ├── .env.example
-│       ├── .gitignore
-│       ├── README.md
-│       ├── components.json
-│       ├── lib
-│       │   └── utils.ts
-│       ├── next-env.d.ts
-│       ├── next.config.ts
-│       ├── nginx.conf
-│       ├── package-lock.json
-│       ├── package.json
-│       ├── postcss.config.mjs
-│       ├── public
-│       │   ├── file.svg
-│       │   ├── globe.svg
-│       │   ├── icons
-│       │   │   ├── double_s_icon.svg
-│       │   │   └── soso_icon.svg
-│       │   ├── next.svg
-│       │   ├── vercel.svg
-│       │   └── window.svg
-│       ├── src
-│       │   ├── app
-│       │   │   ├── auth
-│       │   │   │   ├── layout.tsx
-│       │   │   │   ├── login
-│       │   │   │   │   └── page.tsx
-│       │   │   │   ├── register
-│       │   │   │   │   └── page.tsx
-│       │   │   │   └── tokenexpired
-│       │   │   │       └── page.tsx
-│       │   │   ├── calenders
-│       │   │   │   ├── [calenderId]
-│       │   │   │   │   └── page.tsx
-│       │   │   │   ├── layout.tsx
-│       │   │   │   └── page.tsx
-│       │   │   ├── favicon.ico
-│       │   │   ├── globals.css
-│       │   │   ├── layout.tsx
-│       │   │   └── page.tsx
-│       │   ├── components
-│       │   │   └── ui
-│       │   │       ├── avatar.tsx
-│       │   │       ├── badge.tsx
-│       │   │       ├── breadcrumb.tsx
-│       │   │       ├── button.tsx
-│       │   │       ├── card.tsx
-│       │   │       ├── checkbox.tsx
-│       │   │       ├── dialog.tsx
-│       │   │       ├── dropdown-menu.tsx
-│       │   │       ├── form.tsx
-│       │   │       ├── input.tsx
-│       │   │       ├── label.tsx
-│       │   │       ├── menubar.tsx
-│       │   │       ├── radio-group.tsx
-│       │   │       ├── scroll-area.tsx
-│       │   │       ├── separator.tsx
-│       │   │       ├── sheet.tsx
-│       │   │       ├── sidebar.tsx
-│       │   │       ├── skeleton.tsx
-│       │   │       ├── snackbar.tsx
-│       │   │       ├── textarea.tsx
-│       │   │       └── tooltip.tsx
-│       │   ├── contexts
-│       │   │   └── AuthContext.tsx
-│       │   ├── hooks
-│       │   │   └── use-mobile.ts
-│       │   ├── layouts
-│       │   │   └── AppLayout
-│       │   │       └── AppLayout.tsx
-│       │   ├── lib
-│       │   │   ├── auth
-│       │   │   │   └── RequireAuth.tsx
-│       │   │   ├── server
-│       │   │   │   └── rootRedirect.ts
-│       │   │   └── utils.ts
-│       │   ├── middleware.ts
-│       │   ├── requests
-│       │   │   ├── authAPI.ts
-│       │   │   ├── calenderAPI.ts
-│       │   │   ├── calenderDetailAPI.ts
-│       │   │   ├── core
-│       │   │   │   ├── client.ts
-│       │   │   │   ├── endpoint.ts
-│       │   │   │   └── tokenStore.ts
-│       │   │   └── userAPI.ts
-│       │   ├── types
-│       │   │   └── interfaces.ts
-│       │   └── views
-│       │       ├── CalendersListView
-│       │       │   ├── CalendersListView.tsx
-│       │       │   ├── components
-│       │       │   │   ├── CalenderListItemCard.tsx
-│       │       │   │   └── CreateCalenderDialogView
-│       │       │   │       ├── CreateCalenderDialog.tsx
-│       │       │   │       ├── components
-│       │       │   │       │   └── CreateCalenderInputs.tsx
-│       │       │   │       ├── schema.ts
-│       │       │   │       └── useCreateCalenderDialog.ts
-│       │       │   └── useCalendersListView.ts
-│       │       ├── HeaderView
-│       │       │   ├── HeaderView.tsx
-│       │       │   ├── components
-│       │       │   │   ├── AccountMenu.tsx
-│       │       │   │   ├── HeaderAccountSection.tsx
-│       │       │   │   ├── HeaderCenterLogo.tsx
-│       │       │   │   ├── HeaderLogo.tsx
-│       │       │   │   ├── LogoutButton.tsx
-│       │       │   │   └── MobileSidebarSheet.tsx
-│       │       │   ├── schema.ts
-│       │       │   └── useHeaderView.ts
-│       │       ├── LoginView
-│       │       │   ├── LoginView.tsx
-│       │       │   ├── components
-│       │       │   │   ├── GoToRegisterLink.tsx
-│       │       │   │   └── LoginButton.tsx
-│       │       │   ├── schema.ts
-│       │       │   └── useLoginView.ts
-│       │       ├── RegisterView
-│       │       │   ├── RegisterView.tsx
-│       │       │   ├── components
-│       │       │   │   ├── CarInfoInputs.tsx
-│       │       │   │   └── RegisterButton.tsx
-│       │       │   ├── schema.ts
-│       │       │   └── useRegisterView.ts
-│       │       └── SidebarView
-│       │           ├── CalenderDetailSidebarView
-│       │           │   ├── CalenderDetailSidebar.tsx
-│       │           │   ├── CalenderDetailSidebarView.tsx
-│       │           │   ├── MembersListPanel
-│       │           │   │   ├── MemberListPanel.tsx
-│       │           │   │   ├── components
-│       │           │   │   │   └── MemberCard.tsx
-│       │           │   │   ├── schema.ts
-│       │           │   │   └── useMemberListPanel.ts
-│       │           │   ├── SoSoPointTimelinePanel
-│       │           │   │   ├── SoSoPointTimelinePanel.tsx
-│       │           │   │   ├── components
-│       │           │   │   │   └── TimelineCard.tsx
-│       │           │   │   ├── schema.ts
-│       │           │   │   └── useSoSoPointTimelinePanel.ts
-│       │           │   ├── components
-│       │           │   │   ├── SidebarMainCard.tsx
-│       │           │   │   ├── SidebarTabButton.tsx
-│       │           │   │   └── SidebarTabFooter.tsx
-│       │           │   ├── schema.ts
-│       │           │   └── useCalenderDetailSidebar.ts
-│       │           ├── CalenderListSidebarView
-│       │           │   ├── CalendersSidebarView.tsx
-│       │           │   └── components
-│       │           │       ├── CalenderSidebar.tsx
-│       │           │       ├── RegisteredEventsCard.tsx
-│       │           │       ├── StatusEditDialogView
-│       │           │       │   ├── StatusEditDialogView.tsx
-│       │           │       │   ├── components
-│       │           │       │   │   └── UserStatusInputs.tsx
-│       │           │       │   ├── schema.ts
-│       │           │       │   └── useStatusEditDialogView.ts
-│       │           │       └── UserStatusCard.tsx
-│       │           └── CalendersSidebarSwitch.tsx
-│       ├── tsconfig.json
-│       ├── vitest.config.ts
-│       └── vitest.shims.d.ts
-└── サイドバー作成ガイド.patch
+└── services
+    ├── .DS_Store
+    ├── soso-api
+    │   ├── .DS_Store
+    │   ├── api
+    │   │   ├── docs.yaml
+    │   │   └── swagger.yaml
+    │   ├── cmd
+    │   │   └── server
+    │   │       └── main.go
+    │   ├── config
+    │   │   ├── .env
+    │   │   └── .env.example
+    │   ├── go.mod
+    │   ├── go.sum
+    │   ├── init
+    │   │   └── 001_init.sql
+    │   ├── internal
+    │   │   ├── config
+    │   │   │   ├── config.go
+    │   │   │   └── router.go
+    │   │   ├── handlers
+    │   │   │   ├── auth.go
+    │   │   │   ├── calender.go
+    │   │   │   ├── calender_membership.go
+    │   │   │   ├── event.go
+    │   │   │   ├── soso_point_history.go
+    │   │   │   └── user.go
+    │   │   ├── model
+    │   │   │   ├── calender.go
+    │   │   │   ├── calender_member.go
+    │   │   │   ├── calender_membership.go
+    │   │   │   ├── event.go
+    │   │   │   ├── event_participant.go
+    │   │   │   ├── my_dispatch_event.go
+    │   │   │   ├── refresh_token.go
+    │   │   │   ├── soso_point_history.go
+    │   │   │   └── user.go
+    │   │   ├── repository
+    │   │   │   ├── calender.go
+    │   │   │   ├── calender_membership.go
+    │   │   │   ├── db.go
+    │   │   │   ├── event.go
+    │   │   │   ├── event_participants.go
+    │   │   │   ├── refresh_token.go
+    │   │   │   ├── soso_point_history.go
+    │   │   │   └── user.go
+    │   │   └── validator
+    │   │       ├── calender.go
+    │   │       ├── calender_membership.go
+    │   │       ├── event.go
+    │   │       ├── user.go
+    │   │       └── validator.go
+    │   ├── pkg
+    │   │   └── auth
+    │   │       ├── jwt.go
+    │   │       └── password.go
+    │   ├── server
+    │   └── tests
+    │       └── internal
+    │           ├── handlers
+    │           │   ├── auth_test.go
+    │           │   ├── calender_membership_test.go
+    │           │   ├── calender_test.go
+    │           │   ├── event_test.go
+    │           │   ├── helpers_test.go
+    │           │   ├── soso_point_history_test.go
+    │           │   └── user_test.go
+    │           └── repository
+    │               ├── calender_membership_test.go
+    │               ├── calender_test.go
+    │               ├── event_participants_test.go
+    │               ├── event_test.go
+    │               ├── helpers_test.go
+    │               ├── refresh_token_test.go
+    │               ├── soso_point_history_test.go
+    │               └── user_test.go
+    └── soso-web
+        ├── .DS_Store
+        ├── .env
+        ├── .env.example
+        ├── .gitignore
+        ├── README.md
+        ├── components.json
+        ├── lib
+        │   └── utils.ts
+        ├── next-env.d.ts
+        ├── next.config.ts
+        ├── nginx.conf
+        ├── package-lock.json
+        ├── package.json
+        ├── postcss.config.mjs
+        ├── public
+        │   ├── file.svg
+        │   ├── globe.svg
+        │   ├── icons
+        │   │   ├── double_s_icon.svg
+        │   │   └── soso_icon.svg
+        │   ├── next.svg
+        │   ├── vercel.svg
+        │   └── window.svg
+        ├── src
+        │   ├── app
+        │   │   ├── auth
+        │   │   │   ├── layout.tsx
+        │   │   │   ├── login
+        │   │   │   │   └── page.tsx
+        │   │   │   ├── register
+        │   │   │   │   └── page.tsx
+        │   │   │   └── tokenexpired
+        │   │   │       └── page.tsx
+        │   │   ├── calenders
+        │   │   │   ├── [calenderId]
+        │   │   │   │   └── page.tsx
+        │   │   │   ├── invite
+        │   │   │   │   └── page.tsx
+        │   │   │   ├── layout.tsx
+        │   │   │   └── page.tsx
+        │   │   ├── favicon.ico
+        │   │   ├── globals.css
+        │   │   ├── layout.tsx
+        │   │   ├── not-found
+        │   │   │   └── page.tsx
+        │   │   └── page.tsx
+        │   ├── components
+        │   │   └── ui
+        │   │       ├── avatar.tsx
+        │   │       ├── badge.tsx
+        │   │       ├── breadcrumb.tsx
+        │   │       ├── button.tsx
+        │   │       ├── card.tsx
+        │   │       ├── checkbox.tsx
+        │   │       ├── dialog.tsx
+        │   │       ├── dropdown-menu.tsx
+        │   │       ├── form.tsx
+        │   │       ├── input.tsx
+        │   │       ├── label.tsx
+        │   │       ├── menubar.tsx
+        │   │       ├── radio-group.tsx
+        │   │       ├── scroll-area.tsx
+        │   │       ├── separator.tsx
+        │   │       ├── sheet.tsx
+        │   │       ├── sidebar.tsx
+        │   │       ├── skeleton.tsx
+        │   │       ├── snackbar.tsx
+        │   │       ├── textarea.tsx
+        │   │       └── tooltip.tsx
+        │   ├── contexts
+        │   │   └── AuthContext.tsx
+        │   ├── hooks
+        │   │   └── use-mobile.ts
+        │   ├── layouts
+        │   │   └── AppLayout
+        │   │       └── AppLayout.tsx
+        │   ├── lib
+        │   │   ├── auth
+        │   │   │   └── RequireAuth.tsx
+        │   │   ├── server
+        │   │   │   └── rootRedirect.ts
+        │   │   └── utils.ts
+        │   ├── middleware.ts
+        │   ├── requests
+        │   │   ├── authAPI.ts
+        │   │   ├── calenderAPI.ts
+        │   │   ├── calenderDetailAPI.ts
+        │   │   ├── core
+        │   │   │   ├── client.ts
+        │   │   │   ├── endpoint.ts
+        │   │   │   └── tokenStore.ts
+        │   │   └── userAPI.ts
+        │   ├── types
+        │   │   └── interfaces.ts
+        │   └── views
+        │       ├── CalenderInviteView
+        │       │   ├── CalenderInviteView.tsx
+        │       │   └── useCalenderInviteView.ts
+        │       ├── CalendersListView
+        │       │   ├── CalendersListView.tsx
+        │       │   ├── components
+        │       │   │   ├── CalenderListItemCard.tsx
+        │       │   │   └── CreateCalenderDialogView
+        │       │   │       ├── CreateCalenderDialog.tsx
+        │       │   │       ├── components
+        │       │   │       │   └── CreateCalenderInputs.tsx
+        │       │   │       ├── schema.ts
+        │       │   │       └── useCreateCalenderDialog.ts
+        │       │   └── useCalendersListView.ts
+        │       ├── HeaderView
+        │       │   ├── HeaderView.tsx
+        │       │   ├── components
+        │       │   │   ├── AccountMenu.tsx
+        │       │   │   ├── HeaderAccountSection.tsx
+        │       │   │   ├── HeaderCenterLogo.tsx
+        │       │   │   ├── HeaderLogo.tsx
+        │       │   │   ├── LogoutButton.tsx
+        │       │   │   └── MobileSidebarSheet.tsx
+        │       │   ├── schema.ts
+        │       │   └── useHeaderView.ts
+        │       ├── LoginView
+        │       │   ├── LoginView.tsx
+        │       │   ├── components
+        │       │   │   ├── GoToRegisterLink.tsx
+        │       │   │   └── LoginButton.tsx
+        │       │   ├── schema.ts
+        │       │   └── useLoginView.ts
+        │       ├── RegisterView
+        │       │   ├── RegisterView.tsx
+        │       │   ├── components
+        │       │   │   ├── CarInfoInputs.tsx
+        │       │   │   └── RegisterButton.tsx
+        │       │   ├── schema.ts
+        │       │   └── useRegisterView.ts
+        │       └── SidebarView
+        │           ├── CalenderDetailSidebarView
+        │           │   ├── CalenderDetailSidebar.tsx
+        │           │   ├── CalenderDetailSidebarView.tsx
+        │           │   ├── MembersListPanel
+        │           │   │   ├── MemberListPanel.tsx
+        │           │   │   ├── components
+        │           │   │   │   └── MemberCard.tsx
+        │           │   │   ├── schema.ts
+        │           │   │   └── useMemberListPanel.ts
+        │           │   ├── SoSoPointTimelinePanel
+        │           │   │   ├── SoSoPointTimelinePanel.tsx
+        │           │   │   ├── components
+        │           │   │   │   └── TimelineCard.tsx
+        │           │   │   ├── schema.ts
+        │           │   │   └── useSoSoPointTimelinePanel.ts
+        │           │   ├── components
+        │           │   │   ├── SidebarMainCard.tsx
+        │           │   │   ├── SidebarTabButton.tsx
+        │           │   │   └── SidebarTabFooter.tsx
+        │           │   ├── schema.ts
+        │           │   └── useCalenderDetailSidebar.ts
+        │           ├── CalenderListSidebarView
+        │           │   ├── CalendersSidebarView.tsx
+        │           │   └── components
+        │           │       ├── CalenderSidebar.tsx
+        │           │       ├── RegisteredEventsCard.tsx
+        │           │       ├── StatusEditDialogView
+        │           │       │   ├── StatusEditDialogView.tsx
+        │           │       │   ├── components
+        │           │       │   │   └── UserStatusInputs.tsx
+        │           │       │   ├── schema.ts
+        │           │       │   └── useStatusEditDialogView.ts
+        │           │       └── UserStatusCard.tsx
+        │           └── CalendersSidebarSwitch.tsx
+        ├── tsconfig.json
+        ├── vitest.config.ts
+        └── vitest.shims.d.ts
 
-68 directories, 195 files
+71 directories, 198 files
 
 ===== FILE CONTENTS =====
 
@@ -4365,7 +4407,7 @@ volumes:
 
 [TRUNCATED] MAX_LINES=5000
 
------ FILE: project_dump.txt (size=23060) -----
+----- FILE: project_dump.txt (size=22421) -----
 ===== DIRECTORY TREE =====
 .
 ├── .DS_Store
@@ -4386,252 +4428,258 @@ volumes:
 ├── package-lock.json
 ├── package.json
 ├── project_dump.txt
-├── services
-│   ├── .DS_Store
-│   ├── soso-api
-│   │   ├── .DS_Store
-│   │   ├── api
-│   │   │   ├── docs.yaml
-│   │   │   └── swagger.yaml
-│   │   ├── cmd
-│   │   │   └── server
-│   │   │       └── main.go
-│   │   ├── config
-│   │   │   ├── .env
-│   │   │   └── .env.example
-│   │   ├── go.mod
-│   │   ├── go.sum
-│   │   ├── init
-│   │   │   └── 001_init.sql
-│   │   ├── internal
-│   │   │   ├── config
-│   │   │   │   ├── config.go
-│   │   │   │   └── router.go
-│   │   │   ├── handlers
-│   │   │   │   ├── auth.go
-│   │   │   │   ├── calender.go
-│   │   │   │   ├── calender_membership.go
-│   │   │   │   ├── event.go
-│   │   │   │   ├── soso_point_history.go
-│   │   │   │   └── user.go
-│   │   │   ├── model
-│   │   │   │   ├── calender.go
-│   │   │   │   ├── calender_member.go
-│   │   │   │   ├── calender_membership.go
-│   │   │   │   ├── event.go
-│   │   │   │   ├── event_participant.go
-│   │   │   │   ├── my_dispatch_event.go
-│   │   │   │   ├── refresh_token.go
-│   │   │   │   ├── soso_point_history.go
-│   │   │   │   └── user.go
-│   │   │   ├── repository
-│   │   │   │   ├── calender.go
-│   │   │   │   ├── calender_membership.go
-│   │   │   │   ├── db.go
-│   │   │   │   ├── event.go
-│   │   │   │   ├── event_participants.go
-│   │   │   │   ├── refresh_token.go
-│   │   │   │   ├── soso_point_history.go
-│   │   │   │   └── user.go
-│   │   │   └── validator
-│   │   │       ├── calender.go
-│   │   │       ├── calender_membership.go
-│   │   │       ├── event.go
-│   │   │       ├── user.go
-│   │   │       └── validator.go
-│   │   ├── pkg
-│   │   │   └── auth
-│   │   │       ├── jwt.go
-│   │   │       └── password.go
-│   │   ├── server
-│   │   └── tests
-│   │       └── internal
-│   │           ├── handlers
-│   │           │   ├── auth_test.go
-│   │           │   ├── calender_membership_test.go
-│   │           │   ├── calender_test.go
-│   │           │   ├── event_test.go
-│   │           │   ├── helpers_test.go
-│   │           │   ├── soso_point_history_test.go
-│   │           │   └── user_test.go
-│   │           └── repository
-│   │               ├── calender_membership_test.go
-│   │               ├── calender_test.go
-│   │               ├── event_participants_test.go
-│   │               ├── event_test.go
-│   │               ├── helpers_test.go
-│   │               ├── refresh_token_test.go
-│   │               ├── soso_point_history_test.go
-│   │               └── user_test.go
-│   └── soso-web
-│       ├── .DS_Store
-│       ├── .env
-│       ├── .env.example
-│       ├── .gitignore
-│       ├── README.md
-│       ├── components.json
-│       ├── lib
-│       │   └── utils.ts
-│       ├── next-env.d.ts
-│       ├── next.config.ts
-│       ├── nginx.conf
-│       ├── package-lock.json
-│       ├── package.json
-│       ├── postcss.config.mjs
-│       ├── public
-│       │   ├── file.svg
-│       │   ├── globe.svg
-│       │   ├── icons
-│       │   │   ├── double_s_icon.svg
-│       │   │   └── soso_icon.svg
-│       │   ├── next.svg
-│       │   ├── vercel.svg
-│       │   └── window.svg
-│       ├── src
-│       │   ├── app
-│       │   │   ├── auth
-│       │   │   │   ├── layout.tsx
-│       │   │   │   ├── login
-│       │   │   │   │   └── page.tsx
-│       │   │   │   ├── register
-│       │   │   │   │   └── page.tsx
-│       │   │   │   └── tokenexpired
-│       │   │   │       └── page.tsx
-│       │   │   ├── calenders
-│       │   │   │   ├── [calenderId]
-│       │   │   │   │   └── page.tsx
-│       │   │   │   ├── layout.tsx
-│       │   │   │   └── page.tsx
-│       │   │   ├── favicon.ico
-│       │   │   ├── globals.css
-│       │   │   ├── layout.tsx
-│       │   │   └── page.tsx
-│       │   ├── components
-│       │   │   └── ui
-│       │   │       ├── avatar.tsx
-│       │   │       ├── badge.tsx
-│       │   │       ├── breadcrumb.tsx
-│       │   │       ├── button.tsx
-│       │   │       ├── card.tsx
-│       │   │       ├── checkbox.tsx
-│       │   │       ├── dialog.tsx
-│       │   │       ├── dropdown-menu.tsx
-│       │   │       ├── form.tsx
-│       │   │       ├── input.tsx
-│       │   │       ├── label.tsx
-│       │   │       ├── menubar.tsx
-│       │   │       ├── radio-group.tsx
-│       │   │       ├── scroll-area.tsx
-│       │   │       ├── separator.tsx
-│       │   │       ├── sheet.tsx
-│       │   │       ├── sidebar.tsx
-│       │   │       ├── skeleton.tsx
-│       │   │       ├── snackbar.tsx
-│       │   │       ├── textarea.tsx
-│       │   │       └── tooltip.tsx
-│       │   ├── contexts
-│       │   │   └── AuthContext.tsx
-│       │   ├── hooks
-│       │   │   └── use-mobile.ts
-│       │   ├── layouts
-│       │   │   └── AppLayout
-│       │   │       └── AppLayout.tsx
-│       │   ├── lib
-│       │   │   ├── auth
-│       │   │   │   └── RequireAuth.tsx
-│       │   │   ├── server
-│       │   │   │   └── rootRedirect.ts
-│       │   │   └── utils.ts
-│       │   ├── middleware.ts
-│       │   ├── requests
-│       │   │   ├── authAPI.ts
-│       │   │   ├── calenderAPI.ts
-│       │   │   ├── calenderDetailAPI.ts
-│       │   │   ├── core
-│       │   │   │   ├── client.ts
-│       │   │   │   ├── endpoint.ts
-│       │   │   │   └── tokenStore.ts
-│       │   │   └── userAPI.ts
-│       │   ├── types
-│       │   │   └── interfaces.ts
-│       │   └── views
-│       │       ├── CalendersListView
-│       │       │   ├── CalendersListView.tsx
-│       │       │   ├── components
-│       │       │   │   ├── CalenderListItemCard.tsx
-│       │       │   │   └── CreateCalenderDialogView
-│       │       │   │       ├── CreateCalenderDialog.tsx
-│       │       │   │       ├── components
-│       │       │   │       │   └── CreateCalenderInputs.tsx
-│       │       │   │       ├── schema.ts
-│       │       │   │       └── useCreateCalenderDialog.ts
-│       │       │   └── useCalendersListView.ts
-│       │       ├── HeaderView
-│       │       │   ├── HeaderView.tsx
-│       │       │   ├── components
-│       │       │   │   ├── AccountMenu.tsx
-│       │       │   │   ├── HeaderAccountSection.tsx
-│       │       │   │   ├── HeaderCenterLogo.tsx
-│       │       │   │   ├── HeaderLogo.tsx
-│       │       │   │   ├── LogoutButton.tsx
-│       │       │   │   └── MobileSidebarSheet.tsx
-│       │       │   ├── schema.ts
-│       │       │   └── useHeaderView.ts
-│       │       ├── LoginView
-│       │       │   ├── LoginView.tsx
-│       │       │   ├── components
-│       │       │   │   ├── GoToRegisterLink.tsx
-│       │       │   │   └── LoginButton.tsx
-│       │       │   ├── schema.ts
-│       │       │   └── useLoginView.ts
-│       │       ├── RegisterView
-│       │       │   ├── RegisterView.tsx
-│       │       │   ├── components
-│       │       │   │   ├── CarInfoInputs.tsx
-│       │       │   │   └── RegisterButton.tsx
-│       │       │   ├── schema.ts
-│       │       │   └── useRegisterView.ts
-│       │       └── SidebarView
-│       │           ├── CalenderDetailSidebarView
-│       │           │   ├── CalenderDetailSidebar.tsx
-│       │           │   ├── CalenderDetailSidebarView.tsx
-│       │           │   ├── MembersListPanel
-│       │           │   │   ├── MemberListPanel.tsx
-│       │           │   │   ├── components
-│       │           │   │   │   └── MemberCard.tsx
-│       │           │   │   ├── schema.ts
-│       │           │   │   └── useMemberListPanel.ts
-│       │           │   ├── SoSoPointTimelinePanel
-│       │           │   │   ├── SoSoPointTimelinePanel.tsx
-│       │           │   │   ├── components
-│       │           │   │   │   └── TimelineCard.tsx
-│       │           │   │   ├── schema.ts
-│       │           │   │   └── useSoSoPointTimelinePanel.ts
-│       │           │   ├── components
-│       │           │   │   ├── SidebarMainCard.tsx
-│       │           │   │   ├── SidebarTabButton.tsx
-│       │           │   │   └── SidebarTabFooter.tsx
-│       │           │   ├── schema.ts
-│       │           │   └── useCalenderDetailSidebar.ts
-│       │           ├── CalenderListSidebarView
-│       │           │   ├── CalendersSidebarView.tsx
-│       │           │   └── components
-│       │           │       ├── CalenderSidebar.tsx
-│       │           │       ├── RegisteredEventsCard.tsx
-│       │           │       ├── StatusEditDialogView
-│       │           │       │   ├── StatusEditDialogView.tsx
-│       │           │       │   ├── components
-│       │           │       │   │   └── UserStatusInputs.tsx
-│       │           │       │   ├── schema.ts
-│       │           │       │   └── useStatusEditDialogView.ts
-│       │           │       └── UserStatusCard.tsx
-│       │           └── CalendersSidebarSwitch.tsx
-│       ├── tsconfig.json
-│       ├── vitest.config.ts
-│       └── vitest.shims.d.ts
-└── サイドバー作成ガイド.patch
+└── services
+    ├── .DS_Store
+    ├── soso-api
+    │   ├── .DS_Store
+    │   ├── api
+    │   │   ├── docs.yaml
+    │   │   └── swagger.yaml
+    │   ├── cmd
+    │   │   └── server
+    │   │       └── main.go
+    │   ├── config
+    │   │   ├── .env
+    │   │   └── .env.example
+    │   ├── go.mod
+    │   ├── go.sum
+    │   ├── init
+    │   │   └── 001_init.sql
+    │   ├── internal
+    │   │   ├── config
+    │   │   │   ├── config.go
+    │   │   │   └── router.go
+    │   │   ├── handlers
+    │   │   │   ├── auth.go
+    │   │   │   ├── calender.go
+    │   │   │   ├── calender_membership.go
+    │   │   │   ├── event.go
+    │   │   │   ├── soso_point_history.go
+    │   │   │   └── user.go
+    │   │   ├── model
+    │   │   │   ├── calender.go
+    │   │   │   ├── calender_member.go
+    │   │   │   ├── calender_membership.go
+    │   │   │   ├── event.go
+    │   │   │   ├── event_participant.go
+    │   │   │   ├── my_dispatch_event.go
+    │   │   │   ├── refresh_token.go
+    │   │   │   ├── soso_point_history.go
+    │   │   │   └── user.go
+    │   │   ├── repository
+    │   │   │   ├── calender.go
+    │   │   │   ├── calender_membership.go
+    │   │   │   ├── db.go
+    │   │   │   ├── event.go
+    │   │   │   ├── event_participants.go
+    │   │   │   ├── refresh_token.go
+    │   │   │   ├── soso_point_history.go
+    │   │   │   └── user.go
+    │   │   └── validator
+    │   │       ├── calender.go
+    │   │       ├── calender_membership.go
+    │   │       ├── event.go
+    │   │       ├── user.go
+    │   │       └── validator.go
+    │   ├── pkg
+    │   │   └── auth
+    │   │       ├── jwt.go
+    │   │       └── password.go
+    │   ├── server
+    │   └── tests
+    │       └── internal
+    │           ├── handlers
+    │           │   ├── auth_test.go
+    │           │   ├── calender_membership_test.go
+    │           │   ├── calender_test.go
+    │           │   ├── event_test.go
+    │           │   ├── helpers_test.go
+    │           │   ├── soso_point_history_test.go
+    │           │   └── user_test.go
+    │           └── repository
+    │               ├── calender_membership_test.go
+    │               ├── calender_test.go
+    │               ├── event_participants_test.go
+    │               ├── event_test.go
+    │               ├── helpers_test.go
+    │               ├── refresh_token_test.go
+    │               ├── soso_point_history_test.go
+    │               └── user_test.go
+    └── soso-web
+        ├── .DS_Store
+        ├── .env
+        ├── .env.example
+        ├── .gitignore
+        ├── README.md
+        ├── components.json
+        ├── lib
+        │   └── utils.ts
+        ├── next-env.d.ts
+        ├── next.config.ts
+        ├── nginx.conf
+        ├── package-lock.json
+        ├── package.json
+        ├── postcss.config.mjs
+        ├── public
+        │   ├── file.svg
+        │   ├── globe.svg
+        │   ├── icons
+        │   │   ├── double_s_icon.svg
+        │   │   └── soso_icon.svg
+        │   ├── next.svg
+        │   ├── vercel.svg
+        │   └── window.svg
+        ├── src
+        │   ├── app
+        │   │   ├── auth
+        │   │   │   ├── layout.tsx
+        │   │   │   ├── login
+        │   │   │   │   └── page.tsx
+        │   │   │   ├── register
+        │   │   │   │   └── page.tsx
+        │   │   │   └── tokenexpired
+        │   │   │       └── page.tsx
+        │   │   ├── calenders
+        │   │   │   ├── [calenderId]
+        │   │   │   │   └── page.tsx
+        │   │   │   ├── invite
+        │   │   │   │   └── page.tsx
+        │   │   │   ├── layout.tsx
+        │   │   │   └── page.tsx
+        │   │   ├── favicon.ico
+        │   │   ├── globals.css
+        │   │   ├── layout.tsx
+        │   │   ├── not-found
+        │   │   │   └── page.tsx
+        │   │   └── page.tsx
+        │   ├── components
+        │   │   └── ui
+        │   │       ├── avatar.tsx
+        │   │       ├── badge.tsx
+        │   │       ├── breadcrumb.tsx
+        │   │       ├── button.tsx
+        │   │       ├── card.tsx
+        │   │       ├── checkbox.tsx
+        │   │       ├── dialog.tsx
+        │   │       ├── dropdown-menu.tsx
+        │   │       ├── form.tsx
+        │   │       ├── input.tsx
+        │   │       ├── label.tsx
+        │   │       ├── menubar.tsx
+        │   │       ├── radio-group.tsx
+        │   │       ├── scroll-area.tsx
+        │   │       ├── separator.tsx
+        │   │       ├── sheet.tsx
+        │   │       ├── sidebar.tsx
+        │   │       ├── skeleton.tsx
+        │   │       ├── snackbar.tsx
+        │   │       ├── textarea.tsx
+        │   │       └── tooltip.tsx
+        │   ├── contexts
+        │   │   └── AuthContext.tsx
+        │   ├── hooks
+        │   │   └── use-mobile.ts
+        │   ├── layouts
+        │   │   └── AppLayout
+        │   │       └── AppLayout.tsx
+        │   ├── lib
+        │   │   ├── auth
+        │   │   │   └── RequireAuth.tsx
+        │   │   ├── server
+        │   │   │   └── rootRedirect.ts
+        │   │   └── utils.ts
+        │   ├── middleware.ts
+        │   ├── requests
+        │   │   ├── authAPI.ts
+        │   │   ├── calenderAPI.ts
+        │   │   ├── calenderDetailAPI.ts
+        │   │   ├── core
+        │   │   │   ├── client.ts
+        │   │   │   ├── endpoint.ts
+        │   │   │   └── tokenStore.ts
+        │   │   └── userAPI.ts
+        │   ├── types
+        │   │   └── interfaces.ts
+        │   └── views
+        │       ├── CalenderInviteView
+        │       │   ├── CalenderInviteView.tsx
+        │       │   └── useCalenderInviteView.ts
+        │       ├── CalendersListView
+        │       │   ├── CalendersListView.tsx
+        │       │   ├── components
+        │       │   │   ├── CalenderListItemCard.tsx
+        │       │   │   └── CreateCalenderDialogView
+        │       │   │       ├── CreateCalenderDialog.tsx
+        │       │   │       ├── components
+        │       │   │       │   └── CreateCalenderInputs.tsx
+        │       │   │       ├── schema.ts
+        │       │   │       └── useCreateCalenderDialog.ts
+        │       │   └── useCalendersListView.ts
+        │       ├── HeaderView
+        │       │   ├── HeaderView.tsx
+        │       │   ├── components
+        │       │   │   ├── AccountMenu.tsx
+        │       │   │   ├── HeaderAccountSection.tsx
+        │       │   │   ├── HeaderCenterLogo.tsx
+        │       │   │   ├── HeaderLogo.tsx
+        │       │   │   ├── LogoutButton.tsx
+        │       │   │   └── MobileSidebarSheet.tsx
+        │       │   ├── schema.ts
+        │       │   └── useHeaderView.ts
+        │       ├── LoginView
+        │       │   ├── LoginView.tsx
+        │       │   ├── components
+        │       │   │   ├── GoToRegisterLink.tsx
+        │       │   │   └── LoginButton.tsx
+        │       │   ├── schema.ts
+        │       │   └── useLoginView.ts
+        │       ├── RegisterView
+        │       │   ├── RegisterView.tsx
+        │       │   ├── components
+        │       │   │   ├── CarInfoInputs.tsx
+        │       │   │   └── RegisterButton.tsx
+        │       │   ├── schema.ts
+        │       │   └── useRegisterView.ts
+        │       └── SidebarView
+        │           ├── CalenderDetailSidebarView
+        │           │   ├── CalenderDetailSidebar.tsx
+        │           │   ├── CalenderDetailSidebarView.tsx
+        │           │   ├── MembersListPanel
+        │           │   │   ├── MemberListPanel.tsx
+        │           │   │   ├── components
+        │           │   │   │   └── MemberCard.tsx
+        │           │   │   ├── schema.ts
+        │           │   │   └── useMemberListPanel.ts
+        │           │   ├── SoSoPointTimelinePanel
+        │           │   │   ├── SoSoPointTimelinePanel.tsx
+        │           │   │   ├── components
+        │           │   │   │   └── TimelineCard.tsx
+        │           │   │   ├── schema.ts
+        │           │   │   └── useSoSoPointTimelinePanel.ts
+        │           │   ├── components
+        │           │   │   ├── SidebarMainCard.tsx
+        │           │   │   ├── SidebarTabButton.tsx
+        │           │   │   └── SidebarTabFooter.tsx
+        │           │   ├── schema.ts
+        │           │   └── useCalenderDetailSidebar.ts
+        │           ├── CalenderListSidebarView
+        │           │   ├── CalendersSidebarView.tsx
+        │           │   └── components
+        │           │       ├── CalenderSidebar.tsx
+        │           │       ├── RegisteredEventsCard.tsx
+        │           │       ├── StatusEditDialogView
+        │           │       │   ├── StatusEditDialogView.tsx
+        │           │       │   ├── components
+        │           │       │   │   └── UserStatusInputs.tsx
+        │           │       │   ├── schema.ts
+        │           │       │   └── useStatusEditDialogView.ts
+        │           │       └── UserStatusCard.tsx
+        │           └── CalendersSidebarSwitch.tsx
+        ├── tsconfig.json
+        ├── vitest.config.ts
+        └── vitest.shims.d.ts
 
-68 directories, 195 files
+71 directories, 198 files
 
 ===== FILE CONTENTS =====
 
@@ -4989,7 +5037,7 @@ volumes:
 
 [TRUNCATED] MAX_LINES=5000
 
------ FILE: project_dump.txt (size=23060) -----
+----- FILE: project_dump.txt (size=22421) -----
 ===== DIRECTORY TREE =====
 .
 ├── .DS_Store
@@ -5010,252 +5058,258 @@ volumes:
 ├── package-lock.json
 ├── package.json
 ├── project_dump.txt
-├── services
-│   ├── .DS_Store
-│   ├── soso-api
-│   │   ├── .DS_Store
-│   │   ├── api
-│   │   │   ├── docs.yaml
-│   │   │   └── swagger.yaml
-│   │   ├── cmd
-│   │   │   └── server
-│   │   │       └── main.go
-│   │   ├── config
-│   │   │   ├── .env
-│   │   │   └── .env.example
-│   │   ├── go.mod
-│   │   ├── go.sum
-│   │   ├── init
-│   │   │   └── 001_init.sql
-│   │   ├── internal
-│   │   │   ├── config
-│   │   │   │   ├── config.go
-│   │   │   │   └── router.go
-│   │   │   ├── handlers
-│   │   │   │   ├── auth.go
-│   │   │   │   ├── calender.go
-│   │   │   │   ├── calender_membership.go
-│   │   │   │   ├── event.go
-│   │   │   │   ├── soso_point_history.go
-│   │   │   │   └── user.go
-│   │   │   ├── model
-│   │   │   │   ├── calender.go
-│   │   │   │   ├── calender_member.go
-│   │   │   │   ├── calender_membership.go
-│   │   │   │   ├── event.go
-│   │   │   │   ├── event_participant.go
-│   │   │   │   ├── my_dispatch_event.go
-│   │   │   │   ├── refresh_token.go
-│   │   │   │   ├── soso_point_history.go
-│   │   │   │   └── user.go
-│   │   │   ├── repository
-│   │   │   │   ├── calender.go
-│   │   │   │   ├── calender_membership.go
-│   │   │   │   ├── db.go
-│   │   │   │   ├── event.go
-│   │   │   │   ├── event_participants.go
-│   │   │   │   ├── refresh_token.go
-│   │   │   │   ├── soso_point_history.go
-│   │   │   │   └── user.go
-│   │   │   └── validator
-│   │   │       ├── calender.go
-│   │   │       ├── calender_membership.go
-│   │   │       ├── event.go
-│   │   │       ├── user.go
-│   │   │       └── validator.go
-│   │   ├── pkg
-│   │   │   └── auth
-│   │   │       ├── jwt.go
-│   │   │       └── password.go
-│   │   ├── server
-│   │   └── tests
-│   │       └── internal
-│   │           ├── handlers
-│   │           │   ├── auth_test.go
-│   │           │   ├── calender_membership_test.go
-│   │           │   ├── calender_test.go
-│   │           │   ├── event_test.go
-│   │           │   ├── helpers_test.go
-│   │           │   ├── soso_point_history_test.go
-│   │           │   └── user_test.go
-│   │           └── repository
-│   │               ├── calender_membership_test.go
-│   │               ├── calender_test.go
-│   │               ├── event_participants_test.go
-│   │               ├── event_test.go
-│   │               ├── helpers_test.go
-│   │               ├── refresh_token_test.go
-│   │               ├── soso_point_history_test.go
-│   │               └── user_test.go
-│   └── soso-web
-│       ├── .DS_Store
-│       ├── .env
-│       ├── .env.example
-│       ├── .gitignore
-│       ├── README.md
-│       ├── components.json
-│       ├── lib
-│       │   └── utils.ts
-│       ├── next-env.d.ts
-│       ├── next.config.ts
-│       ├── nginx.conf
-│       ├── package-lock.json
-│       ├── package.json
-│       ├── postcss.config.mjs
-│       ├── public
-│       │   ├── file.svg
-│       │   ├── globe.svg
-│       │   ├── icons
-│       │   │   ├── double_s_icon.svg
-│       │   │   └── soso_icon.svg
-│       │   ├── next.svg
-│       │   ├── vercel.svg
-│       │   └── window.svg
-│       ├── src
-│       │   ├── app
-│       │   │   ├── auth
-│       │   │   │   ├── layout.tsx
-│       │   │   │   ├── login
-│       │   │   │   │   └── page.tsx
-│       │   │   │   ├── register
-│       │   │   │   │   └── page.tsx
-│       │   │   │   └── tokenexpired
-│       │   │   │       └── page.tsx
-│       │   │   ├── calenders
-│       │   │   │   ├── [calenderId]
-│       │   │   │   │   └── page.tsx
-│       │   │   │   ├── layout.tsx
-│       │   │   │   └── page.tsx
-│       │   │   ├── favicon.ico
-│       │   │   ├── globals.css
-│       │   │   ├── layout.tsx
-│       │   │   └── page.tsx
-│       │   ├── components
-│       │   │   └── ui
-│       │   │       ├── avatar.tsx
-│       │   │       ├── badge.tsx
-│       │   │       ├── breadcrumb.tsx
-│       │   │       ├── button.tsx
-│       │   │       ├── card.tsx
-│       │   │       ├── checkbox.tsx
-│       │   │       ├── dialog.tsx
-│       │   │       ├── dropdown-menu.tsx
-│       │   │       ├── form.tsx
-│       │   │       ├── input.tsx
-│       │   │       ├── label.tsx
-│       │   │       ├── menubar.tsx
-│       │   │       ├── radio-group.tsx
-│       │   │       ├── scroll-area.tsx
-│       │   │       ├── separator.tsx
-│       │   │       ├── sheet.tsx
-│       │   │       ├── sidebar.tsx
-│       │   │       ├── skeleton.tsx
-│       │   │       ├── snackbar.tsx
-│       │   │       ├── textarea.tsx
-│       │   │       └── tooltip.tsx
-│       │   ├── contexts
-│       │   │   └── AuthContext.tsx
-│       │   ├── hooks
-│       │   │   └── use-mobile.ts
-│       │   ├── layouts
-│       │   │   └── AppLayout
-│       │   │       └── AppLayout.tsx
-│       │   ├── lib
-│       │   │   ├── auth
-│       │   │   │   └── RequireAuth.tsx
-│       │   │   ├── server
-│       │   │   │   └── rootRedirect.ts
-│       │   │   └── utils.ts
-│       │   ├── middleware.ts
-│       │   ├── requests
-│       │   │   ├── authAPI.ts
-│       │   │   ├── calenderAPI.ts
-│       │   │   ├── calenderDetailAPI.ts
-│       │   │   ├── core
-│       │   │   │   ├── client.ts
-│       │   │   │   ├── endpoint.ts
-│       │   │   │   └── tokenStore.ts
-│       │   │   └── userAPI.ts
-│       │   ├── types
-│       │   │   └── interfaces.ts
-│       │   └── views
-│       │       ├── CalendersListView
-│       │       │   ├── CalendersListView.tsx
-│       │       │   ├── components
-│       │       │   │   ├── CalenderListItemCard.tsx
-│       │       │   │   └── CreateCalenderDialogView
-│       │       │   │       ├── CreateCalenderDialog.tsx
-│       │       │   │       ├── components
-│       │       │   │       │   └── CreateCalenderInputs.tsx
-│       │       │   │       ├── schema.ts
-│       │       │   │       └── useCreateCalenderDialog.ts
-│       │       │   └── useCalendersListView.ts
-│       │       ├── HeaderView
-│       │       │   ├── HeaderView.tsx
-│       │       │   ├── components
-│       │       │   │   ├── AccountMenu.tsx
-│       │       │   │   ├── HeaderAccountSection.tsx
-│       │       │   │   ├── HeaderCenterLogo.tsx
-│       │       │   │   ├── HeaderLogo.tsx
-│       │       │   │   ├── LogoutButton.tsx
-│       │       │   │   └── MobileSidebarSheet.tsx
-│       │       │   ├── schema.ts
-│       │       │   └── useHeaderView.ts
-│       │       ├── LoginView
-│       │       │   ├── LoginView.tsx
-│       │       │   ├── components
-│       │       │   │   ├── GoToRegisterLink.tsx
-│       │       │   │   └── LoginButton.tsx
-│       │       │   ├── schema.ts
-│       │       │   └── useLoginView.ts
-│       │       ├── RegisterView
-│       │       │   ├── RegisterView.tsx
-│       │       │   ├── components
-│       │       │   │   ├── CarInfoInputs.tsx
-│       │       │   │   └── RegisterButton.tsx
-│       │       │   ├── schema.ts
-│       │       │   └── useRegisterView.ts
-│       │       └── SidebarView
-│       │           ├── CalenderDetailSidebarView
-│       │           │   ├── CalenderDetailSidebar.tsx
-│       │           │   ├── CalenderDetailSidebarView.tsx
-│       │           │   ├── MembersListPanel
-│       │           │   │   ├── MemberListPanel.tsx
-│       │           │   │   ├── components
-│       │           │   │   │   └── MemberCard.tsx
-│       │           │   │   ├── schema.ts
-│       │           │   │   └── useMemberListPanel.ts
-│       │           │   ├── SoSoPointTimelinePanel
-│       │           │   │   ├── SoSoPointTimelinePanel.tsx
-│       │           │   │   ├── components
-│       │           │   │   │   └── TimelineCard.tsx
-│       │           │   │   ├── schema.ts
-│       │           │   │   └── useSoSoPointTimelinePanel.ts
-│       │           │   ├── components
-│       │           │   │   ├── SidebarMainCard.tsx
-│       │           │   │   ├── SidebarTabButton.tsx
-│       │           │   │   └── SidebarTabFooter.tsx
-│       │           │   ├── schema.ts
-│       │           │   └── useCalenderDetailSidebar.ts
-│       │           ├── CalenderListSidebarView
-│       │           │   ├── CalendersSidebarView.tsx
-│       │           │   └── components
-│       │           │       ├── CalenderSidebar.tsx
-│       │           │       ├── RegisteredEventsCard.tsx
-│       │           │       ├── StatusEditDialogView
-│       │           │       │   ├── StatusEditDialogView.tsx
-│       │           │       │   ├── components
-│       │           │       │   │   └── UserStatusInputs.tsx
-│       │           │       │   ├── schema.ts
-│       │           │       │   └── useStatusEditDialogView.ts
-│       │           │       └── UserStatusCard.tsx
-│       │           └── CalendersSidebarSwitch.tsx
-│       ├── tsconfig.json
-│       ├── vitest.config.ts
-│       └── vitest.shims.d.ts
-└── サイドバー作成ガイド.patch
+└── services
+    ├── .DS_Store
+    ├── soso-api
+    │   ├── .DS_Store
+    │   ├── api
+    │   │   ├── docs.yaml
+    │   │   └── swagger.yaml
+    │   ├── cmd
+    │   │   └── server
+    │   │       └── main.go
+    │   ├── config
+    │   │   ├── .env
+    │   │   └── .env.example
+    │   ├── go.mod
+    │   ├── go.sum
+    │   ├── init
+    │   │   └── 001_init.sql
+    │   ├── internal
+    │   │   ├── config
+    │   │   │   ├── config.go
+    │   │   │   └── router.go
+    │   │   ├── handlers
+    │   │   │   ├── auth.go
+    │   │   │   ├── calender.go
+    │   │   │   ├── calender_membership.go
+    │   │   │   ├── event.go
+    │   │   │   ├── soso_point_history.go
+    │   │   │   └── user.go
+    │   │   ├── model
+    │   │   │   ├── calender.go
+    │   │   │   ├── calender_member.go
+    │   │   │   ├── calender_membership.go
+    │   │   │   ├── event.go
+    │   │   │   ├── event_participant.go
+    │   │   │   ├── my_dispatch_event.go
+    │   │   │   ├── refresh_token.go
+    │   │   │   ├── soso_point_history.go
+    │   │   │   └── user.go
+    │   │   ├── repository
+    │   │   │   ├── calender.go
+    │   │   │   ├── calender_membership.go
+    │   │   │   ├── db.go
+    │   │   │   ├── event.go
+    │   │   │   ├── event_participants.go
+    │   │   │   ├── refresh_token.go
+    │   │   │   ├── soso_point_history.go
+    │   │   │   └── user.go
+    │   │   └── validator
+    │   │       ├── calender.go
+    │   │       ├── calender_membership.go
+    │   │       ├── event.go
+    │   │       ├── user.go
+    │   │       └── validator.go
+    │   ├── pkg
+    │   │   └── auth
+    │   │       ├── jwt.go
+    │   │       └── password.go
+    │   ├── server
+    │   └── tests
+    │       └── internal
+    │           ├── handlers
+    │           │   ├── auth_test.go
+    │           │   ├── calender_membership_test.go
+    │           │   ├── calender_test.go
+    │           │   ├── event_test.go
+    │           │   ├── helpers_test.go
+    │           │   ├── soso_point_history_test.go
+    │           │   └── user_test.go
+    │           └── repository
+    │               ├── calender_membership_test.go
+    │               ├── calender_test.go
+    │               ├── event_participants_test.go
+    │               ├── event_test.go
+    │               ├── helpers_test.go
+    │               ├── refresh_token_test.go
+    │               ├── soso_point_history_test.go
+    │               └── user_test.go
+    └── soso-web
+        ├── .DS_Store
+        ├── .env
+        ├── .env.example
+        ├── .gitignore
+        ├── README.md
+        ├── components.json
+        ├── lib
+        │   └── utils.ts
+        ├── next-env.d.ts
+        ├── next.config.ts
+        ├── nginx.conf
+        ├── package-lock.json
+        ├── package.json
+        ├── postcss.config.mjs
+        ├── public
+        │   ├── file.svg
+        │   ├── globe.svg
+        │   ├── icons
+        │   │   ├── double_s_icon.svg
+        │   │   └── soso_icon.svg
+        │   ├── next.svg
+        │   ├── vercel.svg
+        │   └── window.svg
+        ├── src
+        │   ├── app
+        │   │   ├── auth
+        │   │   │   ├── layout.tsx
+        │   │   │   ├── login
+        │   │   │   │   └── page.tsx
+        │   │   │   ├── register
+        │   │   │   │   └── page.tsx
+        │   │   │   └── tokenexpired
+        │   │   │       └── page.tsx
+        │   │   ├── calenders
+        │   │   │   ├── [calenderId]
+        │   │   │   │   └── page.tsx
+        │   │   │   ├── invite
+        │   │   │   │   └── page.tsx
+        │   │   │   ├── layout.tsx
+        │   │   │   └── page.tsx
+        │   │   ├── favicon.ico
+        │   │   ├── globals.css
+        │   │   ├── layout.tsx
+        │   │   ├── not-found
+        │   │   │   └── page.tsx
+        │   │   └── page.tsx
+        │   ├── components
+        │   │   └── ui
+        │   │       ├── avatar.tsx
+        │   │       ├── badge.tsx
+        │   │       ├── breadcrumb.tsx
+        │   │       ├── button.tsx
+        │   │       ├── card.tsx
+        │   │       ├── checkbox.tsx
+        │   │       ├── dialog.tsx
+        │   │       ├── dropdown-menu.tsx
+        │   │       ├── form.tsx
+        │   │       ├── input.tsx
+        │   │       ├── label.tsx
+        │   │       ├── menubar.tsx
+        │   │       ├── radio-group.tsx
+        │   │       ├── scroll-area.tsx
+        │   │       ├── separator.tsx
+        │   │       ├── sheet.tsx
+        │   │       ├── sidebar.tsx
+        │   │       ├── skeleton.tsx
+        │   │       ├── snackbar.tsx
+        │   │       ├── textarea.tsx
+        │   │       └── tooltip.tsx
+        │   ├── contexts
+        │   │   └── AuthContext.tsx
+        │   ├── hooks
+        │   │   └── use-mobile.ts
+        │   ├── layouts
+        │   │   └── AppLayout
+        │   │       └── AppLayout.tsx
+        │   ├── lib
+        │   │   ├── auth
+        │   │   │   └── RequireAuth.tsx
+        │   │   ├── server
+        │   │   │   └── rootRedirect.ts
+        │   │   └── utils.ts
+        │   ├── middleware.ts
+        │   ├── requests
+        │   │   ├── authAPI.ts
+        │   │   ├── calenderAPI.ts
+        │   │   ├── calenderDetailAPI.ts
+        │   │   ├── core
+        │   │   │   ├── client.ts
+        │   │   │   ├── endpoint.ts
+        │   │   │   └── tokenStore.ts
+        │   │   └── userAPI.ts
+        │   ├── types
+        │   │   └── interfaces.ts
+        │   └── views
+        │       ├── CalenderInviteView
+        │       │   ├── CalenderInviteView.tsx
+        │       │   └── useCalenderInviteView.ts
+        │       ├── CalendersListView
+        │       │   ├── CalendersListView.tsx
+        │       │   ├── components
+        │       │   │   ├── CalenderListItemCard.tsx
+        │       │   │   └── CreateCalenderDialogView
+        │       │   │       ├── CreateCalenderDialog.tsx
+        │       │   │       ├── components
+        │       │   │       │   └── CreateCalenderInputs.tsx
+        │       │   │       ├── schema.ts
+        │       │   │       └── useCreateCalenderDialog.ts
+        │       │   └── useCalendersListView.ts
+        │       ├── HeaderView
+        │       │   ├── HeaderView.tsx
+        │       │   ├── components
+        │       │   │   ├── AccountMenu.tsx
+        │       │   │   ├── HeaderAccountSection.tsx
+        │       │   │   ├── HeaderCenterLogo.tsx
+        │       │   │   ├── HeaderLogo.tsx
+        │       │   │   ├── LogoutButton.tsx
+        │       │   │   └── MobileSidebarSheet.tsx
+        │       │   ├── schema.ts
+        │       │   └── useHeaderView.ts
+        │       ├── LoginView
+        │       │   ├── LoginView.tsx
+        │       │   ├── components
+        │       │   │   ├── GoToRegisterLink.tsx
+        │       │   │   └── LoginButton.tsx
+        │       │   ├── schema.ts
+        │       │   └── useLoginView.ts
+        │       ├── RegisterView
+        │       │   ├── RegisterView.tsx
+        │       │   ├── components
+        │       │   │   ├── CarInfoInputs.tsx
+        │       │   │   └── RegisterButton.tsx
+        │       │   ├── schema.ts
+        │       │   └── useRegisterView.ts
+        │       └── SidebarView
+        │           ├── CalenderDetailSidebarView
+        │           │   ├── CalenderDetailSidebar.tsx
+        │           │   ├── CalenderDetailSidebarView.tsx
+        │           │   ├── MembersListPanel
+        │           │   │   ├── MemberListPanel.tsx
+        │           │   │   ├── components
+        │           │   │   │   └── MemberCard.tsx
+        │           │   │   ├── schema.ts
+        │           │   │   └── useMemberListPanel.ts
+        │           │   ├── SoSoPointTimelinePanel
+        │           │   │   ├── SoSoPointTimelinePanel.tsx
+        │           │   │   ├── components
+        │           │   │   │   └── TimelineCard.tsx
+        │           │   │   ├── schema.ts
+        │           │   │   └── useSoSoPointTimelinePanel.ts
+        │           │   ├── components
+        │           │   │   ├── SidebarMainCard.tsx
+        │           │   │   ├── SidebarTabButton.tsx
+        │           │   │   └── SidebarTabFooter.tsx
+        │           │   ├── schema.ts
+        │           │   └── useCalenderDetailSidebar.ts
+        │           ├── CalenderListSidebarView
+        │           │   ├── CalendersSidebarView.tsx
+        │           │   └── components
+        │           │       ├── CalenderSidebar.tsx
+        │           │       ├── RegisteredEventsCard.tsx
+        │           │       ├── StatusEditDialogView
+        │           │       │   ├── StatusEditDialogView.tsx
+        │           │       │   ├── components
+        │           │       │   │   └── UserStatusInputs.tsx
+        │           │       │   ├── schema.ts
+        │           │       │   └── useStatusEditDialogView.ts
+        │           │       └── UserStatusCard.tsx
+        │           └── CalendersSidebarSwitch.tsx
+        ├── tsconfig.json
+        ├── vitest.config.ts
+        └── vitest.shims.d.ts
 
-68 directories, 195 files
+71 directories, 198 files
 
 ===== FILE CONTENTS =====
 
@@ -5574,54 +5628,6 @@ volumes:
       "version": "19.1.9",
       "resolved": "https://registry.npmjs.org/@types/react/-/react-19.1.9.tgz",
       "integrity": "sha512-WmdoynAX8Stew/36uTSVMcLJJ1KRh6L3IZRx1PZ7qJtBqT3dYTgyDTx8H1qoRghErydW7xw9mSJ3wS//tCRpFA==",
-      "dev": true,
-      "license": "MIT",
-      "dependencies": {
-        "csstype": "^3.0.2"
-      }
-    },
-    "node_modules/csstype": {
-      "version": "3.1.3",
-      "resolved": "https://registry.npmjs.org/csstype/-/csstype-3.1.3.tgz",
-      "integrity": "sha512-M1uQkMl8rQK/szD0LNhtqxIPLpimGm8sOBwU7lLnCpSbTyY3yeU1Vc7l4KT5zT4s/yOxHH5O7tIuuLOCnLADRw==",
-      "dev": true,
-      "license": "MIT"
-    },
-    "node_modules/js-cookie": {
-      "version": "3.0.5",
-      "resolved": "https://registry.npmjs.org/js-cookie/-/js-cookie-3.0.5.tgz",
-      "integrity": "sha512-cEiJEAEoIbWfCZYKWhVwFuvPX1gETRYPw6LlaTKoxD3s2AkXzkCjnp6h0V77ozyqj0jakteJ4YqDJT830+lVGw==",
-      "license": "MIT",
-      "engines": {
-        "node": ">=14"
-      }
-    }
-  }
-}
-
-[TRUNCATED] MAX_LINES=5000
-
------ FILE: package.json (size=112) -----
-{
-  "devDependencies": {
-    "@types/react": "^19.1.9"
-  },
-  "dependencies": {
-    "js-cookie": "^3.0.5"
-  }
-}
-
-[TRUNCATED] MAX_LINES=5000
-
------ FILE: project_dump.txt (size=23060) -----
-===== DIRECTORY TREE =====
-.
-├── .DS_Store
-├── .github
-│   ├── ISSUE_TEMPLATE
-│   │   ├── bug_report.yml
-│   │   ├── config.yml
-│   │   ├── feature_request.yml
 
 [TRUNCATED] MAX_LINES=5000
 
@@ -7973,7 +7979,7 @@ func getEnvDuration(k, def string) time.Duration {
 
 [TRUNCATED] MAX_LINES=5000
 
------ FILE: services/soso-api/internal/config/router.go (size=4588) -----
+----- FILE: services/soso-api/internal/config/router.go (size=4635) -----
 package config
 
 import (
@@ -8101,6 +8107,7 @@ func SetupRouter(cfg *Config) *echo.Echo {
 	calG.POST("/create", calenderH.Create)
 	calG.POST("/:calender_id/join", calenderMembershipH.Create)
 	calG.GET("/my", calenderH.FindMyCalenders)
+	calG.GET("/:calender_id", calenderH.FindById)
 	calG.GET("/:calender_id/members", calenderMembershipH.List)
 	calG.PUT("/:calender_id/members/:user_id/point", sosoPH.Update)
 	calG.POST("/:calender_id/events", eventH.Create)
@@ -8322,7 +8329,7 @@ func (h *AuthHandler) clearRefreshCookie(c echo.Context) {
 
 [TRUNCATED] MAX_LINES=5000
 
------ FILE: services/soso-api/internal/handlers/calender.go (size=4764) -----
+----- FILE: services/soso-api/internal/handlers/calender.go (size=5960) -----
 package handlers
 
 import (
@@ -8462,6 +8469,42 @@ func (h *CalenderHandler) Create(c echo.Context) error {
 		"name":        ca.Name,
 		"description": ca.Description,
 		"ownerId":     ca.OwnerId,
+	})
+}
+
+// GET /calenders/:calender_id
+// 招待ページ表示用に、カレンダーの基本情報を返す（所属していなくても取得可）
+func (h *CalenderHandler) FindById(c echo.Context) error {
+	// --- 認証 -------------------------------------------------------------
+	// router 側で JWT ミドルウェアを噛ませているが、テストや防御のためここでも確認する
+	tok, ok := c.Get("user").(*jwt.Token)
+	if !ok {
+		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized")
+	}
+	claims, ok := tok.Claims.(*jwt.RegisteredClaims)
+	if !ok || claims.Subject == "" {
+		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized")
+	}
+
+	calenderID := c.Param("calender_id")
+	if calenderID == "" {
+		return echo.NewHTTPError(http.StatusBadRequest, "calender_id is required")
+	}
+
+	ctx := c.Request().Context()
+	cal, err := h.CalenderRepo.FindById(ctx, calenderID)
+	if err != nil {
+		return err
+	}
+	if cal == nil {
+		return echo.NewHTTPError(http.StatusNotFound, "calender not found")
+	}
+
+	return c.JSON(http.StatusOK, map[string]any{
+		"id":          cal.ID,
+		"name":        cal.Name,
+		"description": cal.Description,
+		"ownerId":     cal.OwnerId,
 	})
 }
 
@@ -9524,7 +9567,7 @@ type User struct {
 
 [TRUNCATED] MAX_LINES=5000
 
------ FILE: services/soso-api/internal/repository/calender.go (size=3448) -----
+----- FILE: services/soso-api/internal/repository/calender.go (size=4004) -----
 package repository
 
 import (
@@ -9603,6 +9646,39 @@ func (r *CalenderRepository) FindByName(ctx context.Context, name string) (*mode
 		}
 		return nil, err
 	}
+	return &c, nil
+}
+
+func (r *CalenderRepository) FindById(ctx context.Context, id string) (*model.Calender, error) {
+	row := r.DB.QueryRowContext(ctx, `
+		SELECT
+			id,
+			name,
+			description,
+			owner_id,
+			created_at,
+			updated_at
+		FROM calenders
+		WHERE id = ?
+		LIMIT 1
+	`, id)
+
+	var c model.Calender
+	var desc sql.NullString
+	if err := row.Scan(
+		&c.ID,
+		&c.Name,
+		&desc,
+		&c.OwnerId,
+		&c.CreatedAt,
+		&c.UpdatedAt,
+	); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, nil
+		}
+		return nil, err
+	}
+	c.Description = desc.String
 	return &c, nil
 }
 
@@ -20041,6 +20117,52 @@ export default function AppRouterLayout({
 
 [TRUNCATED] MAX_LINES=5000
 
+----- FILE: services/soso-web/src/app/not-found/page.tsx (size=1398) -----
+import Link from "next/link";
+
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+
+export default function NotFoundPage() {
+  return (
+    <main className="flex min-h-dvh items-center justify-center px-4">
+      <Card className="w-full max-w-lg">
+        <CardHeader className="space-y-2">
+          <CardTitle className="text-xl">お探しのページが見つかりませんでした</CardTitle>
+          <CardDescription>
+            権限がない操作、または存在しないリソースにアクセスした可能性があります。
+          </CardDescription>
+        </CardHeader>
+
+        <CardContent className="text-sm leading-6 text-muted-foreground">
+          <ul className="list-disc pl-5 space-y-1">
+            <li>URL が正しいか確認してください。</li>
+            <li>管理者権限が必要な操作の場合、管理者に確認してください。</li>
+          </ul>
+        </CardContent>
+
+        <CardFooter className="flex justify-end gap-2">
+          <Button asChild variant="outline">
+            <Link href="/calenders">カレンダーへ戻る</Link>
+          </Button>
+          <Button asChild>
+            <Link href="/">トップへ</Link>
+          </Button>
+        </CardFooter>
+      </Card>
+    </main>
+  );
+}
+
+[TRUNCATED] MAX_LINES=5000
+
 ----- FILE: services/soso-web/src/app/page.tsx (size=408) -----
 // src/app/page.tsx
 import { handleRootRedirect } from "@/lib/server/rootRedirect";
@@ -23026,7 +23148,7 @@ export async function logout(): Promise<void> {
 
 [TRUNCATED] MAX_LINES=5000
 
------ FILE: services/soso-web/src/requests/calenderAPI.ts (size=763) -----
+----- FILE: services/soso-web/src/requests/calenderAPI.ts (size=1295) -----
 // src/requests/calenderAPI.ts
 
 import type { Calender } from "@/types/interfaces";
@@ -23051,6 +23173,21 @@ export async function createCalender(
   return apiPost<Calender, CalenderCreateRequest>(
     "/calenders/create",
     input,
+    { _auth: true, _csrf: true }
+  );
+}
+
+/** カレンダー詳細を取得（招待ページ表示用） */
+export async function getCalenderById(calenderId: string): Promise<Calender> {
+  return apiGet<Calender>(`/calenders/${calenderId}`, { _auth: true, _csrf: true });
+}
+
+/** カレンダーに参加 */
+export async function joinCalender(calenderId: string): Promise<void> {
+  // サーバ側が Bind をしているので {} を送る
+  await apiPost<void, Record<string, never>>(
+    `/calenders/${calenderId}/join`,
+    {},
     { _auth: true, _csrf: true }
   );
 }
@@ -23093,7 +23230,7 @@ export async function listSosoPointHistory(
 
 [TRUNCATED] MAX_LINES=5000
 
------ FILE: services/soso-web/src/requests/core/client.ts (size=6453) -----
+----- FILE: services/soso-web/src/requests/core/client.ts (size=7257) -----
 import axios, {
   type AxiosRequestConfig,
   type InternalAxiosRequestConfig,
@@ -23150,21 +23287,22 @@ async function ensureCsrfToken(): Promise<string> {
 }
 
 // ==============================
-// tokenexpired redirect
+// redirects (tokenexpired / not-found)
 // ==============================
-let redirected = false;
+let redirectedToTokenExpired = false;
+let redirectedToNotFound = false;
 
-function shouldSkipRedirect() {
+function shouldSkipRedirectToTokenExpired() {
   if (typeof window === "undefined") return true;
   return window.location.pathname.startsWith("/auth");
 }
 
 function redirectToTokenExpiredOnce() {
   if (typeof window === "undefined") return;
-  if (redirected) return;
-  if (shouldSkipRedirect()) return;
+  if (redirectedToTokenExpired) return;
+  if (shouldSkipRedirectToTokenExpired()) return;
 
-  redirected = true;
+  redirectedToTokenExpired = true;
   clearAccessToken();
 
   const next = window.location.pathname + window.location.search;
@@ -23173,7 +23311,26 @@ function redirectToTokenExpiredOnce() {
   );
 }
 
-// auth系 endpoint は refresh で救わない（ループ源になりやすい）
+function shouldSkipRedirectToNotFound() {
+  if (typeof window === "undefined") return true;
+  const p = window.location.pathname;
+  // auth 系は 403 でもこの画面に飛ばさない
+  if (p.startsWith("/auth")) return true;
+  if (p.startsWith("/not-found")) return true;
+  return false;
+}
+
+function redirectToNotFoundOnce() {
+  if (typeof window === "undefined") return;
+  if (redirectedToNotFound) return;
+  if (shouldSkipRedirectToNotFound()) return;
+
+  redirectedToNotFound = true;
+
+  window.location.assign("/not-found");
+}
+
+// auth系 endpoint は refresh で救わない（ループ源になりやすい）（ループ源になりやすい）
 function isAuthEndpoint(url?: string): boolean {
   if (!url) return false;
   return (
@@ -23256,7 +23413,13 @@ apiClient.interceptors.response.use(
     const cfg = error.config as InternalApiConfig | undefined;
     if (!cfg) return Promise.reject(error);
 
-    // ★ 401 のみ refresh 対象（403は救わない）
+    // 403 -> Not Found ページへ
+    if (status === 403) {
+      redirectToNotFoundOnce();
+      return Promise.reject(error);
+    }
+
+    // ★ 401 のみ refresh 対象
     if (status !== 401) {
       return Promise.reject(error);
     }

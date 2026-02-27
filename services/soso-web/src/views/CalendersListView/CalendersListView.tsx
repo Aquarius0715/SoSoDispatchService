@@ -1,7 +1,8 @@
-// src/views/CalendersListView/CalendersListView.tsx
+// services/soso-web/src/views/CalendersListView/CalendersListView.tsx
 "use client";
 
 import { Plus } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,8 +13,15 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useCalendersListView } from "./useCalendersListView";
 import { CalenderListItemCard } from "./components/CalenderListItemCard";
 import { CreateCalenderDialog } from "./components/CreateCalenderDialogView/CreateCalenderDialog";
+import { JoinCalendarDialog } from "./components/JoinCalenderDialogView/JoinCalandarDialog";
 
 export function CalendersListView() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const inviteCalenderId = searchParams.get("calenderId");
+  const inviteOpen = Boolean(inviteCalenderId);
+
   const {
     calenders,
     isLoading,
@@ -25,7 +33,12 @@ export function CalendersListView() {
     setNewCalenderDescription,
     create,
     createDisabled,
+    reload,
   } = useCalendersListView();
+
+  const closeInvite = () => {
+    router.replace("/calenders");
+  };
 
   return (
     <div className="relative flex h-full flex-col">
@@ -92,6 +105,13 @@ export function CalendersListView() {
         onChangeDescription={setNewCalenderDescription}
         onCreate={create}
         createDisabled={createDisabled}
+      />
+
+      <JoinCalendarDialog
+        open={inviteOpen}
+        calenderId={inviteCalenderId}
+        onClose={closeInvite}
+        onJoined={reload}
       />
     </div>
   );

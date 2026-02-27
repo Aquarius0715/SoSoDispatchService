@@ -140,6 +140,42 @@ func (h *CalenderHandler) Create(c echo.Context) error {
 	})
 }
 
+// GET /calenders/:calender_id
+// 招待ページ表示用に、カレンダーの基本情報を返す（所属していなくても取得可）
+func (h *CalenderHandler) FindById(c echo.Context) error {
+	// --- 認証 -------------------------------------------------------------
+	// router 側で JWT ミドルウェアを噛ませているが、テストや防御のためここでも確認する
+	tok, ok := c.Get("user").(*jwt.Token)
+	if !ok {
+		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized")
+	}
+	claims, ok := tok.Claims.(*jwt.RegisteredClaims)
+	if !ok || claims.Subject == "" {
+		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized")
+	}
+
+	calenderID := c.Param("calender_id")
+	if calenderID == "" {
+		return echo.NewHTTPError(http.StatusBadRequest, "calender_id is required")
+	}
+
+	ctx := c.Request().Context()
+	cal, err := h.CalenderRepo.FindById(ctx, calenderID)
+	if err != nil {
+		return err
+	}
+	if cal == nil {
+		return echo.NewHTTPError(http.StatusNotFound, "calender not found")
+	}
+
+	return c.JSON(http.StatusOK, map[string]any{
+		"id":          cal.ID,
+		"name":        cal.Name,
+		"description": cal.Description,
+		"ownerId":     cal.OwnerId,
+	})
+}
+
 func (h *CalenderHandler) FindMyTransportEvents(c echo.Context) error {
 	tok, ok := c.Get("user").(*jwt.Token)
 	if !ok {

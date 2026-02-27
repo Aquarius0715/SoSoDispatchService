@@ -79,6 +79,39 @@ func (r *CalenderRepository) FindByName(ctx context.Context, name string) (*mode
 	return &c, nil
 }
 
+func (r *CalenderRepository) FindById(ctx context.Context, id string) (*model.Calender, error) {
+	row := r.DB.QueryRowContext(ctx, `
+		SELECT
+			id,
+			name,
+			description,
+			owner_id,
+			created_at,
+			updated_at
+		FROM calenders
+		WHERE id = ?
+		LIMIT 1
+	`, id)
+
+	var c model.Calender
+	var desc sql.NullString
+	if err := row.Scan(
+		&c.ID,
+		&c.Name,
+		&desc,
+		&c.OwnerId,
+		&c.CreatedAt,
+		&c.UpdatedAt,
+	); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, nil
+		}
+		return nil, err
+	}
+	c.Description = desc.String
+	return &c, nil
+}
+
 func (r *CalenderRepository) Create(ctx context.Context, c *model.Calender) error {
 	_, err := r.DB.ExecContext(ctx, `
 		INSERT INTO calenders (
