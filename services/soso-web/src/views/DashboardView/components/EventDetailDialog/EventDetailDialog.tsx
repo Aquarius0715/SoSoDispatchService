@@ -180,6 +180,17 @@ export const EventDetailDialog: React.FC<EventDetailDialogProps> = ({
 
         <DialogFooter className="p-4 border-t bg-gray-50/50">
           <div className="flex gap-3 w-full">
+
+          <Button
+              className="flex-1"
+              variant="outline"
+              onClick={() => handleRegisterDriver('return')}
+              disabled={!display || isActionLoading || display.remainingReturn === 0}
+            >
+              {isActionLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+              送り(帰り)に登録
+            </Button>
+            
             <Button
               className="flex-1"
               variant="outline"
@@ -190,15 +201,7 @@ export const EventDetailDialog: React.FC<EventDetailDialogProps> = ({
               迎え(行き)に登録
             </Button>
 
-            <Button
-              className="flex-1"
-              variant="outline"
-              onClick={() => handleRegisterDriver('return')}
-              disabled={!display || isActionLoading || display.remainingReturn === 0}
-            >
-              {isActionLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-              送り(帰り)に登録
-            </Button>
+            
           </div>
         </DialogFooter>
       </DialogContent>
