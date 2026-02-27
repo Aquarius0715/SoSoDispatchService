@@ -23,7 +23,7 @@ export async function listSosoPointHistory(
   calendarId: string
 ): Promise<SosoPointHistory[]> {
   return apiGet<SosoPointHistory[]>(
-    `/calendars/${calendarId}/soso_point_history`,
+    `/calendars/${calendarId}/soso_history`,
     {
       _auth: true,
       _csrf: false,

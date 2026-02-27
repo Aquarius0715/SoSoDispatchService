@@ -23,14 +23,14 @@ export function TimelineCard({
   reasonText,
 }: Props) {
   return (
-    <Card>
-      <CardContent className="p-3">
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0 flex-1 truncate text-sm font-medium">
-            {eventLabel}
-          </div>
-          <div className="shrink-0 text-xs text-muted-foreground">
-            {changedAtText}
+    <Card className="w-full max-w-full">
+      <CardContent className="p-3 overflow-hidden">
+        <div className="flex items-start gap-3">
+          <div className="min-w-0 flex-1">
+            <div className="break-words text-sm font-medium">{eventLabel}</div>
+            <div className="mt-0.5 text-xs text-muted-foreground">
+              {changedAtText}
+            </div>
           </div>
         </div>
 
