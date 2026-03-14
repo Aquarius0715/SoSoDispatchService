@@ -32,7 +32,7 @@ storybook-build:
 ## Storybook以外ビルドし直して起動（キャッシュなし）
 rebuild:
 	$(DC) down -v --remove-orphans
-	$(DC) build --no-cache soso-api soso-database soso-api-document soso-web
+	$(DC) build --no-cache soso-api soso-database soso-api-document
 	$(DC) up -d
 
 dev:

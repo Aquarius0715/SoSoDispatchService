@@ -2,11 +2,11 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { parseCalenderIdFromPathname } from "./schema";
+import { parseCalendarIdFromPathname } from "./schema";
 
 export type HeaderViewState = {
   pathname: string;
-  calenderId: string | null;
+  calendarId: string | null;
 };
 
 /**
@@ -14,7 +14,7 @@ export type HeaderViewState = {
  */
 export function useHeaderView(): HeaderViewState {
   const pathname = usePathname();
-  const calenderId = parseCalenderIdFromPathname(pathname);
+  const calendarId = parseCalendarIdFromPathname(pathname);
 
-  return { pathname, calenderId };
+  return { pathname, calendarId };
 }
