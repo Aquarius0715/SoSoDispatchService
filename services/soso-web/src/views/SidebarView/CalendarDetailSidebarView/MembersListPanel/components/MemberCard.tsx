@@ -14,22 +14,29 @@ type Props = {
 };
 
 export function MemberCard({ member }: Props) {
+  const username = member.username || "（名前未設定）";
+
   return (
-    <Card>
-      <CardContent className="p-3">
-        <div className="flex items-center gap-3">
-          <Avatar className="h-9 w-9">
+    <Card className="w-full">
+      {/* 上下の余白を詰める: p-3 -> px-3 py-2（必要なら py-1.5 でもOK） */}
+      <CardContent className="overflow-hidden px-3 py-0">
+        <div className="flex w-full min-w-0 items-center gap-3 overflow-hidden">
+          <Avatar className="h-9 w-9 shrink-0">
             <AvatarFallback>
               {member.username?.slice(0, 1)?.toUpperCase() ?? "?"}
             </AvatarFallback>
           </Avatar>
 
-          <div className="min-w-0 flex-1">
-            <div className="truncate text-base font-semibold">
-              {member.username || "（名前未設定）"}
+          <div className="min-w-0 w-0 flex-1 overflow-hidden">
+            <div
+              className="truncate text-base font-semibold leading-tight"
+              title={username}
+            >
+              {username}
             </div>
 
-            <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+            {/* 余白を詰める: mt-1 -> mt-0.5 */}
+            <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground leading-none">
               <div className="inline-flex items-center gap-1">
                 <Car className="h-3.5 w-3.5" />
                 {member.hasCar ? "車あり" : "車なし"}
@@ -39,13 +46,16 @@ export function MemberCard({ member }: Props) {
                 {member.capacity}人
               </div>
             </div>
-          </div>
 
-          <div className="text-right">
-            <div className="text-[10px] leading-none text-muted-foreground">
-              SOSo
+            {/* 余白を詰める: mt-2 -> mt-1 */}
+            <div className="mt-2 flex items-baseline gap-2">
+              <div className="text-[10px] leading-none text-muted-foreground">
+                SOSo
+              </div>
+              <div className="text-sm font-semibold leading-none">
+                {(member.sosoPoint ?? 0).toString()}pt
+              </div>
             </div>
-            <div className="text-sm font-semibold">{member.sosoPoint}pt</div>
           </div>
         </div>
       </CardContent>

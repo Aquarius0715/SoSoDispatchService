@@ -52,8 +52,6 @@ services:
       - ./services/soso-api/api/swagger.yaml:/swagger.yaml:ro
     depends_on:
       - soso-api
-
-  
-
+      
 volumes:
   db_data:
