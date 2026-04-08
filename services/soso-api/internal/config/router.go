@@ -136,6 +136,7 @@ func SetupRouter(cfg *Config) *echo.Echo {
 	eveG.GET("/:event_id", eventH.FindById)
 	eveG.POST("/:event_id/pickup", eventH.RegisterPickUp)
 	eveG.POST("/:event_id/return", eventH.RegisterReturn)
+	eveG.POST("/:event_id/both", eventH.RegisterBoth)
 	eveG.GET("/:event_id/detail", eventH.Detail)
 	eveG.GET("/:event_id/members", eventH.Members)
 	eveG.GET("/dispatch/me", calenderH.FindMyTransportEvents)
