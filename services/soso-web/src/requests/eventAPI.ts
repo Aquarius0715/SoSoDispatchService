@@ -11,17 +11,37 @@ export async function getEventDetail(eventId: string): Promise<EventDetail> {
   });
 }
 
+/** 参加者のみ登録（送り迎え不要） */
+export async function registerParticipant(eventId: string): Promise<void> {
+  await apiPost<void>(`/events/${eventId}/participate`, {}, { _auth: true, _csrf: true });
+}
+
 /** 行きドライバー登録 */
-export async function registerPickUp(eventId: string): Promise<void> {
-  await apiPost<void>(`/events/${eventId}/pickup`, {}, { _auth: true, _csrf: true });
+export async function registerGoDriver(eventId: string): Promise<void> {
+  await apiPost<void>(`/events/${eventId}/go-driver`, {}, { _auth: true, _csrf: true });
 }
 
 /** 帰りドライバー登録 */
-export async function registerReturn(eventId: string): Promise<void> {
-  await apiPost<void>(`/events/${eventId}/return`, {}, { _auth: true, _csrf: true });
+export async function registerReturnDriver(eventId: string): Promise<void> {
+  await apiPost<void>(`/events/${eventId}/return-driver`, {}, { _auth: true, _csrf: true });
 }
 
 /** 両方ドライバー登録 */
-export async function registerBoth(eventId: string): Promise<void> {
-  await apiPost<void>(`/events/${eventId}/both`, {}, { _auth: true, _csrf: true });
+export async function registerBothDriver(eventId: string): Promise<void> {
+  await apiPost<void>(`/events/${eventId}/both-driver`, {}, { _auth: true, _csrf: true });
+}
+
+/** 行き同乗者登録 */
+export async function registerGoRider(eventId: string): Promise<void> {
+  await apiPost<void>(`/events/${eventId}/go-rider`, {}, { _auth: true, _csrf: true });
+}
+
+/** 帰り同乗者登録 */
+export async function registerReturnRider(eventId: string): Promise<void> {
+  await apiPost<void>(`/events/${eventId}/return-rider`, {}, { _auth: true, _csrf: true });
+}
+
+/** 両方同乗者登録 */
+export async function registerBothRider(eventId: string): Promise<void> {
+  await apiPost<void>(`/events/${eventId}/both-rider`, {}, { _auth: true, _csrf: true });
 }
