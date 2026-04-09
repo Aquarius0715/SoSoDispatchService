@@ -186,25 +186,47 @@ func (h *EventHandler) ListByCalender(c echo.Context) error {
 
 -------------------------------------------------------------
 */
-func (h *EventHandler) RegisterPickUp(c echo.Context) error {
+func (h *EventHandler) RegisterParticipant(c echo.Context) error {
 	return h.registerDriver(c, func(ep *model.EventParticipant) {
 		ep.ParticipantStatus = true
+	})
+}
+
+func (h *EventHandler) RegisterGoDriver(c echo.Context) error {
+	return h.registerDriver(c, func(ep *model.EventParticipant) {
 		ep.GoDriverStatus = true
 	})
 }
 
-func (h *EventHandler) RegisterReturn(c echo.Context) error {
+func (h *EventHandler) RegisterReturnDriver(c echo.Context) error {
 	return h.registerDriver(c, func(ep *model.EventParticipant) {
-		ep.ParticipantStatus = true
 		ep.ReturnDriverStatus = true
 	})
 }
 
-func (h *EventHandler) RegisterBoth(c echo.Context) error {
+func (h *EventHandler) RegisterBothDriver(c echo.Context) error {
 	return h.registerDriver(c, func(ep *model.EventParticipant) {
-		ep.ParticipantStatus = true
-		ep.ReturnDriverStatus = true
 		ep.GoDriverStatus = true
+		ep.ReturnDriverStatus = true
+	})
+}
+
+func (h *EventHandler) RegisterGoRider(c echo.Context) error {
+	return h.registerDriver(c, func(ep *model.EventParticipant) {
+		ep.GoRiderStatus = true
+	})
+}
+
+func (h *EventHandler) RegisterReturnRider(c echo.Context) error {
+	return h.registerDriver(c, func(ep *model.EventParticipant) {
+		ep.ReturnRiderStatus = true
+	})
+}
+
+func (h *EventHandler) RegisterBothRider(c echo.Context) error {
+	return h.registerDriver(c, func(ep *model.EventParticipant) {
+		ep.GoRiderStatus = true
+		ep.ReturnRiderStatus = true
 	})
 }
 
@@ -280,7 +302,9 @@ func (h *EventHandler) Detail(c echo.Context) error {
 		returnDrivers []DriverDTO
 	)
 	for _, inf := range infos {
-		userNames = append(userNames, inf.UserName)
+		if inf.ParticipantStatus {
+			userNames = append(userNames, inf.UserName)
+		}
 		if inf.GoDriverStatus {
 			goCapSum += inf.Capacity
 			goDrivers = append(goDrivers, DriverDTO{Username: inf.UserName, Capacity: inf.Capacity})
