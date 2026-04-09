@@ -41,17 +41,21 @@
 - 各列の `false` は「その役割として無効/未登録」
 
 ## 表で表現（1行でできること）
-「参加者かつドライバー/同乗者」が **2行ではなく1行**で表現できる例：
+`participants_status` = 「イベント自体に参加するか」（送迎だけの人は `false`）。
+各役割は独立した boolean なので **1行で複数の役割を同時に表現**できる：
 
 | ケース | participants_status | go_driver_status | return_driver_status | go_rider_status | return_rider_status |
 |---|---|---|---|---|---|
-| 参加者のみ | `true` | `false` | `false` | `false` | `false` |
-| 行きドライバーのみ（迎え担当） | `true` | `true` | `false` | `false` | `false` |
-| 帰りドライバーのみ（送り担当） | `true` | `false` | `true` | `false` | `false` |
-| 両方ドライバー（行きも帰りも担当） | `true` | `true` | `true` | `false` | `false` |
-| 行き同乗のみ | `true` | `false` | `false` | `true` | `false` |
-| 帰り同乗のみ | `true` | `false` | `false` | `false` | `true` |
-| 行き帰り同乗 | `true` | `false` | `false` | `true` | `true` |
+| 参加者のみ（送り迎え不要） | `true` | `false` | `false` | `false` | `false` |
+| 参加＋行きドライバー | `true` | `true` | `false` | `false` | `false` |
+| 参加＋帰りドライバー | `true` | `false` | `true` | `false` | `false` |
+| 参加＋両方ドライバー | `true` | `true` | `true` | `false` | `false` |
+| 参加＋行き同乗 | `true` | `false` | `false` | `true` | `false` |
+| 参加＋帰り同乗 | `true` | `false` | `false` | `false` | `true` |
+| 参加＋行き帰り同乗 | `true` | `false` | `false` | `true` | `true` |
+| 送迎だけ（行きドライバー） | `false` | `true` | `false` | `false` | `false` |
+| 送迎だけ（帰りドライバー） | `false` | `false` | `true` | `false` | `false` |
+| 送迎だけ（両方ドライバー） | `false` | `true` | `true` | `false` | `false` |
 
 ## API/取得クエリへの影響（絞り込み条件）
 - 参加者一覧（event detail の `participants`）
