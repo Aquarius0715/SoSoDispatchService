@@ -108,11 +108,11 @@ func (r *EventParticipantRepository) Upsert(
 	return_rider_status)
 		VALUES (?, ?, ?, ?, ?, ?, ?)
 		ON DUPLICATE KEY UPDATE
-			participant_status    = VALUES(participant_status),
-			go_driver_status      = VALUES(go_driver_status),
-			return_driver_status  = VALUES(return_driver_status),     
-			go_rider_status       = VALUES(go_rider_status),          
-			return_rider_status   = VALUES(return_rider_status)
+			participant_status   = participant_status   OR VALUES(participant_status),
+			go_driver_status     = go_driver_status     OR VALUES(go_driver_status),
+			return_driver_status = return_driver_status OR VALUES(return_driver_status),
+			go_rider_status      = go_rider_status      OR VALUES(go_rider_status),
+			return_rider_status  = return_rider_status  OR VALUES(return_rider_status)
 	`
 
 	_, err := r.DB.ExecContext(ctx, q,
@@ -199,6 +199,7 @@ func (r *EventParticipantRepository) ExistsByEventAndUser(
 type ParticipantInfo struct {
 	UserName           string
 	Capacity           int
+	ParticipantStatus  bool
 	GoDriverStatus     bool
 	ReturnDriverStatus bool
 }
@@ -211,10 +212,10 @@ func (r *EventParticipantRepository) FetchUserInfos(
 ) ([]ParticipantInfo, error) {
 
 	const q = `
-		SELECT u.username, u.capacity, ep.go_driver_status, ep.return_driver_status
+		SELECT u.username, u.capacity, ep.participant_status, ep.go_driver_status, ep.return_driver_status
 		FROM event_participants AS ep
 		INNER JOIN users AS u ON u.id = ep.user_id
-		WHERE ep.event_id = ? AND ep.participant_status = 1`
+		WHERE ep.event_id = ?`
 
 	rows, err := r.DB.QueryContext(ctx, q, eventID)
 	if err != nil {
@@ -225,7 +226,7 @@ func (r *EventParticipantRepository) FetchUserInfos(
 	var list []ParticipantInfo
 	for rows.Next() {
 		var p ParticipantInfo
-		if err := rows.Scan(&p.UserName, &p.Capacity, &p.GoDriverStatus, &p.ReturnDriverStatus); err != nil {
+		if err := rows.Scan(&p.UserName, &p.Capacity, &p.ParticipantStatus, &p.GoDriverStatus, &p.ReturnDriverStatus); err != nil {
 			return nil, err
 		}
 		list = append(list, p)
@@ -243,7 +244,7 @@ type MemberInfo struct {
 	SoSoPoint int
 }
 
-// FetchMemberInfos returns event members (participant_status = 1)
+// FetchMemberInfos returns all event members
 // with their SoSo points in the same calendar.
 func (r *EventParticipantRepository) FetchMemberInfos(
 	ctx context.Context,
@@ -257,7 +258,7 @@ func (r *EventParticipantRepository) FetchMemberInfos(
 		INNER JOIN calender_memberships AS cm
 		     ON cm.calender_id = e.calender_id AND cm.user_id = ep.user_id
 		INNER JOIN users AS u ON u.id = ep.user_id
-		WHERE ep.event_id = ? AND ep.participant_status = 1
+		WHERE ep.event_id = ?
 	`
 
 	rows, err := r.DB.QueryContext(ctx, q, eventID)
