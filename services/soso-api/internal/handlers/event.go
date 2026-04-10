@@ -122,15 +122,12 @@ func (h *EventHandler) Create(c echo.Context) error {
 	}
 
 	// 参加者
-	registered := time.Now()
 	parts := make([]model.EventParticipant, len(req.ParticipantUserIDs))
 	for i, uid := range req.ParticipantUserIDs {
 		parts[i] = model.EventParticipant{
-			EventID:      ev.ID,
-			UserID:       uid,
-			Status:       model.Registered,
-			Type:         model.Participants,
-			RegisteredAt: registered,
+			EventID:           ev.ID,
+			UserID:            uid,
+			ParticipantStatus: true,
 		}
 	}
 	if err := h.EventParticipantRepo.BulkInsert(c.Request().Context(), parts); err != nil {
@@ -154,13 +151,15 @@ func (h *EventHandler) FindById(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusNotFound, "event not found")
 	}
 	// 参加者
-	ps, err := h.EventParticipantRepo.FindByEventIDAndType(c.Request().Context(), eid, model.Participants)
+	ps, err := h.EventParticipantRepo.FindByEventID(c.Request().Context(), eid)
 	if err != nil {
 		return err
 	}
-	ids := make([]string, len(ps))
-	for i, p := range ps {
-		ids[i] = p.UserID
+	var ids []string
+	for _, p := range ps {
+		if p.ParticipantStatus {
+			ids = append(ids, p.UserID)
+		}
 	}
 	resp := baseEventResponse(ev)
 	resp["participantUserIds"] = ids
@@ -182,32 +181,59 @@ func (h *EventHandler) ListByCalender(c echo.Context) error {
 }
 
 /*
-	-------------------------------------------------------------
-	  POST /events/:event_id/pickup   (迎え登録)
+-------------------------------------------------------------
+
+	POST /events/:event_id/pickup   (迎え登録)
 
 -------------------------------------------------------------
 */
-func (h *EventHandler) RegisterPickUp(c echo.Context) error {
-	return h.registerParticipant(c, model.Go) // Type.Go
+func (h *EventHandler) RegisterParticipant(c echo.Context) error {
+	return h.registerDriver(c, func(ep *model.EventParticipant) {
+		ep.ParticipantStatus = true
+	})
 }
 
-/*
-	-------------------------------------------------------------
-	  POST /events/:event_id/return  (送り登録)
-
--------------------------------------------------------------
-*/
-func (h *EventHandler) RegisterReturn(c echo.Context) error {
-	return h.registerParticipant(c, model.Return) // Type.Return
+func (h *EventHandler) RegisterGoDriver(c echo.Context) error {
+	return h.registerDriver(c, func(ep *model.EventParticipant) {
+		ep.GoDriverStatus = true
+	})
 }
 
-/*
-=============================================================
+func (h *EventHandler) RegisterReturnDriver(c echo.Context) error {
+	return h.registerDriver(c, func(ep *model.EventParticipant) {
+		ep.ReturnDriverStatus = true
+	})
+}
 
-	共通ロジック
-	=============================================================
-*/
-func (h *EventHandler) registerParticipant(c echo.Context, tp model.Type) error {
+func (h *EventHandler) RegisterBothDriver(c echo.Context) error {
+	return h.registerDriver(c, func(ep *model.EventParticipant) {
+		ep.GoDriverStatus = true
+		ep.ReturnDriverStatus = true
+	})
+}
+
+func (h *EventHandler) RegisterGoRider(c echo.Context) error {
+	return h.registerDriver(c, func(ep *model.EventParticipant) {
+		ep.GoRiderStatus = true
+	})
+}
+
+func (h *EventHandler) RegisterReturnRider(c echo.Context) error {
+	return h.registerDriver(c, func(ep *model.EventParticipant) {
+		ep.ReturnRiderStatus = true
+	})
+}
+
+func (h *EventHandler) RegisterBothRider(c echo.Context) error {
+	return h.registerDriver(c, func(ep *model.EventParticipant) {
+		ep.GoRiderStatus = true
+		ep.ReturnRiderStatus = true
+	})
+}
+
+// registerDriver は認証→EventParticipant組み立て→Upsert の共通ロジック。
+// setFields で呼び出し元がどの boolean を立てるか決める。
+func (h *EventHandler) registerDriver(c echo.Context, setFields func(*model.EventParticipant)) error {
 	eventID := c.Param("event_id")
 
 	/* ---- 認証ユーザ ID ---- */
@@ -221,19 +247,14 @@ func (h *EventHandler) registerParticipant(c echo.Context, tp model.Type) error 
 	}
 	userID := claims.Subject
 
-	/* ---- 1 行だけ Insert ---- */
+	/* ---- Upsert ---- */
 	ep := model.EventParticipant{
-		EventID:      eventID,
-		UserID:       userID,
-		Status:       model.Registered,
-		Type:         tp,
-		RegisteredAt: time.Now(),
+		EventID: eventID,
+		UserID:  userID,
 	}
+	setFields(&ep)
 
-	if err := h.EventParticipantRepo.BulkInsert(
-		c.Request().Context(),
-		[]model.EventParticipant{ep},
-	); err != nil {
+	if err := h.EventParticipantRepo.Upsert(c.Request().Context(), ep); err != nil {
 		return err
 	}
 	return c.NoContent(http.StatusCreated)
@@ -282,13 +303,14 @@ func (h *EventHandler) Detail(c echo.Context) error {
 		returnDrivers []DriverDTO
 	)
 	for _, inf := range infos {
-		switch inf.Type {
-		case model.Participants:
+		if inf.ParticipantStatus {
 			userNames = append(userNames, inf.UserName)
-		case model.Go:
+		}
+		if inf.GoDriverStatus {
 			goCapSum += inf.Capacity
 			goDrivers = append(goDrivers, DriverDTO{UserId: inf.UserID, Username: inf.UserName, Capacity: inf.Capacity})
-		case model.Return:
+		}
+		if inf.ReturnDriverStatus {
 			returnCapSum += inf.Capacity
 			returnDrivers = append(returnDrivers, DriverDTO{UserId: inf.UserID, Username: inf.UserName, Capacity: inf.Capacity})
 		}

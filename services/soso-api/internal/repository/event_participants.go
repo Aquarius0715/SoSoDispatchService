@@ -36,27 +36,28 @@ func (r *EventParticipantRepository) BulkInsert(
 		return fmt.Errorf("begin tx: %w", err)
 	}
 	defer func() {
-		// panic や中途 return に備えた保険
 		if p := recover(); p != nil {
 			_ = tx.Rollback()
 			panic(p)
 		}
 	}()
 
-	const cols = "(event_id, user_id, status, type, registered_at)"
+	const cols = "(event_id, user_id, participant_status, go_driver_status, return_driver_status, go_rider_status, return_rider_status)"
 	var (
 		valuePlaceholders []string
 		args              []interface{}
 	)
 
 	for _, ep := range participants {
-		valuePlaceholders = append(valuePlaceholders, "(?, ?, ?, ?, ?)")
+		valuePlaceholders = append(valuePlaceholders, "(?, ?, ?, ?, ?, ?, ?)")
 		args = append(args,
 			ep.EventID,
 			ep.UserID,
-			string(ep.Status), // ENUM は string として扱う
-			string(ep.Type),
-			ep.RegisteredAt,
+			ep.ParticipantStatus,
+			ep.GoDriverStatus,
+			ep.ReturnDriverStatus,
+			ep.GoRiderStatus,
+			ep.ReturnRiderStatus,
 		)
 	}
 
@@ -94,24 +95,56 @@ func isDuplicateError(err error) bool {
 	return false
 }
 
-func (r *EventParticipantRepository) FindByEventIDAndType(
+// Upsert inserts a new participant or updates the boolean status columns
+// if the (event_id, user_id) row already exists.
+func (r *EventParticipantRepository) Upsert(
+	ctx context.Context,
+	ep model.EventParticipant,
+) error {
+	const q = `
+		INSERT INTO event_participants
+			(event_id, user_id, participant_status,
+	go_driver_status, return_driver_status, go_rider_status,
+	return_rider_status)
+		VALUES (?, ?, ?, ?, ?, ?, ?)
+		ON DUPLICATE KEY UPDATE
+			participant_status   = participant_status   OR VALUES(participant_status),
+			go_driver_status     = go_driver_status     OR VALUES(go_driver_status),
+			return_driver_status = return_driver_status OR VALUES(return_driver_status),
+			go_rider_status      = go_rider_status      OR VALUES(go_rider_status),
+			return_rider_status  = return_rider_status  OR VALUES(return_rider_status)
+	`
+
+	_, err := r.DB.ExecContext(ctx, q,
+		ep.EventID,            // 1つ目の ?
+		ep.UserID,             // 2つ目の ?
+		ep.ParticipantStatus,  // 3つ目の ?
+		ep.GoDriverStatus,     // 4つ目の ?
+		ep.ReturnDriverStatus, // 5つ目の ?
+		ep.GoRiderStatus,      // 6つ目の ?
+		ep.ReturnRiderStatus,  // 7つ目の ?
+	)
+
+	return err
+}
+
+// FindByEventID returns all participants for an event.
+func (r *EventParticipantRepository) FindByEventID(
 	ctx context.Context,
 	eventID string,
-	pt model.Type,
 ) ([]*model.EventParticipant, error) {
 
 	const q = `
 		SELECT
-			event_id,
-			user_id,
-			status,
-			type,
-			registered_at
+			event_id, user_id,
+			participant_status, go_driver_status, return_driver_status,
+			go_rider_status, return_rider_status,
+			created_at, updated_at
 		FROM event_participants
-		WHERE event_id = ? AND type = ?
+		WHERE event_id = ?
 	`
 
-	rows, err := r.DB.QueryContext(ctx, q, eventID, string(pt))
+	rows, err := r.DB.QueryContext(ctx, q, eventID)
 	if err != nil {
 		return nil, err
 	}
@@ -123,9 +156,13 @@ func (r *EventParticipantRepository) FindByEventIDAndType(
 		if err := rows.Scan(
 			&ep.EventID,
 			&ep.UserID,
-			&ep.Status,
-			&ep.Type,
-			&ep.RegisteredAt,
+			&ep.ParticipantStatus,
+			&ep.GoDriverStatus,
+			&ep.ReturnDriverStatus,
+			&ep.GoRiderStatus,
+			&ep.ReturnRiderStatus,
+			&ep.CreatedAt,
+			&ep.UpdatedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -137,22 +174,20 @@ func (r *EventParticipantRepository) FindByEventIDAndType(
 	return list, nil
 }
 
-// 新規追加
-// ExistsByEventAndUser checks if a participant record exists for the given event and user
+// ExistsByEventAndUser checks if a participant record exists for the given event and user.
 func (r *EventParticipantRepository) ExistsByEventAndUser(
 	ctx context.Context,
 	eventID string,
 	userID string,
-	participantType model.Type,
 ) (bool, error) {
 	const q = `
 		SELECT COUNT(*)
 		FROM event_participants
-		WHERE event_id = ? AND user_id = ? AND type = ?
+		WHERE event_id = ? AND user_id = ?
 	`
 
 	var count int
-	err := r.DB.QueryRowContext(ctx, q, eventID, userID, string(participantType)).Scan(&count)
+	err := r.DB.QueryRowContext(ctx, q, eventID, userID).Scan(&count)
 	if err != nil {
 		return false, fmt.Errorf("check participant existence: %w", err)
 	}
@@ -162,21 +197,23 @@ func (r *EventParticipantRepository) ExistsByEventAndUser(
 
 /* 参加者とユーザー情報をまとめた DTO */
 type ParticipantInfo struct {
-	UserID   string
-	UserName string
-	Capacity int
-	Type     model.Type
+	UserID             string
+	UserName           string
+	Capacity           int
+	ParticipantStatus  bool
+	GoDriverStatus     bool
+	ReturnDriverStatus bool
 }
 
 // FetchUserInfos returns all participants of an event
-// together with their username and capacity.
+// together with their username, capacity, and driver statuses.
 func (r *EventParticipantRepository) FetchUserInfos(
 	ctx context.Context,
 	eventID string,
 ) ([]ParticipantInfo, error) {
 
 	const q = `
-		SELECT u.id, u.username, u.capacity, ep.type
+		SELECT u.id, u.username, u.capacity, ep.participant_status, ep.go_driver_status, ep.return_driver_status
 		FROM event_participants AS ep
 		INNER JOIN users AS u ON u.id = ep.user_id
 		WHERE ep.event_id = ?`
@@ -190,7 +227,7 @@ func (r *EventParticipantRepository) FetchUserInfos(
 	var list []ParticipantInfo
 	for rows.Next() {
 		var p ParticipantInfo
-		if err := rows.Scan(&p.UserID, &p.UserName, &p.Capacity, &p.Type); err != nil {
+		if err := rows.Scan(&p.UserID, &p.UserName, &p.Capacity, &p.ParticipantStatus, &p.GoDriverStatus, &p.ReturnDriverStatus); err != nil {
 			return nil, err
 		}
 		list = append(list, p)
@@ -208,7 +245,7 @@ type MemberInfo struct {
 	SoSoPoint int
 }
 
-// FetchMemberInfos returns event members (type = "participants")
+// FetchMemberInfos returns all event members
 // with their SoSo points in the same calendar.
 func (r *EventParticipantRepository) FetchMemberInfos(
 	ctx context.Context,
@@ -222,7 +259,7 @@ func (r *EventParticipantRepository) FetchMemberInfos(
 		INNER JOIN calender_memberships AS cm
 		     ON cm.calender_id = e.calender_id AND cm.user_id = ep.user_id
 		INNER JOIN users AS u ON u.id = ep.user_id
-		WHERE ep.event_id = ? AND ep.type = 'participants'
+		WHERE ep.event_id = ?
 	`
 
 	rows, err := r.DB.QueryContext(ctx, q, eventID)
