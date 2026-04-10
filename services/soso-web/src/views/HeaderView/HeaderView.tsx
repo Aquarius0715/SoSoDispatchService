@@ -12,21 +12,21 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Menu } from "lucide-react";
 
-import { CalendersSidebar } from "../SidebarView/CalenderListSidebarView/components/CalenderSidebar";
-import { CalenderDetailSidebar } from "../SidebarView/CalenderDetailSidebarView/CalenderDetailSidebar";
+import { CalendarsSidebar } from "../SidebarView/CalendarListSidebarView/components/CalendarSidebar";
+import { CalendarDetailSidebar } from "../SidebarView/CalendarDetailSidebarView/CalendarDetailSidebar";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 const UUID_RE =
   /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$/;
 
-function getCalenderIdFromPathname(pathname: string): string | null {
+function getCalendarIdFromPathname(pathname: string): string | null {
   // pathname examples:
-  // - /calenders
-  // - /calenders/<uuid>
-  // - /calenders/<uuid>/events
+  // - /calendars
+  // - /calendars/<uuid>
+  // - /calendars/<uuid>/events
   const parts = pathname.split("/").filter(Boolean);
-  if (parts[0] !== "calenders") return null;
+  if (parts[0] !== "calendars") return null;
 
   const id = parts[1];
   if (!id) return null;
@@ -36,7 +36,7 @@ function getCalenderIdFromPathname(pathname: string): string | null {
 
 export default function HeaderView() {
   const pathname = usePathname();
-  const calenderId = getCalenderIdFromPathname(pathname);
+  const calendarId = getCalendarIdFromPathname(pathname);
 
   return (
     <header className="w-full">
@@ -70,10 +70,10 @@ export default function HeaderView() {
               </DialogHeader>
 
               <div className="h-full border-r bg-background">
-                {calenderId ? (
-                  <CalenderDetailSidebar calenderId={calenderId} />
+                {calendarId ? (
+                  <CalendarDetailSidebar calendarId={calendarId} />
                 ) : (
-                  <CalendersSidebar />
+                  <CalendarsSidebar />
                 )}
               </div>
             </SheetContent>

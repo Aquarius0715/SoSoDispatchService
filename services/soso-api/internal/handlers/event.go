@@ -36,6 +36,7 @@ type EventCreateRequest struct {
 }
 
 type DriverDTO struct {
+	UserId   string `json:"userId"`
 	Username string `json:"username"`
 	Capacity int    `json:"capacity"`
 }
@@ -286,10 +287,10 @@ func (h *EventHandler) Detail(c echo.Context) error {
 			userNames = append(userNames, inf.UserName)
 		case model.Go:
 			goCapSum += inf.Capacity
-			goDrivers = append(goDrivers, DriverDTO{Username: inf.UserName, Capacity: inf.Capacity})
+			goDrivers = append(goDrivers, DriverDTO{UserId: inf.UserID, Username: inf.UserName, Capacity: inf.Capacity})
 		case model.Return:
 			returnCapSum += inf.Capacity
-			returnDrivers = append(returnDrivers, DriverDTO{Username: inf.UserName, Capacity: inf.Capacity})
+			returnDrivers = append(returnDrivers, DriverDTO{UserId: inf.UserID, Username: inf.UserName, Capacity: inf.Capacity})
 		}
 	}
 

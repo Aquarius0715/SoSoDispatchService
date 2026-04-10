@@ -1,11 +1,12 @@
 import Link from "next/link";
 
 type Props = {
-  searchParams?: { next?: string };
+  searchParams: Promise<{ next?: string }>;
 };
 
-export default function TokenExpiredPage({ searchParams }: Props) {
-  const next = searchParams?.next ?? "/";
+export default async function TokenExpiredPage({ searchParams }: Props) {
+  const { next } = await searchParams;
+  const nextPath = next ?? "/";
 
   return (
     <div className="flex w-full flex-col items-center justify-center text-center gap-4 px-6">
@@ -18,7 +19,7 @@ export default function TokenExpiredPage({ searchParams }: Props) {
       </p>
 
       <Link
-        href={`/auth/login?next=${encodeURIComponent(next)}`}
+        href={`/auth/login?next=${encodeURIComponent(nextPath)}`}
         className="mt-2 inline-flex items-center justify-center rounded-md bg-primary px-6 py-2 text-sm font-medium text-primary-foreground hover:opacity-90"
       >
         ログイン画面へ

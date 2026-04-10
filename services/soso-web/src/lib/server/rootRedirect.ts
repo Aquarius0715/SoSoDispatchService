@@ -13,5 +13,5 @@ export async function handleRootRedirect(): Promise<never> {
   }
 
   // RT があれば一旦アプリ側へ（詳細ページ側で必要なら検証）
-  redirect("/calenders");
+  redirect("/calendars");
 }
