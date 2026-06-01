@@ -125,6 +125,7 @@ func SetupRouter(cfg *Config) *echo.Echo {
 	calG.POST("/create", calenderH.Create)
 	calG.POST("/:calender_id/join", calenderMembershipH.Create)
 	calG.GET("/my", calenderH.FindMyCalenders)
+	calG.GET("/:calender_id", calenderH.FindById)
 	calG.GET("/:calender_id/members", calenderMembershipH.List)
 	calG.PUT("/:calender_id/members/:user_id/point", sosoPH.Update)
 	calG.POST("/:calender_id/events", eventH.Create)

@@ -25,3 +25,17 @@ export async function createCalendar(
     { _auth: true, _csrf: true }
   );
 }
+
+/** カレンダー詳細を取得（招待ページ表示用） */
+export async function getCalendarById(calendarId: string): Promise<Calendar> {
+  return apiGet<Calendar>(`/calendars/${calendarId}`, { _auth: true, _csrf: true });
+}
+
+/** カレンダーに参加 */
+export async function joinCalendar(calendarId: string): Promise<void> {
+  await apiPost<void, Record<string, never>>(
+    `/calendars/${calendarId}/join`,
+    {},
+    { _auth: true, _csrf: true }
+  );
+}

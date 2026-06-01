@@ -3,3 +3,5 @@ services/soso-api/config/.env
 node_modules/
 .cursorignore
 *.txt
+# 誤コミット防止: ローカルのプロジェクトダンプ
+project_dump.txt

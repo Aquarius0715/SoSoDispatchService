@@ -2,6 +2,7 @@
 "use client";
 
 import { Plus } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,8 +13,14 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useCalendarsListView } from "./useCalendarsListView";
 import { CalendarListItemCard } from "./components/CalendarListItemCard";
 import { CreateCalendarDialog } from "./components/CreateCalendarDialogView/CreateCalendarDialog";
+import { JoinCalendarDialog } from "./components/JoinCalendarDialogView/JoinCalandarDialog";
 
 export function CalendarsListView() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const inviteCalenderId = searchParams.get("calenderId");
+  const inviteOpen = Boolean(inviteCalenderId);
   const {
     calendars,
     isLoading,
@@ -25,7 +32,12 @@ export function CalendarsListView() {
     setNewCalendarDescription,
     create,
     createDisabled,
+    reload,
   } = useCalendarsListView();
+
+  const closeInvite = () => {
+    router.replace("/calendars");
+  };
 
   return (
     <div className="relative flex h-full flex-col">
@@ -92,6 +104,13 @@ export function CalendarsListView() {
         onChangeDescription={setNewCalendarDescription}
         onCreate={create}
         createDisabled={createDisabled}
+      />
+
+      <JoinCalendarDialog
+        open={inviteOpen}
+        calenderId={inviteCalenderId}
+        onClose={closeInvite}
+        onJoined={reload}
       />
     </div>
   );

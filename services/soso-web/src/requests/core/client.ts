@@ -6,6 +6,7 @@ import axios, {
 } from "axios";
 import Cookies from "js-cookie";
 import { getAccessToken, setAccessToken, clearAccessToken } from "./tokenStore";
+import { normalizeCalendarKeys } from "./normalize";
 
 // _auth/_csrf を AxiosRequestConfig に追加
 export type ApiRequestConfig<D = any> = AxiosRequestConfig<D> & {
@@ -172,7 +173,11 @@ apiClient.interceptors.request.use(
 // refresh 失敗 -> tokenexpired
 // ==============================
 apiClient.interceptors.response.use(
-  (response: AxiosResponse) => response,
+  (response: AxiosResponse) => {
+    // API 境界の綴り吸収: er(calenderId 等) -> ar(calendarId) へ正規化
+    response.data = normalizeCalendarKeys(response.data);
+    return response;
+  },
   async (error) => {
     if (!axios.isAxiosError(error)) return Promise.reject(error);
 

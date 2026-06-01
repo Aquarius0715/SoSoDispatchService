@@ -31,8 +31,7 @@ const EventAddDialog: React.FC<EventAddDialogProps> = ({
   calendarId,
   onSuccess
 }) => {
-  // ★ フックを使用: ロジックは全てここに隠蔽された
-  const { form, onSubmit, isSubmitting } = useEventAddDialog({
+  const { form, onSubmit, isSubmitting, members } = useEventAddDialog({
     calendarId,
     selectedDate,
     onSuccess,
@@ -57,7 +56,7 @@ const EventAddDialog: React.FC<EventAddDialogProps> = ({
             {/* Scrollable Inputs Area */}
             <div className="flex-1 min-h-0 overflow-y-auto">
               <div className="px-6 py-6">
-                <EventFormInputs control={form.control} />
+                <EventFormInputs control={form.control} participants={members} />
               </div>
             </div>
 

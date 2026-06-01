@@ -12,30 +12,17 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
-import { User } from "@/types/interfaces";
+import { CalendarMember } from "@/types/interfaces";
 
 import { EventAddValues } from "../schema";
 
-// 仮の参加者データ（本来は親からPropsで受け取るか、フックで取得する）
-// const MOCK_PARTICIPANTS = [
-//   { id: "1", name: "山田 太郎" },
-//   { id: "2", name: "鈴木 花子" },
-//   { id: "3", name: "佐藤 次郎" },
-// ];
-
-const MOCK_PARTICIPANTS: User[] = [
-  { id: "1", username: "山田 太郎", mailAddress: "yamada@example.com", hasCar: true, capacity: 1 },
-  { id: "2", username: "鈴木 花子", mailAddress: "suzuki@example.com", hasCar: false, capacity: 0 },
-  { id: "3", username: "佐藤 次郎", mailAddress: "sato@example.com", hasCar: true, capacity: 2 },
-];
-
 interface EventFormInputsProps {
   control: Control<EventAddValues>;
-  // 必要に応じて参加者リストもPropsで受け取る
-  // participants: { id: string; name: string }[];
+  // カレンダーの実メンバー（参加者候補）。親(useEventAddDialog)が API から取得して渡す。
+  participants: CalendarMember[];
 }
 
-export const EventFormInputs = ({ control }: EventFormInputsProps) => {
+export const EventFormInputs = ({ control, participants }: EventFormInputsProps) => {
   return (
     <div className="grid gap-4 py-4 px-1">
       {/* --- タイトル --- */}
@@ -204,34 +191,34 @@ export const EventFormInputs = ({ control }: EventFormInputsProps) => {
               <Users className="h-3.5 w-3.5" /> 参加者候補
             </FormLabel>
             <div className="border rounded-md p-4 space-y-3 bg-gray-50/50">
-              {MOCK_PARTICIPANTS.length > 0 ? (
-                MOCK_PARTICIPANTS.map((user) => (
+              {participants.length > 0 ? (
+                participants.map((member) => (
                   <FormField
-                    key={user.id}
+                    key={member.id}
                     control={control}
                     name="participantUserIds"
                     render={({ field }) => {
                       return (
                         <FormItem
-                          key={user.id}
+                          key={member.id}
                           className="flex flex-row items-start space-x-3 space-y-0"
                         >
                           <FormControl>
                             <Checkbox
-                              checked={field.value?.includes(user.id)}
+                              checked={field.value?.includes(member.id)}
                               onCheckedChange={(checked) => {
                                 return checked
-                                  ? field.onChange([...field.value, user.id])
+                                  ? field.onChange([...field.value, member.id])
                                   : field.onChange(
                                       field.value?.filter(
-                                        (value) => value !== user.id
+                                        (value) => value !== member.id
                                       )
                                     );
                               }}
                             />
                           </FormControl>
                           <FormLabel className="font-normal cursor-pointer">
-                            {user.username}
+                            {member.username}
                           </FormLabel>
                         </FormItem>
                       );
