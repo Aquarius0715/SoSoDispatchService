@@ -1,9 +1,11 @@
 'use client';
 
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createEvent } from "@/requests/eventAPI";
-import { EventCreateRequest } from "@/types/interfaces";
+import { listCalendarMembers } from "@/requests/calendarDetailAPI";
+import { CalendarMember, EventCreateRequest } from "@/types/interfaces";
 import { eventAddSchema, type EventAddValues } from "./schema";
 import { useSnackbar } from "@/components/ui/snackbar";
 import axios from "axios";
@@ -22,6 +24,27 @@ export const useEventAddDialog = ({
   onClose,
 }: UseEventAddDialogProps) => {
   const { showSnackbar } = useSnackbar();
+
+  // 参加者候補は「このカレンダーの実メンバー」を API から取得する。
+  // ここで得る member.id はバックエンドで users.id にマッピングされた値なので、
+  // そのまま participantUserIds として送れば FK 制約(fk_rp_user)を満たす。
+  const [members, setMembers] = useState<CalendarMember[]>([]);
+
+  useEffect(() => {
+    if (!calendarId) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const list = await listCalendarMembers(calendarId);
+        if (!cancelled) setMembers(list);
+      } catch {
+        if (!cancelled) setMembers([]);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [calendarId]);
 
   const form = useForm<EventAddValues>({
     resolver: zodResolver(eventAddSchema) as any,
@@ -76,5 +99,6 @@ export const useEventAddDialog = ({
     form,
     onSubmit,
     isSubmitting: form.formState.isSubmitting,
+    members,
   };
 };
