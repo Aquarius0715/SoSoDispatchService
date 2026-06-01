@@ -4,9 +4,9 @@ import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 
-import type { Calender } from "@/types/interfaces";
+import type { Calendar } from "@/types/interfaces";
 import { useSnackbar } from "@/components/ui/snackbar";
-import { getCalenderById, joinCalender } from "@/requests/calenderAPI";
+import { getCalendarById, joinCalendar } from "@/requests/calendarAPI";
 
 const toErrorMessage = (error: unknown): string => {
   if (axios.isAxiosError(error)) {
@@ -29,14 +29,14 @@ export function useJoinCalendarDialog({ open, calenderId, onClose, onJoined }: A
   const router = useRouter();
   const { showSnackbar } = useSnackbar();
 
-  const [calender, setCalender] = useState<Calender | null>(null);
+  const [calendar, setCalendar] = useState<Calendar | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [hasLoadError, setHasLoadError] = useState(false);
   const [isJoining, setIsJoining] = useState(false);
 
   useEffect(() => {
     if (!open || !calenderId) {
-      setCalender(null);
+      setCalendar(null);
       setHasLoadError(false);
       setIsLoading(false);
       return;
@@ -48,8 +48,8 @@ export function useJoinCalendarDialog({ open, calenderId, onClose, onJoined }: A
       setIsLoading(true);
       setHasLoadError(false);
       try {
-        const c = await getCalenderById(calenderId);
-        if (!cancelled) setCalender(c);
+        const c = await getCalendarById(calenderId);
+        if (!cancelled) setCalendar(c);
       } catch (e) {
         if (cancelled) return;
 
@@ -79,7 +79,7 @@ export function useJoinCalendarDialog({ open, calenderId, onClose, onJoined }: A
 
     setIsJoining(true);
     try {
-      await joinCalender(calenderId);
+      await joinCalendar(calenderId);
 
       showSnackbar("カレンダーに参加しました", "success");
       await onJoined(); // 一覧を更新
@@ -98,5 +98,5 @@ export function useJoinCalendarDialog({ open, calenderId, onClose, onJoined }: A
     }
   }, [calenderId, onClose, onJoined, showSnackbar]);
 
-  return { calender, isLoading, hasLoadError, isJoining, onJoin, onBack };
+  return { calendar, isLoading, hasLoadError, isJoining, onJoin, onBack };
 }

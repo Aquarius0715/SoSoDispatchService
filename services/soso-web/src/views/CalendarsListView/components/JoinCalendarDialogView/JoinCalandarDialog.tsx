@@ -17,7 +17,7 @@ type Props = {
 };
 
 export function JoinCalendarDialog({ open, calenderId, onClose, onJoined }: Props) {
-  const { calender, isLoading, isJoining, hasLoadError, onJoin, onBack } =
+  const { calendar, isLoading, isJoining, hasLoadError, onJoin, onBack } =
     useJoinCalendarDialog({
       open,
       calenderId,
@@ -25,9 +25,9 @@ export function JoinCalendarDialog({ open, calenderId, onClose, onJoined }: Prop
       onJoined,
     });
 
-  const title = calender?.name ?? "カレンダー";
-  const description = calender?.description?.trim()
-    ? calender.description
+  const title = calendar?.name ?? "カレンダー";
+  const description = calendar?.description?.trim()
+    ? calendar.description
     : "説明はありません";
 
   return (
