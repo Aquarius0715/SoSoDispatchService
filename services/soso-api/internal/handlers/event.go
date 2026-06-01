@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"errors"
 	"net/http"
 	"time"
 
@@ -234,6 +235,9 @@ func (h *EventHandler) registerParticipant(c echo.Context, tp model.Type) error 
 		c.Request().Context(),
 		[]model.EventParticipant{ep},
 	); err != nil {
+		if errors.Is(err, repository.ErrDuplicateEntry) {
+			return echo.NewHTTPError(http.StatusConflict, "already registered")
+		}
 		return err
 	}
 	return c.NoContent(http.StatusCreated)
