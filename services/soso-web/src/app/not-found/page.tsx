@@ -30,7 +30,7 @@ export default function NotFoundPage() {
 
         <CardFooter className="flex justify-end gap-2">
           <Button asChild variant="outline">
-            <Link href="/calenders">カレンダーへ戻る</Link>
+            <Link href="/calendars">カレンダーへ戻る</Link>
           </Button>
           <Button asChild>
             <Link href="/">トップへ</Link>
