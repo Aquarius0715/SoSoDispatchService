@@ -70,11 +70,15 @@ CREATE TABLE `events` (
 
 -- 5. event_participants テーブル
 CREATE TABLE `event_participants` (
-  `event_id`             VARCHAR(36)                        NOT NULL,
-  `user_id`              VARCHAR(36)                        NOT NULL,
-  `status`               ENUM('registered','cancelled')     NOT NULL DEFAULT 'registered',
-  `type`                 ENUM('participants', 'go', 'return') NOT NULL,
-  `registered_at`        DATETIME(6)                        NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  `event_id`              VARCHAR(36)   NOT NULL,
+  `user_id`               VARCHAR(36)   NOT NULL,
+  `participant_status`    TINYINT(1)    NOT NULL DEFAULT 0,
+  `go_driver_status`      TINYINT(1)    NOT NULL DEFAULT 0,
+  `return_driver_status`  TINYINT(1)    NOT NULL DEFAULT 0,
+  `go_rider_status`       TINYINT(1)    NOT NULL DEFAULT 0,
+  `return_rider_status`   TINYINT(1)    NOT NULL DEFAULT 0,
+  `created_at`            DATETIME(6)   NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  `updated_at`            DATETIME(6)   NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
   PRIMARY KEY (`event_id`,`user_id`),
   INDEX `idx_rp_user` (`user_id`),
   CONSTRAINT `fk_rp_event`
